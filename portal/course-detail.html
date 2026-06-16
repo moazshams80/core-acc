@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Course — CORE Academy Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="course-detail" data-title="Course">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <a href="courses.html" class="muted" style="font-weight:700;display:inline-block;margin-bottom:16px;">← Back to courses</a>
+
+        <section class="card card-pad" id="courseHead" style="margin-bottom:22px;"></section>
+
+        <div class="tabs">
+          <button class="active" data-tab="tab-overview" data-tab-group="cd">Overview</button>
+          <button data-tab="tab-modules" data-tab-group="cd">Modules</button>
+          <button data-tab="tab-materials" data-tab-group="cd">Materials</button>
+          <button data-tab="tab-discussion" data-tab-group="cd">Discussion</button>
+        </div>
+
+        <div id="tab-overview" class="tab-panel active" data-tab-panel-group="cd"></div>
+        <div id="tab-modules" class="tab-panel" data-tab-panel-group="cd"></div>
+        <div id="tab-materials" class="tab-panel" data-tab-panel-group="cd">
+          <div class="empty-state"><div class="es-ico">📂</div><h3>Materials coming soon</h3><p>Downloadable resources for this course will appear here.</p></div>
+        </div>
+        <div id="tab-discussion" class="tab-panel" data-tab-panel-group="cd">
+          <div class="empty-state"><div class="es-ico">💬</div><h3>Discussion is quiet</h3><p>Start a thread with your instructor and classmates.</p></div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="mock-data.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    var id = new URLSearchParams(location.search).get("id");
+    var course = courseById(id) || courses[0];
+    document.body.setAttribute("data-title", course.title);
+    var h1 = document.querySelector("#portalHeader h1"); if (h1) h1.textContent = course.title;
+
+    // Header
+    document.getElementById("courseHead").innerHTML =
+      '<div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;">' +
+        '<span class="course-icon" style="margin:0;" aria-hidden="true">' + course.icon + "</span>" +
+        '<div class="grow" style="flex:1;min-width:240px;">' +
+          '<div class="between"><h2 class="section-title" style="font-size:24px;">' + esc(course.title) + "</h2>" + badgeHTML(course.status) + "</div>" +
+          '<p class="muted" style="margin:6px 0 14px;">' + esc(course.instructor) + " &middot; Enrolled " + esc(course.enrolledOn) + "</p>" +
+          progressHTML(course.progress, true) +
+        "</div>" +
+      "</div>";
+
+    // Overview
+    document.getElementById("tab-overview").innerHTML =
+      '<div class="card card-pad"><p>' + esc(course.description) + "</p>" +
+      '<h3 style="color:var(--core-navy);margin:18px 0 10px;">Learning Outcomes</h3>' +
+      '<ul class="checklist">' + course.outcomes.map(function (o) { return "<li>" + esc(o) + "</li>"; }).join("") + "</ul>" +
+      '<div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap;">' + course.tags.map(function (tg) { return '<span class="tag">' + esc(tg) + "</span>"; }).join("") + "</div></div>";
+
+    // Modules accordion
+    var lessonIcon = { video: "▶", reading: "📄" };
+    document.getElementById("tab-modules").innerHTML = course.modules.map(function (m, i) {
+      var lessons = m.lessons.map(function (l) {
+        var ic = l.done ? '<span class="lic done">✓</span>' : '<span class="lic">' + lessonIcon[l.type] + "</span>";
+        return '<div class="lesson">' + ic + "<span>" + esc(l.title) + '</span><span class="len">' + esc(l.length) + "</span></div>";
+      }).join("");
+      var doneCount = m.lessons.filter(function (l) { return l.done; }).length;
+      return '<div class="accordion-item' + (i === 0 ? " open" : "") + '">' +
+        '<button class="accordion-head"><span>' + esc(m.title) + '</span>' +
+        '<span class="muted" style="font-weight:700;font-size:13px;">' + doneCount + "/" + m.lessons.length + ' &nbsp;<span class="chev">▾</span></span></button>' +
+        '<div class="accordion-body">' + lessons + "</div></div>";
+    }).join("");
+  </script>
+</body>
+</html>

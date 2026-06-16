@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Assignments — CORE Academy Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="assignments">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <div class="filter-tabs" id="filters">
+          <button class="active" data-filter="all">All</button>
+          <button data-filter="pending">Pending</button>
+          <button data-filter="submitted">Submitted</button>
+          <button data-filter="graded">Graded</button>
+        </div>
+
+        <section class="card card-pad">
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Assignment</th><th>Course</th><th>Due</th><th>Status</th><th>Grade / Action</th></tr></thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+          <div id="empty"></div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Submit modal -->
+  <div class="portal-modal" id="submitModal">
+    <div class="backdrop" data-modal-close></div>
+    <div class="modal-card">
+      <div class="modal-head"><h3>Submit Assignment</h3><button class="modal-close" data-modal-close aria-label="Close">×</button></div>
+      <p class="muted" id="submitFor" style="margin-top:0;"></p>
+      <form class="stack" onsubmit="event.preventDefault(); document.getElementById('submitModal').classList.remove('open'); alert('Assignment submitted! (demo)');">
+        <div><label class="field-label">Notes for your instructor</label><textarea class="textarea" placeholder="Add any notes about your submission…"></textarea></div>
+        <div><label class="field-label">Upload file</label><input class="input" type="file" /></div>
+        <button type="submit" class="btn btn-primary btn-block">Submit Assignment</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="mock-data.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    function render(filter) {
+      var list = assignments.filter(function (a) { return filter === "all" || a.status === filter; });
+      var tbody = document.getElementById("rows");
+      var empty = document.getElementById("empty");
+      if (!list.length) {
+        tbody.innerHTML = "";
+        empty.innerHTML = '<div class="empty-state"><div class="es-ico">✅</div><h3>Nothing here</h3><p>No assignments match this filter.</p></div>';
+        return;
+      }
+      empty.innerHTML = "";
+      tbody.innerHTML = list.map(function (a) {
+        var course = courseById(a.courseId);
+        var soon = a.status === "pending" && daysUntil(a.dueDate) <= 2 && daysUntil(a.dueDate) >= 0;
+        var due = '<span class="' + (soon ? "due-soon" : "") + '">' + prettyDate(a.dueDate) + (soon ? " ⚠" : "") + "</span>";
+        var action;
+        if (a.status === "graded") action = '<span class="badge badge-success">' + esc(a.grade) + "</span>";
+        else if (a.status === "submitted") action = '<span class="muted">Awaiting grade</span>';
+        else action = '<button class="btn btn-primary btn-sm" data-modal-open="submitModal" data-title="' + esc(a.title) + '">Submit</button>';
+        return "<tr><td><b>" + esc(a.title) + "</b></td>" +
+          '<td><span class="tag">' + esc(course.title) + "</span></td>" +
+          "<td>" + due + "</td>" +
+          "<td>" + badgeHTML(a.status) + "</td>" +
+          "<td>" + action + "</td></tr>";
+      }).join("");
+    }
+    var filterBar = document.getElementById("filters");
+    function setActive(filter) {
+      filterBar.querySelectorAll("button").forEach(function (x) {
+        x.classList.toggle("active", x.getAttribute("data-filter") === filter);
+      });
+    }
+    filterBar.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-filter]"); if (!b) return;
+      setActive(b.getAttribute("data-filter"));
+      render(b.getAttribute("data-filter"));
+    });
+    // set modal subtitle to the assignment being submitted
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest('[data-modal-open="submitModal"]');
+      if (b) document.getElementById("submitFor").textContent = b.getAttribute("data-title");
+    });
+    // honor ?filter= deep links (e.g. from the dashboard)
+    var valid = ["all", "pending", "submitted", "graded"];
+    var initial = new URLSearchParams(location.search).get("filter");
+    if (valid.indexOf(initial) === -1) initial = "all";
+    setActive(initial);
+    render(initial);
+  </script>
+</body>
+</html>

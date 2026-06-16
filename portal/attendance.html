@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attendance — CORE Academy Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="attendance">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <div class="row-2" style="margin-bottom:22px;">
+          <section class="card card-pad">
+            <h2 class="section-title" style="font-size:20px;margin-bottom:18px;">Overall Attendance</h2>
+            <div class="donut-wrap">
+              <div class="donut" id="donut"></div>
+              <div>
+                <p style="margin:0 0 6px;font-weight:800;color:var(--core-navy);font-size:18px;">Great consistency!</p>
+                <p class="muted" style="margin:0;">You've attended 15 of 16 scheduled sessions this month.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="card card-pad">
+            <h2 class="section-title" style="font-size:20px;margin-bottom:18px;">June 2026</h2>
+            <div class="calendar" id="calendar"></div>
+            <div class="legend">
+              <span><i style="background:#e4f6ec;border:1px solid #bfe6cd;"></i> Present</span>
+              <span><i style="background:#fdecec;border:1px solid #f6c9c9;"></i> Absent</span>
+              <span><i style="background:var(--core-bg);border:1px solid var(--core-border);"></i> No session</span>
+              <span><i style="outline:2px solid var(--core-cyan);"></i> Today</span>
+            </div>
+          </section>
+        </div>
+
+        <section class="card card-pad">
+          <h2 class="section-title" style="font-size:20px;margin-bottom:16px;">Session Log</h2>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Date</th><th>Course</th><th>Session</th><th>Status</th></tr></thead>
+              <tbody id="log"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="mock-data.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    // Donut
+    var r = 54, C = 2 * Math.PI * r, dash = (overallAttendance / 100) * C;
+    document.getElementById("donut").innerHTML =
+      '<svg width="140" height="140" viewBox="0 0 140 140">' +
+        '<circle cx="70" cy="70" r="' + r + '" fill="none" stroke="var(--core-border)" stroke-width="14"/>' +
+        '<circle cx="70" cy="70" r="' + r + '" fill="none" stroke="var(--core-cyan)" stroke-width="14" stroke-linecap="round" ' +
+          'stroke-dasharray="' + dash.toFixed(1) + " " + C.toFixed(1) + '"/>' +
+      "</svg>" +
+      '<div class="center"><strong>' + overallAttendance + '%</strong><span>Attendance</span></div>';
+
+    // Calendar (June 2026)
+    var byDate = {};
+    attendanceRecords.forEach(function (rec) { byDate[rec.date] = rec.status; });
+    var year = 2026, month = 5; // June (0-indexed)
+    var firstDow = new Date(year, month, 1).getDay();
+    var days = new Date(year, month + 1, 0).getDate();
+    var todayStr = "2026-06-16";
+    var heads = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(function (h) { return '<div class="cal-h">' + h + "</div>"; }).join("");
+    var cells = "";
+    for (var i = 0; i < firstDow; i++) cells += '<div class="cal-day empty"></div>';
+    for (var d = 1; d <= days; d++) {
+      var ds = year + "-06-" + String(d).padStart(2, "0");
+      var st = byDate[ds] || "";
+      var cls = "cal-day " + st + (ds === todayStr ? " today" : "");
+      cells += '<div class="' + cls.trim() + '">' + d + "</div>";
+    }
+    document.getElementById("calendar").innerHTML = heads + cells;
+
+    // Session log
+    document.getElementById("log").innerHTML = attendanceRecords.slice().reverse().map(function (rec) {
+      var course = courseById(rec.courseId);
+      return "<tr><td>" + prettyDate(rec.date) + "</td>" +
+        '<td><span class="tag">' + esc(course.title) + "</span></td>" +
+        "<td>Class Session</td>" +
+        "<td>" + badgeHTML(rec.status) + "</td></tr>";
+    }).join("");
+  </script>
+</body>
+</html>

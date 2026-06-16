@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Courses — CORE Academy Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="courses">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <div class="filter-tabs" id="filters">
+          <button class="active" data-filter="all">All</button>
+          <button data-filter="in-progress">In Progress</button>
+          <button data-filter="completed">Completed</button>
+          <button data-filter="not-started">Not Started</button>
+        </div>
+
+        <div class="grid grid-3" id="courseGrid"></div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="mock-data.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    var actionFor = { "in-progress": "Continue", completed: "Review", "not-started": "Start" };
+    function render(filter) {
+      var list = courses.filter(function (c) { return filter === "all" || c.status === filter; });
+      var grid = document.getElementById("courseGrid");
+      if (!list.length) { grid.innerHTML = '<div class="empty-state"><div class="es-ico">📭</div><h3>No courses here</h3><p>Try a different filter.</p></div>'; return; }
+      grid.innerHTML = list.map(function (c) {
+        return '<article class="course-card">' +
+          '<span class="corner">' + badgeHTML(c.status) + "</span>" +
+          '<span class="course-icon" aria-hidden="true">' + c.icon + "</span>" +
+          "<h3>" + esc(c.title) + "</h3>" +
+          '<p class="muted" style="font-size:13px;margin:0 0 14px;">' + esc(c.instructor) + "</p>" +
+          progressHTML(c.progress, true) +
+          '<a class="btn btn-primary btn-sm btn-block" style="margin-top:16px;" href="course-detail.html?id=' + c.id + '">' + actionFor[c.status] + "</a>" +
+          "</article>";
+      }).join("");
+    }
+    var filterBar = document.getElementById("filters");
+    function setActive(filter) {
+      filterBar.querySelectorAll("button").forEach(function (x) {
+        x.classList.toggle("active", x.getAttribute("data-filter") === filter);
+      });
+    }
+    filterBar.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-filter]"); if (!b) return;
+      setActive(b.getAttribute("data-filter"));
+      render(b.getAttribute("data-filter"));
+    });
+    // honor ?filter= deep links (e.g. from the dashboard)
+    var valid = ["all", "in-progress", "completed", "not-started"];
+    var initial = new URLSearchParams(location.search).get("filter");
+    if (valid.indexOf(initial) === -1) initial = "all";
+    setActive(initial);
+    render(initial);
+  </script>
+</body>
+</html>

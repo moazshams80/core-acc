@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grades — CORE Academy Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="grades">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <div class="row-2" style="margin-bottom:22px;">
+          <section class="card card-pad" style="text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center;">
+            <p class="kicker">Overall Grade</p>
+            <div class="grade-big" id="gpa"></div>
+            <p class="muted" style="margin-top:8px;">Across all active courses</p>
+          </section>
+          <section class="card card-pad">
+            <h2 class="section-title" style="font-size:20px;margin-bottom:6px;">Grade Distribution</h2>
+            <p class="muted" style="margin:0 0 6px;font-size:13px;">Overall grade per course</p>
+            <div class="bars" id="bars"></div>
+          </section>
+        </div>
+
+        <section class="card card-pad">
+          <h2 class="section-title" style="font-size:20px;margin-bottom:16px;">Course Breakdown</h2>
+          <p class="muted" style="margin:-8px 0 16px;font-size:13px;">Click a course to see individual assignment grades.</p>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Course</th><th>Assignments</th><th>Labs</th><th>Final</th><th>Overall</th></tr></thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="mock-data.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    var gradeVal = { "A": 95, "A−": 90, "B+": 87, "B": 83, "B−": 80, "C+": 77, "C": 73 };
+    function gradeBadge(g) {
+      var cls = "badge-neutral";
+      if (g[0] === "A") cls = "badge-success"; else if (g[0] === "B") cls = "badge-info"; else if (g[0] === "C") cls = "badge-warning";
+      return '<span class="badge ' + cls + '">' + esc(g) + "</span>";
+    }
+
+    document.getElementById("gpa").textContent = overallGrade;
+
+    // Bar chart
+    document.getElementById("bars").innerHTML = grades.map(function (g) {
+      var course = courseById(g.courseId);
+      var h = (gradeVal[g.overallGrade] || 70);
+      return '<div class="bar"><div class="col" style="height:' + h + '%"></div>' +
+        '<div class="lbl">' + esc(course.icon) + "<br>" + esc(g.overallGrade) + "</div></div>";
+    }).join("");
+
+    // Breakdown table with expandable rows
+    var rows = "";
+    grades.forEach(function (g, idx) {
+      var course = courseById(g.courseId);
+      var detailId = "detail-" + g.courseId;
+      var graded = assignments.filter(function (a) { return a.courseId === g.courseId && a.status === "graded"; });
+      var detailInner = graded.length
+        ? graded.map(function (a) { return '<div class="between" style="padding:8px 0;border-bottom:1px solid var(--core-border);"><span>' + esc(a.title) + "</span>" + gradeBadge(a.grade) + "</div>"; }).join("")
+        : '<p class="muted" style="margin:0;">No graded assignments yet.</p>';
+      rows += '<tr class="clickable-row" data-detail="' + detailId + '"><td><b>' + esc(course.title) + '</b> <span class="muted">▾</span></td>' +
+        "<td>" + esc(g.assignmentsAvg) + "</td><td>" + esc(g.labsAvg) + "</td><td>" + esc(g.finalGrade) + "</td><td>" + gradeBadge(g.overallGrade) + "</td></tr>";
+      rows += '<tr id="' + detailId + '" style="display:none;"><td colspan="5" style="background:var(--core-bg);"><b style="display:block;margin-bottom:6px;">Assignment grades</b>' + detailInner + "</td></tr>";
+    });
+    document.getElementById("rows").innerHTML = rows;
+    document.getElementById("rows").addEventListener("click", function (e) {
+      var tr = e.target.closest("[data-detail]"); if (!tr) return;
+      var d = document.getElementById(tr.getAttribute("data-detail"));
+      d.style.display = d.style.display === "none" ? "table-row" : "none";
+    });
+  </script>
+</body>
+</html>

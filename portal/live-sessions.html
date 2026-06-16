@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Sessions — CORE Academy Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="live-sessions">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <h2 class="section-title" style="font-size:20px;margin-bottom:16px;">Upcoming Sessions</h2>
+        <div class="grid grid-3" id="upcoming" style="margin-bottom:32px;"></div>
+
+        <h2 class="section-title" style="font-size:20px;margin-bottom:16px;">Past Sessions</h2>
+        <section class="card card-pad">
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Session</th><th>Course</th><th>Date</th><th>Duration</th><th></th></tr></thead>
+              <tbody id="past"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="mock-data.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    // Upcoming cards
+    document.getElementById("upcoming").innerHTML = liveSessions.filter(function (s) { return !s.past; }).map(function (s) {
+      var course = courseById(s.courseId);
+      var btn = s.joinable
+        ? '<a class="btn btn-primary btn-sm btn-block" href="#">Join Session</a>'
+        : '<button class="btn btn-primary btn-sm btn-block is-disabled" disabled>Join Session</button>';
+      var cd = '<span class="badge ' + (s.joinable ? "badge-cyan" : "badge-neutral") + '">' + esc(s.countdown) + "</span>";
+      return '<article class="course-card"><span class="corner">' + cd + "</span>" +
+        '<span class="tag">' + esc(course.title) + "</span>" +
+        '<h3 style="margin-top:12px;">' + esc(s.title) + "</h3>" +
+        '<p style="font-size:18px;font-weight:800;color:var(--core-blue);margin:4px 0;">' + esc(s.when) + "</p>" +
+        '<p class="muted" style="font-size:13px;margin:0 0 16px;">' + esc(s.instructor) + "</p>" +
+        btn + "</article>";
+    }).join("");
+
+    // Past sessions table
+    document.getElementById("past").innerHTML = liveSessions.filter(function (s) { return s.past; }).map(function (s) {
+      var course = courseById(s.courseId);
+      return "<tr><td><b>" + esc(s.title) + "</b></td>" +
+        '<td><span class="tag">' + esc(course.title) + "</span></td>" +
+        "<td>" + esc(s.when) + "</td>" +
+        "<td>" + esc(s.duration) + "</td>" +
+        '<td><a class="card-link" style="color:var(--core-blue);font-weight:800;" href="#">▶ Watch Recording</a></td></tr>";
+    }).join("");
+  </script>
+</body>
+</html>

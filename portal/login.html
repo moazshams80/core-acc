@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Login — CORE Academy Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body>
+  <div class="login-wrap">
+    <!-- Left branded panel -->
+    <aside class="login-aside">
+      <span class="brand-mark">C</span>
+      <h1>Welcome back,<br />future engineer.</h1>
+      <p>Pick up your training where you left off — courses, live sessions, assignments, and your verified certificates, all in one place.</p>
+      <!-- decorative circuit/network lines -->
+      <svg width="320" height="160" viewBox="0 0 320 160" fill="none" aria-hidden="true" style="margin-top:36px;opacity:.5;">
+        <g stroke="#22a7e0" stroke-width="1.5">
+          <path d="M10 130 H110 L150 90 H250" />
+          <path d="M10 80 H70 L100 50 H300" />
+          <path d="M40 150 V110 L80 70" />
+        </g>
+        <g fill="#22a7e0">
+          <circle cx="110" cy="130" r="4" /><circle cx="150" cy="90" r="4" /><circle cx="250" cy="90" r="4" />
+          <circle cx="70" cy="80" r="4" /><circle cx="100" cy="50" r="4" /><circle cx="80" cy="70" r="4" />
+        </g>
+      </svg>
+    </aside>
+
+    <!-- Right form panel -->
+    <main class="login-form-panel">
+      <div class="login-form-card card card-pad">
+        <p class="kicker">Student Portal</p>
+        <h2 class="section-title" style="margin-bottom:6px;">Student Login</h2>
+        <p class="muted" style="margin:0 0 22px;font-size:14px;">Enter any details — this is a demo portal.</p>
+
+        <form id="loginForm" class="stack" autocomplete="off">
+          <div>
+            <label class="field-label" for="who">Student ID or Email</label>
+            <input class="input" id="who" type="text" placeholder="CA-2024-0317" required />
+          </div>
+          <div>
+            <label class="field-label" for="pwd">Password</label>
+            <div class="password-field">
+              <input class="input" id="pwd" type="password" placeholder="••••••••" required />
+              <button type="button" class="toggle-pass" id="togglePass" aria-label="Show password">👁️</button>
+            </div>
+          </div>
+          <div class="login-row">
+            <label><input type="checkbox" id="remember" /> Remember me</label>
+            <a href="#">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Log In</button>
+          <div class="divider">or</div>
+          <p style="text-align:center;margin:0;font-size:14px;" class="muted">
+            New student? <a href="#" style="color:var(--core-blue);font-weight:700;">Start registration</a>
+          </p>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Show / hide password
+    document.getElementById("togglePass").addEventListener("click", function () {
+      var p = document.getElementById("pwd");
+      var show = p.type === "password";
+      p.type = show ? "text" : "password";
+      this.textContent = show ? "🙈" : "👁️";
+      this.setAttribute("aria-label", show ? "Hide password" : "Show password");
+    });
+    // Login always "succeeds": set session flag + go to dashboard
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      try { sessionStorage.setItem("coreSession", "1"); } catch (err) {}
+      window.location.href = "dashboard.html";
+    });
+  </script>
+</body>
+</html>
