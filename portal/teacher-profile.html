@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile — CORE Academy Instructor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="teacher-profile" data-role="teacher">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <div class="profile-grid">
+          <section class="card card-pad" style="text-align:center;height:fit-content;" id="profileCard"></section>
+
+          <section class="card card-pad">
+            <div class="tabs">
+              <button class="active" data-tab="pi" data-tab-group="pf">Personal Info</button>
+              <button data-tab="sec" data-tab-group="pf">Security</button>
+              <button data-tab="notif" data-tab-group="pf">Notifications</button>
+            </div>
+
+            <div id="pi" class="tab-panel active" data-tab-panel-group="pf">
+              <form class="stack" style="max-width:560px;" onsubmit="event.preventDefault(); showToast('Changes saved (demo)');">
+                <div><label class="field-label">Full Name</label><input class="input" id="f-name" /></div>
+                <div><label class="field-label">Email</label><input class="input" id="f-email" type="email" /></div>
+                <div><label class="field-label">Phone</label><input class="input" id="f-phone" /></div>
+                <div><label class="field-label">Bio</label><textarea class="textarea" id="f-bio"></textarea></div>
+                <div><label class="field-label">Areas of expertise</label>
+                  <div id="tagBox" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;"></div>
+                  <input class="input" id="tagInput" placeholder="Type a skill and press Enter…" />
+                </div>
+                <button class="btn btn-primary" style="justify-self:start;">Save Changes</button>
+              </form>
+            </div>
+
+            <div id="sec" class="tab-panel" data-tab-panel-group="pf">
+              <form class="stack" style="max-width:460px;" onsubmit="event.preventDefault(); showToast('Password updated (demo)');">
+                <div><label class="field-label">Current Password</label><input class="input" type="password" placeholder="••••••••" /></div>
+                <div><label class="field-label">New Password</label><input class="input" type="password" placeholder="••••••••" /></div>
+                <div><label class="field-label">Confirm New Password</label><input class="input" type="password" placeholder="••••••••" /></div>
+                <button class="btn btn-primary" style="justify-self:start;">Update Password</button>
+              </form>
+            </div>
+
+            <div id="notif" class="tab-panel" data-tab-panel-group="pf" style="max-width:520px;">
+              <div class="toggle-row"><div><b>Grading reminders</b><div class="muted" style="font-size:13px;">Nudges for pending submissions</div></div>
+                <label class="toggle-switch"><input type="checkbox" checked /><span class="track"></span></label></div>
+              <div class="toggle-row"><div><b>Session reminders</b><div class="muted" style="font-size:13px;">Alerts before your live sessions</div></div>
+                <label class="toggle-switch"><input type="checkbox" checked /><span class="track"></span></label></div>
+              <div class="toggle-row"><div><b>New submission alerts</b><div class="muted" style="font-size:13px;">When a student submits work</div></div>
+                <label class="toggle-switch"><input type="checkbox" checked /><span class="track"></span></label></div>
+              <div class="toggle-row"><div><b>Student messages</b><div class="muted" style="font-size:13px;">Direct messages from students</div></div>
+                <label class="toggle-switch"><input type="checkbox" /><span class="track"></span></label></div>
+            </div>
+          </section>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="teacher-mock-data.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    var t = currentInstructor;
+    document.getElementById("profileCard").innerHTML =
+      avatarHTML(t.avatarInitials, "avatar-lg") +
+      '<div style="margin-top:14px;"><button class="btn btn-light btn-sm">Edit avatar</button></div>' +
+      '<h2 class="section-title" style="font-size:22px;margin-top:16px;">' + esc(t.name) + "</h2>" +
+      '<p class="muted" style="margin:4px 0 16px;">' + esc(t.id) + "</p>" +
+      '<div style="text-align:left;border-top:1px solid var(--core-border);padding-top:16px;display:grid;gap:10px;font-size:14px;">' +
+        '<div class="between"><span class="muted">Disciplines</span><b style="text-align:right;">' + esc(t.disciplines.join(", ")) + "</b></div>" +
+        '<div class="between"><span class="muted">Teaching since</span><b>' + esc(t.teachingSince) + "</b></div>" +
+        '<div class="between"><span class="muted">Status</span><span class="badge badge-success">Active</span></div>' +
+      "</div>";
+
+    document.getElementById("f-name").value = t.name;
+    document.getElementById("f-email").value = t.email;
+    document.getElementById("f-phone").value = t.phone;
+    document.getElementById("f-bio").value = t.bio;
+
+    // Expertise tag input
+    var tagBox = document.getElementById("tagBox");
+    function renderTags() {
+      tagBox.innerHTML = t.disciplines.map(function (d, i) {
+        return '<span class="tag">' + esc(d) + ' <button type="button" data-tag="' + i + '" style="border:0;background:none;cursor:pointer;color:var(--core-blue);font-weight:800;">×</button></span>';
+      }).join("");
+    }
+    renderTags();
+    tagBox.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-tag]"); if (!b) return;
+      t.disciplines.splice(+b.getAttribute("data-tag"), 1); renderTags();
+    });
+    document.getElementById("tagInput").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") { e.preventDefault(); var v = this.value.trim(); if (v) { t.disciplines.push(v); this.value = ""; renderTags(); } }
+    });
+
+    if (location.hash === "#security") document.querySelector('[data-tab="sec"]').click();
+  </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Students — CORE Academy Instructor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="teacher-students" data-role="teacher">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <div class="toolbar">
+          <input class="input grow" id="search" type="search" placeholder="🔍 Search students by name…" />
+          <select class="select" id="courseFilter"></select>
+        </div>
+
+        <section class="card card-pad">
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Student</th><th>ID</th><th>Courses</th><th>Progress</th><th>Grade</th><th>Attendance</th><th></th></tr></thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+          <div id="empty"></div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Student detail modal -->
+  <div class="portal-modal" id="studentModal">
+    <div class="backdrop" data-modal-close></div>
+    <div class="modal-card" style="width:min(560px,100%);">
+      <div class="modal-head"><h3 id="smName">Student</h3><button class="modal-close" data-modal-close aria-label="Close">×</button></div>
+      <div id="smBody"></div>
+    </div>
+  </div>
+
+  <script src="teacher-mock-data.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    function gradeBadge(g) {
+      var cls = "badge-neutral";
+      if (g[0] === "A") cls = "badge-success"; else if (g[0] === "B") cls = "badge-info"; else if (g[0] === "C") cls = "badge-warning";
+      return '<span class="badge ' + cls + '">' + esc(g) + "</span>";
+    }
+    function courseTags(ids) {
+      return ids.map(function (id) { var c = teacherCourseById(id); return '<span class="tag">' + esc(c ? c.title : id) + "</span>"; }).join(" ");
+    }
+
+    // Course filter options
+    var cf = document.getElementById("courseFilter");
+    cf.innerHTML = '<option value="all">All courses</option>' +
+      teacherCourses.filter(function (c) { return c.status === "published"; }).map(function (c) {
+        return '<option value="' + c.id + '">' + esc(c.title) + "</option>";
+      }).join("");
+    var preCourse = new URLSearchParams(location.search).get("course");
+    if (preCourse) cf.value = preCourse;
+
+    function render() {
+      var q = document.getElementById("search").value.trim().toLowerCase();
+      var course = cf.value;
+      var list = teacherStudents.filter(function (s) {
+        var okName = !q || s.name.toLowerCase().indexOf(q) !== -1;
+        var okCourse = course === "all" || s.courseIds.indexOf(course) !== -1;
+        return okName && okCourse;
+      });
+      var tbody = document.getElementById("rows"), empty = document.getElementById("empty");
+      if (!list.length) { tbody.innerHTML = ""; empty.innerHTML = '<div class="empty-state"><div class="es-ico">🔍</div><h3>No students found</h3><p>Try a different search or filter.</p></div>'; return; }
+      empty.innerHTML = "";
+      tbody.innerHTML = list.map(function (s) {
+        return "<tr><td><div style='display:flex;align-items:center;gap:10px;'>" + avatarHTML(s.avatarInitials, "avatar-sm") + "<b>" + esc(s.name) + "</b></div></td>" +
+          "<td>" + esc(s.id) + "</td>" +
+          "<td>" + courseTags(s.courseIds) + "</td>" +
+          "<td><div style='width:120px;'>" + progressHTML(s.progress, false) + "</div></td>" +
+          "<td>" + gradeBadge(s.grade) + "</td>" +
+          "<td>" + s.attendanceRate + "%</td>" +
+          '<td><button class="btn btn-light btn-sm" data-modal-open="studentModal" data-student="' + s.id + '">View Profile</button></td></tr>";
+      }).join("");
+    }
+
+    document.getElementById("search").addEventListener("input", render);
+    cf.addEventListener("change", render);
+    render();
+
+    // Populate modal
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-student]"); if (!b) return;
+      var s = teacherStudentById(b.getAttribute("data-student"));
+      document.getElementById("smName").textContent = s.name;
+      var subs = submissions.filter(function (x) { return x.studentId === s.id; });
+      var subsHTML = subs.length ? subs.map(function (x) {
+        var st = x.status === "graded" ? '<span class="badge badge-success">' + x.score + "/" + x.maxPoints + "</span>" : '<span class="badge badge-warning">Ungraded</span>';
+        return '<div class="between" style="padding:8px 0;border-bottom:1px solid var(--core-border);"><span>' + esc(x.assignmentTitle) + "</span>" + st + "</div>";
+      }).join("") : '<p class="muted">No submissions yet.</p>';
+      document.getElementById("smBody").innerHTML =
+        "<div style='display:flex;align-items:center;gap:14px;margin-bottom:16px;'>" + avatarHTML(s.avatarInitials, "avatar-lg") +
+          "<div><div class='muted'>" + esc(s.id) + "</div><div style='margin-top:4px;'>" + courseTags(s.courseIds) + "</div></div></div>" +
+        "<div class='grid grid-3' style='gap:12px;margin-bottom:18px;'>" +
+          "<div class='callout top' style='display:block;'><div class='muted' style='font-size:12px;'>Grade</div><b style='font-size:20px;'>" + esc(s.grade) + "</b></div>" +
+          "<div class='callout' style='display:block;'><div class='muted' style='font-size:12px;'>Progress</div><b style='font-size:20px;'>" + s.progress + "%</b></div>" +
+          "<div class='callout' style='display:block;'><div class='muted' style='font-size:12px;'>Attendance</div><b style='font-size:20px;'>" + s.attendanceRate + "%</b></div>" +
+        "</div>" +
+        "<h4 style='color:var(--core-navy);margin-bottom:6px;'>Recent Submissions</h4>" + subsHTML;
+    });
+  </script>
+</body>
+</html>

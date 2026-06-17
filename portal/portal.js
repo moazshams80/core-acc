@@ -35,10 +35,54 @@ var PAGE_TITLES = {
   profile: "Profile",
 };
 
-/* ---- Session helpers ---- */
+/* ---- Teacher (instructor) portal navigation ---- */
+var TEACHER_NAV = [
+  { key: "teacher-dashboard",  label: "Dashboard",     icon: "🏠", href: "teacher-dashboard.html" },
+  { key: "teacher-courses",    label: "My Courses",    icon: "📚", href: "teacher-courses.html" },
+  { key: "teacher-students",   label: "Students",      icon: "👥", href: "teacher-students.html" },
+  { key: "teacher-grading",    label: "Grading",       icon: "✍️", href: "teacher-grading.html" },
+  { key: "teacher-sessions",   label: "Live Sessions", icon: "🎥", href: "teacher-sessions.html" },
+  { key: "teacher-attendance", label: "Attendance",    icon: "📅", href: "teacher-attendance.html" },
+  { key: "teacher-reports",    label: "Reports",       icon: "📊", href: "teacher-reports.html" },
+  { key: "teacher-profile",    label: "Profile",       icon: "👤", href: "teacher-profile.html" },
+];
+
+var TEACHER_NOTIFS = [
+  { icon: "✍️", text: "<strong>7 submissions</strong> awaiting your grading", href: "teacher-grading.html" },
+  { icon: "🎥", text: "<strong>CCTV Network Integration</strong> session starts soon", href: "teacher-sessions.html" },
+  { icon: "📊", text: "Low attendance flagged in <strong>Fire Alarm Systems</strong>", href: "teacher-reports.html" },
+];
+
+var TEACHER_PAGE_TITLES = {
+  "teacher-dashboard": "Dashboard",
+  "teacher-courses": "My Courses",
+  "teacher-course-builder": "Course Builder",
+  "teacher-students": "Students",
+  "teacher-grading": "Grading",
+  "teacher-sessions": "Live Sessions",
+  "teacher-attendance": "Attendance",
+  "teacher-reports": "Reports",
+  "teacher-profile": "Profile",
+};
+
+/* ---- Session helpers (role-aware) ---- */
 function portalLogout() {
-  try { sessionStorage.removeItem("coreSession"); } catch (e) {}
+  try {
+    sessionStorage.removeItem("loggedIn");
+    sessionStorage.removeItem("role");
+    sessionStorage.removeItem("coreSession");
+  } catch (e) {}
   window.location.href = "login.html";
+}
+
+/* Toast notification (shared, used by save actions) */
+function showToast(msg) {
+  var t = document.createElement("div");
+  t.className = "toast";
+  t.textContent = msg;
+  document.body.appendChild(t);
+  requestAnimationFrame(function () { t.classList.add("show"); });
+  setTimeout(function () { t.classList.remove("show"); setTimeout(function () { t.remove(); }, 250); }, 2400);
 }
 
 /* ---- Render helpers (used by page inline scripts) ---- */
@@ -80,39 +124,55 @@ function prettyDate(dateStr) {
   return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }
 
-/* ---- Build the app shell ---- */
+/* ---- Build the app shell (role-aware) ---- */
 function buildShell() {
   var page = document.body.getAttribute("data-page");
   if (!page) return;
+  var pageRole = document.body.getAttribute("data-role") === "teacher" ? "teacher" : "student";
 
-  /* gate: must be "logged in" to view portal pages */
-  var hasSession = false;
-  try { hasSession = sessionStorage.getItem("coreSession") === "1"; } catch (e) {}
-  if (!hasSession) { window.location.replace("login.html"); return; }
+  /* gate: must be logged in, and on the correct portal for the role */
+  var loggedIn = false, role = "student";
+  try {
+    loggedIn = sessionStorage.getItem("loggedIn") === "true";
+    role = sessionStorage.getItem("role") || "student";
+  } catch (e) {}
+  if (!loggedIn) { window.location.replace("login.html"); return; }
+  if (role !== pageRole) { window.location.replace(role === "teacher" ? "teacher-dashboard.html" : "dashboard.html"); return; }
 
-  var student = (typeof currentStudent !== "undefined") ? currentStudent : { name: "Student", avatarInitials: "S", program: "" };
+  var isTeacher = pageRole === "teacher";
+  var nav = isTeacher ? TEACHER_NAV : PORTAL_NAV;
+  var notifs = isTeacher ? TEACHER_NOTIFS : PORTAL_NOTIFS;
+  var titles = isTeacher ? TEACHER_PAGE_TITLES : PAGE_TITLES;
+  var profileHref = isTeacher ? "teacher-profile.html" : "profile.html";
+  var person = isTeacher
+    ? (typeof currentInstructor !== "undefined" ? currentInstructor : { name: "Instructor", avatarInitials: "IN" })
+    : (typeof currentStudent !== "undefined" ? currentStudent : { name: "Student", avatarInitials: "S" });
+
+  var activeKey = page;
+  if (page === "course-detail") activeKey = "courses";
+  if (page === "teacher-course-builder") activeKey = "teacher-courses";
 
   /* Sidebar */
   var sidebar = document.getElementById("portalSidebar");
-  var activeKey = page === "course-detail" ? "courses" : page;
   if (sidebar) {
-    var nav = PORTAL_NAV.map(function (n) {
+    var navHTML = nav.map(function (n) {
       return '<li><a href="' + n.href + '" class="' + (n.key === activeKey ? "active" : "") + '">' +
              '<span class="ico" aria-hidden="true">' + n.icon + "</span>" + esc(n.label) + "</a></li>";
     }).join("");
+    var pill = isTeacher ? ' <span class="teacher-pill">Instructor</span>' : "";
     sidebar.innerHTML =
-      '<div class="portal-brand"><span class="brand-mark">C</span><span>CORE Academy</span></div>' +
-      '<ul class="portal-nav">' + nav + "</ul>" +
-      '<div class="portal-userbox">' + avatarHTML(student.avatarInitials, "avatar-sm") +
-        '<div class="meta"><b>' + esc(student.name) + "</b>" +
+      '<div class="portal-brand"><span class="brand-mark">C</span><span>CORE Academy</span>' + pill + "</div>" +
+      '<ul class="portal-nav">' + navHTML + "</ul>" +
+      '<div class="portal-userbox">' + avatarHTML(person.avatarInitials, "avatar-sm") +
+        '<div class="meta"><b>' + esc(person.name) + "</b>" +
         '<a href="#" data-logout>Log Out</a></div></div>';
   }
 
   /* Header */
   var header = document.getElementById("portalHeader");
   if (header) {
-    var title = document.body.getAttribute("data-title") || PAGE_TITLES[page] || "Portal";
-    var notifItems = PORTAL_NOTIFS.map(function (n) {
+    var title = document.body.getAttribute("data-title") || titles[page] || "Portal";
+    var notifItems = notifs.map(function (n) {
       return '<a href="' + n.href + '"><span class="ico" aria-hidden="true" style="margin-right:8px;">' + n.icon + "</span>" + n.text + "</a>";
     }).join("");
     header.innerHTML =
@@ -130,11 +190,11 @@ function buildShell() {
         "</div>" +
         '<div class="portal-usermenu">' +
           '<button class="trigger" data-dropdown-toggle="userMenu" aria-haspopup="true">' +
-            avatarHTML(student.avatarInitials, "avatar-sm") + "<b>" + esc(student.name) + '</b><span class="caret">▾</span>' +
+            avatarHTML(person.avatarInitials, "avatar-sm") + "<b>" + esc(person.name) + '</b><span class="caret">▾</span>' +
           "</button>" +
           '<div class="dropdown" id="userMenu">' +
-            '<a href="profile.html">Profile</a>' +
-            '<a href="profile.html#security">Settings</a>' +
+            '<a href="' + profileHref + '">Profile</a>' +
+            '<a href="' + profileHref + '#security">Settings</a>' +
             '<a href="#" data-logout>Log Out</a>' +
           "</div>" +
         "</div>" +

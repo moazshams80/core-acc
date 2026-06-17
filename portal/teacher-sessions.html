@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Live Sessions — CORE Academy Instructor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="teacher-sessions" data-role="teacher">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <div class="between" style="margin-bottom:22px;">
+          <div><h2 class="section-title" style="font-size:20px;">Live Sessions</h2><p class="muted" style="margin:4px 0 0;">Host and manage your sessions.</p></div>
+          <button class="btn btn-primary" data-modal-open="scheduleModal">+ Schedule Session</button>
+        </div>
+
+        <h3 style="color:var(--core-navy);margin-bottom:14px;">Upcoming</h3>
+        <div class="grid grid-3" id="upcoming" style="margin-bottom:32px;"></div>
+
+        <h3 style="color:var(--core-navy);margin-bottom:14px;">Past Sessions</h3>
+        <section class="card card-pad">
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Session</th><th>Course</th><th>Date</th><th>Attendance</th><th></th></tr></thead>
+              <tbody id="past"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Schedule modal -->
+  <div class="portal-modal" id="scheduleModal">
+    <div class="backdrop" data-modal-close></div>
+    <div class="modal-card">
+      <div class="modal-head"><h3>Schedule Session</h3><button class="modal-close" data-modal-close aria-label="Close">×</button></div>
+      <div class="stack">
+        <div><label class="field-label">Course</label><select class="select" id="sCourse"></select></div>
+        <div><label class="field-label">Session title</label><input class="input" id="sTitle" placeholder="e.g. CCTV Network Integration" /></div>
+        <div><label class="field-label">Date &amp; time</label><input class="input" id="sWhen" type="datetime-local" /></div>
+        <div><label class="field-label">Duration (minutes)</label><input class="input" id="sDuration" type="number" placeholder="60" /></div>
+        <button class="btn btn-primary btn-block" id="sSave">Schedule Session</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="teacher-mock-data.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    var sc = document.getElementById("sCourse");
+    sc.innerHTML = teacherCourses.filter(function (c) { return c.status === "published"; }).map(function (c) {
+      return '<option value="' + c.id + '">' + esc(c.title) + "</option>";
+    }).join("");
+
+    function render() {
+      document.getElementById("upcoming").innerHTML = teacherSessions.filter(function (s) { return s.status === "upcoming"; }).map(function (s) {
+        var c = teacherCourseById(s.courseId);
+        return '<article class="course-card"><span class="tag">' + esc(c.title) + "</span>" +
+          '<h3 style="margin-top:12px;">' + esc(s.title) + "</h3>" +
+          '<p style="font-size:17px;font-weight:800;color:var(--core-blue);margin:4px 0;">' + esc(s.when) + "</p>" +
+          '<p class="muted" style="font-size:13px;margin:0 0 16px;">👥 ' + s.enrolledCount + " enrolled</p>" +
+          '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+            '<button class="btn btn-primary btn-sm" data-start="' + s.id + '">Start Session</button>' +
+            '<button class="btn btn-light btn-sm" data-edit="' + s.id + '">Edit</button>' +
+            '<button class="btn btn-light btn-sm" data-cancel="' + s.id + '" style="color:#c0392b;">Cancel</button>' +
+          "</div></article>";
+      }).join("") || '<div class="empty-state"><div class="es-ico">🎥</div><h3>No upcoming sessions</h3><p>Schedule one to get started.</p></div>';
+
+      document.getElementById("past").innerHTML = teacherSessions.filter(function (s) { return s.status === "past"; }).map(function (s) {
+        var c = teacherCourseById(s.courseId);
+        return "<tr><td><b>" + esc(s.title) + "</b></td>" +
+          '<td><span class="tag">' + esc(c.title) + "</span></td>" +
+          "<td>" + esc(s.when) + "</td>" +
+          "<td>" + s.attendedCount + "/" + s.enrolledCount + " attended</td>" +
+          '<td><a class="card-link" style="color:var(--core-blue);font-weight:800;" href="#">⬆ Upload Recording</a></td></tr>";
+      }).join("");
+    }
+
+    document.addEventListener("click", function (e) {
+      var st = e.target.closest("[data-start]");
+      if (st) { showToast("Starting session… (demo)"); return; }
+      var ed = e.target.closest("[data-edit]");
+      if (ed) { showToast("Edit session (demo)"); return; }
+      var ca = e.target.closest("[data-cancel]");
+      if (ca) {
+        teacherSessions = teacherSessions.filter(function (s) { return s.id !== ca.getAttribute("data-cancel"); });
+        showToast("Session cancelled");
+        render();
+        return;
+      }
+    });
+
+    document.getElementById("sSave").addEventListener("click", function () {
+      var title = document.getElementById("sTitle").value.trim() || "New Session";
+      var courseId = sc.value;
+      var whenRaw = document.getElementById("sWhen").value;
+      var when = whenRaw ? new Date(whenRaw).toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "To be scheduled";
+      var c = teacherCourseById(courseId);
+      teacherSessions.unshift({ id: "ts" + Date.now(), title: title, courseId: courseId, when: when, status: "upcoming", enrolledCount: c.enrolledCount, attendedCount: null });
+      document.getElementById("scheduleModal").classList.remove("open");
+      document.getElementById("sTitle").value = "";
+      showToast("Session scheduled");
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

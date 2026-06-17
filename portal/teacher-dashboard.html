@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instructor Dashboard — CORE Academy</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="teacher-dashboard" data-role="teacher">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <div id="banner"></div>
+        <div class="grid grid-4" style="margin-bottom:24px;" id="stats"></div>
+
+        <div class="row-2">
+          <section class="card card-pad">
+            <h2 class="section-title" style="font-size:20px;margin-bottom:16px;">Needs Your Attention</h2>
+            <div class="stack" id="attention"></div>
+          </section>
+          <section class="card card-pad">
+            <h2 class="section-title" style="font-size:20px;margin-bottom:8px;">Today's Schedule</h2>
+            <div id="schedule"></div>
+          </section>
+        </div>
+
+        <section class="card card-pad" style="margin-top:22px;">
+          <h2 class="section-title" style="font-size:20px;margin-bottom:18px;">Course Performance Snapshot</h2>
+          <div id="perf"></div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="teacher-mock-data.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    var published = teacherCourses.filter(function (c) { return c.status === "published"; });
+    var totalStudents = published.reduce(function (s, c) { return s + c.enrolledCount; }, 0);
+    var pending = submissions.filter(function (s) { return s.status === "ungraded"; }).length;
+    var upcoming = teacherSessions.filter(function (s) { return s.status === "upcoming"; });
+
+    document.getElementById("banner").innerHTML =
+      '<div class="portal-banner"><h2>Welcome back, ' + esc(currentInstructor.name) + ' 👋</h2>' +
+      '<p>' + published.length + ' active courses &middot; ' + totalStudents + ' students taught</p></div>';
+
+    var statData = [
+      { ico: "📚", num: published.length, label: "Active Courses", href: "teacher-courses.html" },
+      { ico: "👥", num: totalStudents, label: "Total Students", href: "teacher-students.html" },
+      { ico: "✍️", num: pending, label: "Pending Grading", href: "teacher-grading.html" },
+      { ico: "🎥", num: upcoming.length, label: "Upcoming Sessions", href: "teacher-sessions.html" },
+    ];
+    document.getElementById("stats").innerHTML = statData.map(function (s) {
+      return '<a class="portal-stat-card" href="' + s.href + '"><span class="ico" aria-hidden="true">' + s.ico + "</span>" +
+        '<div><strong>' + s.num + "</strong><span>" + s.label + "</span></div></a>";
+    }).join("");
+
+    // Needs attention
+    var items = [];
+    published.forEach(function (c) {
+      var n = submissions.filter(function (s) { return s.status === "ungraded" && s.courseId === c.id; }).length;
+      if (n) items.push({ icon: "✍️", text: "<strong>" + n + " submissions</strong> to grade in " + esc(c.title), btn: "Grade now", href: "teacher-grading.html?course=" + c.id });
+    });
+    teacherSessions.filter(function (s) { return s.today; }).forEach(function (s) {
+      items.push({ icon: "🎥", text: "Host <strong>" + esc(s.title) + "</strong> at " + esc(s.time), btn: "Start session", href: "teacher-sessions.html" });
+    });
+    published.filter(function (c) { return c.avgAttendance < 80; }).forEach(function (c) {
+      items.push({ icon: "📅", text: "Low attendance in <strong>" + esc(c.title) + "</strong> (" + c.avgAttendance + "%)", btn: "View", href: "teacher-reports.html" });
+    });
+    document.getElementById("attention").innerHTML = items.map(function (i) {
+      return '<div class="list-row"><span class="course-icon" style="width:42px;height:42px;font-size:18px;margin:0;border-radius:12px;" aria-hidden="true">' + i.icon + "</span>" +
+        '<div class="grow">' + i.text + "</div>" +
+        '<a class="btn btn-light btn-sm" href="' + i.href + '">' + i.btn + "</a></div>";
+    }).join("");
+
+    // Today's schedule
+    var today = teacherSessions.filter(function (s) { return s.today; });
+    document.getElementById("schedule").innerHTML = today.length ? today.map(function (s) {
+      var c = teacherCourseById(s.courseId);
+      return '<div class="mini-item"><div class="grow"><div style="font-weight:700;">' + esc(s.title) + "</div>" +
+        '<div class="when">' + esc(c.title) + " &middot; " + s.enrolledCount + ' enrolled</div></div>' +
+        '<span class="badge badge-cyan">' + esc(s.time) + "</span></div>";
+    }).join("") : '<div class="empty-state"><div class="es-ico">☕</div><h3>No sessions today</h3><p>Enjoy the breather.</p></div>';
+
+    // Course performance snapshot (avg grade per course)
+    document.getElementById("perf").innerHTML = published.map(function (c) {
+      return '<div class="hbar-row"><span class="hbar-label">' + c.icon + " " + esc(c.title) + "</span>" +
+        '<div class="hbar-track"><div class="hbar-fill" style="width:' + c.avgGradePct + '%"></div></div>' +
+        '<span class="hbar-val">' + esc(c.avgGrade) + "</span></div>";
+    }).join("");
+  </script>
+</body>
+</html>

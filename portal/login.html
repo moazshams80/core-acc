@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Student Login — CORE Academy Portal</title>
+  <title>Login — CORE Academy Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
@@ -15,7 +15,7 @@
     <aside class="login-aside">
       <span class="brand-mark">C</span>
       <h1>Welcome back,<br />future engineer.</h1>
-      <p>Pick up your training where you left off — courses, live sessions, assignments, and your verified certificates, all in one place.</p>
+      <p>One portal for students and instructors — courses, live sessions, grading, attendance, and verified certificates, all in one place.</p>
       <!-- decorative circuit/network lines -->
       <svg width="320" height="160" viewBox="0 0 320 160" fill="none" aria-hidden="true" style="margin-top:36px;opacity:.5;">
         <g stroke="#22a7e0" stroke-width="1.5">
@@ -33,13 +33,19 @@
     <!-- Right form panel -->
     <main class="login-form-panel">
       <div class="login-form-card card card-pad">
-        <p class="kicker">Student Portal</p>
-        <h2 class="section-title" style="margin-bottom:6px;">Student Login</h2>
+        <!-- Role toggle -->
+        <div class="segmented" id="roleToggle" role="tablist" aria-label="Choose account type">
+          <button type="button" class="active" data-role="student" role="tab" aria-selected="true">🎓 Student</button>
+          <button type="button" data-role="teacher" role="tab" aria-selected="false">👨‍🏫 Teacher</button>
+        </div>
+
+        <p class="kicker" id="rolePortal">Student Portal</p>
+        <h2 class="section-title" id="roleTitle" style="margin-bottom:6px;">Student Login</h2>
         <p class="muted" style="margin:0 0 22px;font-size:14px;">Enter any details — this is a demo portal.</p>
 
         <form id="loginForm" class="stack" autocomplete="off">
           <div>
-            <label class="field-label" for="who">Student ID or Email</label>
+            <label class="field-label" id="whoLabel" for="who">Student ID or Email</label>
             <input class="input" id="who" type="text" placeholder="CA-2024-0317" required />
           </div>
           <div>
@@ -55,7 +61,7 @@
           </div>
           <button type="submit" class="btn btn-primary btn-block">Log In</button>
           <div class="divider">or</div>
-          <p style="text-align:center;margin:0;font-size:14px;" class="muted">
+          <p style="text-align:center;margin:0;font-size:14px;" class="muted" id="regLine">
             New student? <a href="#" style="color:var(--core-blue);font-weight:700;">Start registration</a>
           </p>
         </form>
@@ -64,6 +70,27 @@
   </div>
 
   <script>
+    var role = "student";
+    var copy = {
+      student: { portal: "Student Portal", title: "Student Login", who: "Student ID or Email", reg: 'New student? <a href="#" style="color:var(--core-blue);font-weight:700;">Start registration</a>', dest: "dashboard.html" },
+      teacher: { portal: "Instructor Portal", title: "Instructor Login", who: "Instructor ID or Email", reg: 'Instructor access? <a href="#" style="color:var(--core-blue);font-weight:700;">Contact admin</a>', dest: "teacher-dashboard.html" },
+    };
+
+    // Role toggle
+    document.getElementById("roleToggle").addEventListener("click", function (e) {
+      var b = e.target.closest("[data-role]"); if (!b) return;
+      role = b.getAttribute("data-role");
+      this.querySelectorAll("button").forEach(function (x) {
+        var on = x === b;
+        x.classList.toggle("active", on);
+        x.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      document.getElementById("rolePortal").textContent = copy[role].portal;
+      document.getElementById("roleTitle").textContent = copy[role].title;
+      document.getElementById("whoLabel").textContent = copy[role].who;
+      document.getElementById("regLine").innerHTML = copy[role].reg;
+    });
+
     // Show / hide password
     document.getElementById("togglePass").addEventListener("click", function () {
       var p = document.getElementById("pwd");
@@ -72,11 +99,15 @@
       this.textContent = show ? "🙈" : "👁️";
       this.setAttribute("aria-label", show ? "Hide password" : "Show password");
     });
-    // Login always "succeeds": set session flag + go to dashboard
+
+    // Login always "succeeds": store role + flag, redirect by role
     document.getElementById("loginForm").addEventListener("submit", function (e) {
       e.preventDefault();
-      try { sessionStorage.setItem("coreSession", "1"); } catch (err) {}
-      window.location.href = "dashboard.html";
+      try {
+        sessionStorage.setItem("loggedIn", "true");
+        sessionStorage.setItem("role", role);
+      } catch (err) {}
+      window.location.href = copy[role].dest;
     });
   </script>
 </body>

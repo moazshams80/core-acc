@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reports — CORE Academy Instructor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="teacher-reports" data-role="teacher">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <div class="toolbar">
+          <select class="select" id="courseFilter"></select>
+          <select class="select" id="rangeFilter">
+            <option>Last 7 weeks</option><option>This term</option><option>All time</option>
+          </select>
+          <div style="margin-left:auto;display:flex;gap:8px;">
+            <button class="btn btn-light btn-sm" id="csv">Export CSV</button>
+            <button class="btn btn-light btn-sm" id="pdf">Download PDF</button>
+          </div>
+        </div>
+
+        <div class="grid grid-4" id="metrics" style="margin-bottom:24px;"></div>
+
+        <div class="row-2" style="margin-bottom:22px;">
+          <section class="card card-pad">
+            <h3 style="color:var(--core-navy);margin-bottom:14px;">Grade Distribution</h3>
+            <div class="bars" id="gradeDist"></div>
+          </section>
+          <section class="card card-pad">
+            <h3 style="color:var(--core-navy);margin-bottom:14px;">Attendance Trend</h3>
+            <div id="trend"></div>
+          </section>
+        </div>
+
+        <section class="card card-pad" style="margin-bottom:22px;">
+          <h3 style="color:var(--core-navy);margin-bottom:14px;">Assignment Completion Rate</h3>
+          <div id="completion"></div>
+        </section>
+
+        <div class="row-2" style="margin-bottom:22px;">
+          <section class="card card-pad">
+            <h3 style="color:var(--core-navy);margin-bottom:14px;">🏆 Top Performers</h3>
+            <div id="top"></div>
+          </section>
+          <section class="card card-pad">
+            <h3 style="color:var(--core-navy);margin-bottom:14px;">⚠️ At-Risk Students</h3>
+            <div id="risk"></div>
+          </section>
+        </div>
+
+        <section class="card card-pad">
+          <h3 style="color:var(--core-navy);margin-bottom:14px;">Per-Student Summary</h3>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Student</th><th>Grade</th><th>Attendance</th><th>Completion</th></tr></thead>
+              <tbody id="summary"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="teacher-mock-data.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    function gradeBadge(g) {
+      var cls = "badge-neutral";
+      if (g[0] === "A") cls = "badge-success"; else if (g[0] === "B") cls = "badge-info"; else if (g[0] === "C") cls = "badge-warning";
+      return '<span class="badge ' + cls + '">' + esc(g) + "</span>";
+    }
+
+    // course filter (cosmetic for the demo)
+    document.getElementById("courseFilter").innerHTML = '<option value="all">All courses</option>' +
+      teacherCourses.filter(function (c) { return c.status === "published"; }).map(function (c) { return "<option>" + esc(c.title) + "</option>"; }).join("");
+
+    // metric cards
+    var m = reportMetrics;
+    var cards = [
+      { ico: "📊", num: m.avgGrade, label: "Avg Class Grade" },
+      { ico: "✅", num: m.completionRate + "%", label: "Completion Rate" },
+      { ico: "📅", num: m.avgAttendance + "%", label: "Avg Attendance" },
+      { ico: "📝", num: m.submissionRate + "%", label: "Submission Rate" },
+    ];
+    document.getElementById("metrics").innerHTML = cards.map(function (c) {
+      return '<div class="portal-stat-card"><span class="ico" aria-hidden="true">' + c.ico + "</span><div><strong>" + c.num + "</strong><span>" + c.label + "</span></div></div>";
+    }).join("");
+
+    // grade distribution (vertical bars)
+    var gd = m.gradeDistribution;
+    var keys = Object.keys(gd), maxV = Math.max.apply(null, keys.map(function (k) { return gd[k]; }));
+    document.getElementById("gradeDist").innerHTML = keys.map(function (k) {
+      return '<div class="bar"><div class="col" style="height:' + Math.round((gd[k] / maxV) * 100) + '%"></div><div class="lbl"><b>' + k + "</b><br>" + gd[k] + "</div></div>";
+    }).join("");
+
+    // attendance trend (SVG polyline)
+    var tr = m.attendanceTrend, W = 460, H = 150, pad = 24;
+    var maxT = 100, minT = 60;
+    var pts = tr.map(function (v, i) {
+      var x = pad + (i * (W - pad * 2) / (tr.length - 1));
+      var y = H - pad - ((v - minT) / (maxT - minT)) * (H - pad * 2);
+      return x.toFixed(1) + "," + y.toFixed(1);
+    });
+    var dots = pts.map(function (p) { var xy = p.split(","); return '<circle cx="' + xy[0] + '" cy="' + xy[1] + '" r="3.5" fill="#0f67b1"/>'; }).join("");
+    document.getElementById("trend").innerHTML =
+      '<svg viewBox="0 0 ' + W + " " + H + '" width="100%" role="img" aria-label="Weekly attendance trend">' +
+      '<polyline fill="none" stroke="#22a7e0" stroke-width="3" points="' + pts.join(" ") + '"/>' + dots + "</svg>" +
+      '<p class="muted" style="margin:6px 0 0;font-size:13px;text-align:center;">Weekly attendance % (last ' + tr.length + " weeks)</p>";
+
+    // assignment completion (horizontal bars)
+    document.getElementById("completion").innerHTML = m.assignmentCompletion.map(function (a) {
+      return '<div class="hbar-row"><span class="hbar-label">' + esc(a.title) + "</span>" +
+        '<div class="hbar-track"><div class="hbar-fill" style="width:' + a.pct + '%"></div></div>' +
+        '<span class="hbar-val">' + a.pct + "%</span></div>";
+    }).join("");
+
+    // top performers & at-risk
+    var top = teacherStudents.filter(function (s) { return s.grade[0] === "A" && s.attendanceRate >= 90; }).slice(0, 4);
+    var risk = teacherStudents.filter(function (s) { return s.attendanceRate < 80 || ["C", "D", "F"].indexOf(s.grade[0]) !== -1; });
+    document.getElementById("top").innerHTML = top.map(function (s) {
+      return '<div class="callout top"><div style="display:flex;align-items:center;gap:10px;">' + avatarHTML(s.avatarInitials, "avatar-sm") + "<b>" + esc(s.name) + "</b></div>" + gradeBadge(s.grade) + "</div>";
+    }).join("") || '<p class="muted">None yet.</p>';
+    document.getElementById("risk").innerHTML = risk.map(function (s) {
+      return '<div class="callout risk"><div style="display:flex;align-items:center;gap:10px;">' + avatarHTML(s.avatarInitials, "avatar-sm") +
+        "<div><b>" + esc(s.name) + "</b><div class='muted' style='font-size:12px;'>" + s.attendanceRate + "% attendance</div></div></div>" + gradeBadge(s.grade) + "</div>";
+    }).join("") || '<p class="muted">No at-risk students.</p>';
+
+    // per-student summary
+    document.getElementById("summary").innerHTML = teacherStudents.map(function (s) {
+      return "<tr><td><div style='display:flex;align-items:center;gap:10px;'>" + avatarHTML(s.avatarInitials, "avatar-sm") + "<b>" + esc(s.name) + "</b></div></td>" +
+        "<td>" + gradeBadge(s.grade) + "</td><td>" + s.attendanceRate + "%</td><td>" + s.progress + "%</td></tr>";
+    }).join("");
+
+    document.getElementById("csv").addEventListener("click", function () { showToast("Exporting CSV… (demo)"); });
+    document.getElementById("pdf").addEventListener("click", function () { showToast("Generating PDF… (demo)"); });
+  </script>
+</body>
+</html>

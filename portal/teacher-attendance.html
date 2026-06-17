@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Attendance — CORE Academy Instructor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="teacher-attendance" data-role="teacher">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <div class="toolbar">
+          <select class="select" id="courseSel"></select>
+          <select class="select" id="sessionSel"></select>
+          <button class="btn btn-light btn-sm" id="allPresent">Mark All Present</button>
+        </div>
+
+        <section class="card card-pad" style="margin-bottom:22px;">
+          <div class="between" style="margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+            <div id="counter" style="font-weight:800;color:var(--core-navy);"></div>
+            <button class="btn btn-primary btn-sm" id="saveAtt">Save Attendance</button>
+          </div>
+          <div id="roster"></div>
+        </section>
+
+        <section class="card card-pad">
+          <h3 style="color:var(--core-navy);margin-bottom:14px;">Recent Sessions</h3>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Session</th><th>Course</th><th>Date</th><th>Summary</th></tr></thead>
+              <tbody id="history"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="teacher-mock-data.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    var state = {}; // studentId -> present|absent|late
+
+    var courseSel = document.getElementById("courseSel");
+    courseSel.innerHTML = teacherCourses.filter(function (c) { return c.status === "published"; }).map(function (c) {
+      return '<option value="' + c.id + '">' + esc(c.title) + "</option>";
+    }).join("");
+
+    var sessionSel = document.getElementById("sessionSel");
+    function fillSessions() {
+      var cid = courseSel.value;
+      var list = teacherSessions.filter(function (s) { return s.courseId === cid; });
+      sessionSel.innerHTML = list.length ? list.map(function (s) { return '<option>' + esc(s.title) + " — " + esc(s.when) + "</option>"; }).join("")
+        : '<option>No sessions</option>';
+    }
+
+    function roster() { return teacherStudents.filter(function (s) { return s.courseIds.indexOf(courseSel.value) !== -1; }); }
+
+    function buildState() {
+      state = {};
+      roster().forEach(function (s) { state[s.id] = "present"; });
+    }
+
+    function updateCounter() {
+      var p = 0, a = 0, l = 0;
+      Object.keys(state).forEach(function (k) { if (state[k] === "present") p++; else if (state[k] === "absent") a++; else l++; });
+      document.getElementById("counter").innerHTML =
+        '<span class="badge badge-success">Present: ' + p + "</span> " +
+        '<span class="badge badge-warning" style="background:#fdecec;color:#c0392b;">Absent: ' + a + "</span> " +
+        '<span class="badge badge-warning">Late: ' + l + "</span>";
+    }
+
+    function renderRoster() {
+      var list = roster();
+      if (!list.length) { document.getElementById("roster").innerHTML = '<div class="empty-state"><div class="es-ico">👥</div><h3>No students enrolled</h3></div>'; updateCounter(); return; }
+      document.getElementById("roster").innerHTML = list.map(function (s) {
+        var v = state[s.id];
+        function btn(val, label) { return '<button type="button" class="' + (v === val ? "on " + val : "") + '" data-set="' + s.id + ":" + val + '">' + label + "</button>"; }
+        return '<div class="list-row" style="margin-bottom:10px;"><div style="display:flex;align-items:center;gap:10px;" class="grow">' +
+          avatarHTML(s.avatarInitials, "avatar-sm") + "<b>" + esc(s.name) + "</b></div>" +
+          '<div class="att-seg">' + btn("present", "Present") + btn("absent", "Absent") + btn("late", "Late") + "</div></div>";
+      }).join("");
+      updateCounter();
+    }
+
+    document.getElementById("roster").addEventListener("click", function (e) {
+      var b = e.target.closest("[data-set]"); if (!b) return;
+      var parts = b.getAttribute("data-set").split(":");
+      state[parts[0]] = parts[1];
+      renderRoster();
+    });
+    document.getElementById("allPresent").addEventListener("click", function () {
+      Object.keys(state).forEach(function (k) { state[k] = "present"; });
+      renderRoster();
+      showToast("All marked present");
+    });
+    document.getElementById("saveAtt").addEventListener("click", function () { showToast("Attendance saved"); });
+
+    courseSel.addEventListener("change", function () { fillSessions(); buildState(); renderRoster(); });
+
+    // History
+    document.getElementById("history").innerHTML = teacherSessions.filter(function (s) { return s.status === "past"; }).map(function (s) {
+      var c = teacherCourseById(s.courseId);
+      var pct = Math.round((s.attendedCount / s.enrolledCount) * 100);
+      return "<tr><td><b>" + esc(s.title) + "</b></td><td><span class='tag'>" + esc(c.title) + "</span></td><td>" + esc(s.when) + "</td>" +
+        "<td>" + s.attendedCount + "/" + s.enrolledCount + " (" + pct + "%)</td></tr>";
+    }).join("");
+
+    fillSessions(); buildState(); renderRoster();
+  </script>
+</body>
+</html>

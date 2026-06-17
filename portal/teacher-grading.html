@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grading — CORE Academy Instructor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="teacher-grading" data-role="teacher">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <div class="toolbar">
+          <div class="filter-tabs" id="filters" style="margin:0;">
+            <button class="active" data-filter="ungraded">To Grade</button>
+            <button data-filter="graded">Graded</button>
+            <button data-filter="all">All</button>
+          </div>
+          <select class="select" id="courseFilter" style="margin-left:auto;"></select>
+        </div>
+
+        <section class="card card-pad">
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Student</th><th>Assignment</th><th>Submitted</th><th>Status</th><th></th></tr></thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+          <div id="empty"></div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Grading modal -->
+  <div class="portal-modal" id="gradeModal">
+    <div class="backdrop" data-modal-close></div>
+    <div class="modal-card" style="width:min(760px,100%);">
+      <div class="modal-head"><h3 id="gmTitle">Grade Submission</h3><button class="modal-close" data-modal-close aria-label="Close">×</button></div>
+      <div class="row-2" style="gap:18px;">
+        <div>
+          <p class="muted" style="margin-top:0;font-size:13px;" id="gmMeta"></p>
+          <div class="card card-pad" style="background:var(--core-bg);box-shadow:none;">
+            <p style="margin:0 0 12px;">Submission notes from the student would appear here. For this demo it's placeholder text describing the work submitted.</p>
+            <a class="card-link" style="color:var(--core-blue);font-weight:800;" href="#">📎 View attached file</a>
+          </div>
+        </div>
+        <div class="stack">
+          <div><label class="field-label">Score (<span id="gmMax"></span> max)</label><input class="input" id="gmScore" type="number" min="0" placeholder="0" /></div>
+          <div><label class="field-label">Letter grade (auto)</label><input class="input" id="gmLetter" readonly placeholder="—" /></div>
+          <div><label class="field-label">Feedback</label><textarea class="textarea" id="gmFeedback" placeholder="Comments for the student…"></textarea></div>
+          <button class="btn btn-primary btn-block" id="gmSave">Save Grade</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="teacher-mock-data.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    var currentSub = null;
+    function letterFromPct(p) {
+      if (p >= 93) return "A"; if (p >= 90) return "A−"; if (p >= 87) return "B+"; if (p >= 83) return "B";
+      if (p >= 80) return "B−"; if (p >= 77) return "C+"; if (p >= 73) return "C"; if (p >= 60) return "D"; return "F";
+    }
+
+    var cf = document.getElementById("courseFilter");
+    cf.innerHTML = '<option value="all">All courses</option>' +
+      teacherCourses.filter(function (c) { return c.status === "published"; }).map(function (c) {
+        return '<option value="' + c.id + '">' + esc(c.title) + "</option>";
+      }).join("");
+    var preCourse = new URLSearchParams(location.search).get("course");
+    if (preCourse) cf.value = preCourse;
+
+    var filter = "ungraded";
+    function render() {
+      var course = cf.value;
+      var list = submissions.filter(function (s) {
+        var okStatus = filter === "all" || s.status === filter;
+        var okCourse = course === "all" || s.courseId === course;
+        return okStatus && okCourse;
+      });
+      var tbody = document.getElementById("rows"), empty = document.getElementById("empty");
+      if (!list.length) { tbody.innerHTML = ""; empty.innerHTML = '<div class="empty-state"><div class="es-ico">✅</div><h3>All caught up</h3><p>No submissions match this view.</p></div>'; return; }
+      empty.innerHTML = "";
+      tbody.innerHTML = list.map(function (s) {
+        var stu = teacherStudentById(s.studentId), c = teacherCourseById(s.courseId);
+        var status = s.status === "graded"
+          ? '<span class="badge badge-success">Graded · ' + s.score + "/" + s.maxPoints + "</span>"
+          : '<span class="badge badge-warning">Ungraded</span>';
+        var action = s.status === "graded"
+          ? '<button class="btn btn-light btn-sm" data-grade="' + s.id + '">Review</button>'
+          : '<button class="btn btn-primary btn-sm" data-grade="' + s.id + '">Grade</button>';
+        return "<tr><td><div style='display:flex;align-items:center;gap:10px;'>" + avatarHTML(stu.avatarInitials, "avatar-sm") + "<b>" + esc(stu.name) + "</b></div></td>" +
+          "<td>" + esc(s.assignmentTitle) + ' <span class="tag">' + esc(c.title) + "</span></td>" +
+          "<td>" + prettyDate(s.submittedDate) + "</td>" +
+          "<td>" + status + "</td>" +
+          "<td>" + action + "</td></tr>";
+      }).join("");
+    }
+
+    document.getElementById("filters").addEventListener("click", function (e) {
+      var b = e.target.closest("[data-filter]"); if (!b) return;
+      this.querySelectorAll("button").forEach(function (x) { x.classList.remove("active"); });
+      b.classList.add("active");
+      filter = b.getAttribute("data-filter");
+      render();
+    });
+    cf.addEventListener("change", render);
+
+    // Open grading modal
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-grade]"); if (!b) return;
+      currentSub = submissions.find(function (s) { return s.id === b.getAttribute("data-grade"); });
+      var stu = teacherStudentById(currentSub.studentId), c = teacherCourseById(currentSub.courseId);
+      document.getElementById("gmTitle").textContent = currentSub.assignmentTitle;
+      document.getElementById("gmMeta").textContent = stu.name + " · " + c.title + " · submitted " + prettyDate(currentSub.submittedDate);
+      document.getElementById("gmMax").textContent = currentSub.maxPoints;
+      document.getElementById("gmScore").value = currentSub.score == null ? "" : currentSub.score;
+      document.getElementById("gmScore").max = currentSub.maxPoints;
+      document.getElementById("gmFeedback").value = "";
+      updateLetter();
+      document.getElementById("gradeModal").classList.add("open");
+    });
+
+    function updateLetter() {
+      var v = parseFloat(document.getElementById("gmScore").value);
+      var letter = (!isNaN(v) && currentSub) ? letterFromPct(Math.round((v / currentSub.maxPoints) * 100)) : "—";
+      document.getElementById("gmLetter").value = letter;
+    }
+    document.getElementById("gmScore").addEventListener("input", updateLetter);
+
+    document.getElementById("gmSave").addEventListener("click", function () {
+      if (!currentSub) return;
+      var v = parseFloat(document.getElementById("gmScore").value);
+      if (isNaN(v)) { showToast("Enter a score first"); return; }
+      currentSub.status = "graded";
+      currentSub.score = v;
+      document.getElementById("gradeModal").classList.remove("open");
+      showToast("Grade saved for " + teacherStudentById(currentSub.studentId).name);
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

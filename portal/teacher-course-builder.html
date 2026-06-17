@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Course Builder — CORE Academy Instructor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="teacher-course-builder" data-role="teacher">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <a href="teacher-courses.html" class="muted" style="font-weight:700;display:inline-block;margin-bottom:16px;">← Back to courses</a>
+        <h2 class="section-title" id="builderTitle" style="font-size:22px;margin-bottom:18px;">Create New Course</h2>
+
+        <!-- Course Info -->
+        <section class="card card-pad" style="margin-bottom:20px;">
+          <h3 style="color:var(--core-navy);margin-bottom:14px;">Course Info</h3>
+          <div class="stack" style="max-width:680px;">
+            <div><label class="field-label">Course title</label><input class="input" id="cTitle" placeholder="e.g. Security Systems Engineering" /></div>
+            <div><label class="field-label">Discipline</label>
+              <select class="select" id="cDiscipline">
+                <option>Security Systems Engineering</option>
+                <option>Fire Alarm Systems Engineering</option>
+                <option>Building Management Systems</option>
+                <option>Data Center Infrastructure</option>
+                <option>Network Engineering</option>
+                <option>Audio Visual Systems</option>
+              </select>
+            </div>
+            <div><label class="field-label">Description</label><textarea class="textarea" placeholder="What will students learn in this course?"></textarea></div>
+            <div><label class="field-label">Course icon</label>
+              <div class="icon-picker">
+                <input type="radio" name="icon" id="i1" checked /><label for="i1">🛡️</label>
+                <input type="radio" name="icon" id="i2" /><label for="i2">🔥</label>
+                <input type="radio" name="icon" id="i3" /><label for="i3">🏢</label>
+                <input type="radio" name="icon" id="i4" /><label for="i4">🖥️</label>
+                <input type="radio" name="icon" id="i5" /><label for="i5">🌐</label>
+                <input type="radio" name="icon" id="i6" /><label for="i6">🎚️</label>
+              </div>
+            </div>
+            <div class="toggle-row" style="border:0;padding:0;">
+              <div><b>Published</b><div class="muted" style="font-size:13px;">Off = saved as draft</div></div>
+              <label class="toggle-switch"><input type="checkbox" id="cPublished" /><span class="track"></span></label>
+            </div>
+          </div>
+        </section>
+
+        <!-- Modules -->
+        <section class="card card-pad" style="margin-bottom:20px;">
+          <div class="between" style="margin-bottom:14px;"><h3 style="color:var(--core-navy);">Modules</h3>
+            <button class="btn btn-light btn-sm" id="addModule">+ Add Module</button></div>
+          <div id="modules"></div>
+        </section>
+
+        <!-- Assignments -->
+        <section class="card card-pad" style="margin-bottom:20px;">
+          <div class="between" style="margin-bottom:14px;"><h3 style="color:var(--core-navy);">Assignments</h3>
+            <button class="btn btn-light btn-sm" id="addAssignment">+ Add Assignment</button></div>
+          <div id="assignments"></div>
+        </section>
+
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-primary" id="saveCourse">Save Course</button>
+          <a class="btn btn-light" href="teacher-courses.html">Cancel</a>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="teacher-mock-data.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    // Prefill if editing
+    var id = new URLSearchParams(location.search).get("id");
+    var editing = id ? teacherCourseById(id) : null;
+    if (editing) {
+      document.getElementById("builderTitle").textContent = "Edit Course";
+      document.getElementById("cTitle").value = editing.title;
+      document.getElementById("cDiscipline").value = editing.title;
+      document.getElementById("cPublished").checked = editing.status === "published";
+    }
+
+    var modules = document.getElementById("modules");
+    var assignments = document.getElementById("assignments");
+    var modCount = 0;
+
+    function lessonRow() {
+      var row = document.createElement("div");
+      row.className = "lesson-row";
+      row.innerHTML =
+        '<input class="input" placeholder="Lesson title" />' +
+        '<select class="select"><option>Video</option><option>Reading</option><option>Lab</option><option>Quiz</option></select>' +
+        '<input class="input" placeholder="Duration" />' +
+        '<button type="button" class="row-remove" aria-label="Remove lesson">✕</button>';
+      row.querySelector(".row-remove").addEventListener("click", function () { row.remove(); });
+      return row;
+    }
+
+    function addModule(title) {
+      modCount++;
+      var n = modCount;
+      var item = document.createElement("div");
+      item.className = "accordion-item is-builder open";
+      item.innerHTML =
+        '<button class="accordion-head" type="button"><span>Module ' + n + '</span><span class="chev">▾</span></button>' +
+        '<div class="accordion-body" style="padding:16px 18px;">' +
+          '<label class="field-label">Module title</label>' +
+          '<input class="input module-title" placeholder="e.g. CCTV Design" style="margin-bottom:12px;" />' +
+          '<div class="lessons"></div>' +
+          '<div style="display:flex;gap:8px;margin-top:6px;">' +
+            '<button type="button" class="btn btn-light btn-sm add-lesson">+ Add lesson</button>' +
+            '<button type="button" class="btn btn-light btn-sm remove-module" style="color:#c0392b;">Remove module</button>' +
+          '</div>' +
+        '</div>';
+      if (title) item.querySelector(".module-title").value = title;
+      var lessons = item.querySelector(".lessons");
+      lessons.appendChild(lessonRow());
+      item.querySelector(".add-lesson").addEventListener("click", function () { lessons.appendChild(lessonRow()); });
+      item.querySelector(".remove-module").addEventListener("click", function () { item.remove(); });
+      modules.appendChild(item);
+    }
+
+    function addAssignment() {
+      var row = document.createElement("div");
+      row.className = "lesson-row";
+      row.style.gridTemplateColumns = "1fr 160px 110px auto";
+      row.innerHTML =
+        '<input class="input" placeholder="Assignment title" />' +
+        '<input class="input" type="date" />' +
+        '<input class="input" type="number" placeholder="Max pts" />' +
+        '<button type="button" class="row-remove" aria-label="Remove assignment">✕</button>';
+      row.querySelector(".row-remove").addEventListener("click", function () { row.remove(); });
+      assignments.appendChild(row);
+    }
+
+    document.getElementById("addModule").addEventListener("click", function () { addModule(); });
+    document.getElementById("addAssignment").addEventListener("click", addAssignment);
+    document.getElementById("saveCourse").addEventListener("click", function () { showToast("Course saved (demo)"); });
+
+    // seed with one module + one assignment
+    addModule(editing ? "Module 1" : "");
+    addAssignment();
+  </script>
+</body>
+</html>

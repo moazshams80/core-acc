@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Courses — CORE Academy Instructor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="teacher-courses" data-role="teacher">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <div class="between" style="margin-bottom:22px;">
+          <div><h2 class="section-title" style="font-size:22px;">My Courses</h2><p class="muted" style="margin:4px 0 0;">Courses you create and manage.</p></div>
+          <a class="btn btn-primary" href="teacher-course-builder.html">+ Create New Course</a>
+        </div>
+
+        <div class="grid grid-3" id="grid"></div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="teacher-mock-data.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    document.getElementById("grid").innerHTML = teacherCourses.map(function (c) {
+      var badge = c.status === "published" ? '<span class="badge badge-success">Published</span>' : '<span class="badge badge-neutral">Draft</span>';
+      var progress = c.status === "published"
+        ? '<div style="margin:6px 0 14px;">' + progressHTML(c.avgProgress, true) + "</div>"
+        : '<p class="muted" style="margin:6px 0 14px;font-size:13px;">Not published yet</p>';
+      return '<article class="course-card"><span class="corner">' + badge + "</span>" +
+        '<span class="course-icon" aria-hidden="true">' + c.icon + "</span>" +
+        "<h3>" + esc(c.title) + "</h3>" +
+        '<p class="muted" style="font-size:13px;margin:0 0 4px;">👥 ' + c.enrolledCount + " students enrolled</p>" +
+        progress +
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+          '<a class="btn btn-primary btn-sm" href="teacher-course-builder.html?id=' + c.id + '">Manage</a>' +
+          '<a class="btn btn-light btn-sm" href="teacher-course-builder.html?id=' + c.id + '">Edit</a>' +
+          '<a class="btn btn-light btn-sm" href="teacher-students.html?course=' + c.id + '">View Students</a>' +
+        "</div></article>";
+    }).join("");
+  </script>
+</body>
+</html>
