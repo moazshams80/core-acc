@@ -62,7 +62,7 @@
           <button type="submit" class="btn btn-primary btn-block">Log In</button>
           <div class="divider">or</div>
           <p style="text-align:center;margin:0;font-size:14px;" class="muted" id="regLine">
-            New student? <a href="#" style="color:var(--core-blue);font-weight:700;">Start registration</a>
+            New student? <a href="register.html?role=student" style="color:var(--core-blue);font-weight:700;">Create an account</a>
           </p>
         </form>
       </div>
@@ -72,8 +72,8 @@
   <script>
     var role = "student";
     var copy = {
-      student: { portal: "Student Portal", title: "Student Login", who: "Student ID or Email", reg: 'New student? <a href="#" style="color:var(--core-blue);font-weight:700;">Start registration</a>', dest: "dashboard.html" },
-      teacher: { portal: "Instructor Portal", title: "Instructor Login", who: "Instructor ID or Email", reg: 'Instructor access? <a href="#" style="color:var(--core-blue);font-weight:700;">Contact admin</a>', dest: "teacher-dashboard.html" },
+      student: { portal: "Student Portal", title: "Student Login", who: "Student ID or Email", reg: 'New student? <a href="register.html?role=student" style="color:var(--core-blue);font-weight:700;">Create an account</a>', dest: "dashboard.html" },
+      teacher: { portal: "Instructor Portal", title: "Instructor Login", who: "Instructor ID or Email", reg: 'New instructor? <a href="register.html?role=teacher" style="color:var(--core-blue);font-weight:700;">Create an account</a>', dest: "teacher-dashboard.html" },
     };
 
     // Role toggle

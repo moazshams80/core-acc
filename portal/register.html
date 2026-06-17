@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account — CORE Academy Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body>
+  <div class="login-wrap">
+    <!-- Left branded panel -->
+    <aside class="login-aside">
+      <span class="brand-mark">C</span>
+      <h1>Start your<br />journey with CORE.</h1>
+      <p>Create your account to access courses, live sessions, assignments, and verified certificates — all in one portal.</p>
+      <svg width="320" height="160" viewBox="0 0 320 160" fill="none" aria-hidden="true" style="margin-top:36px;opacity:.5;">
+        <g stroke="#22a7e0" stroke-width="1.5">
+          <path d="M10 130 H110 L150 90 H250" />
+          <path d="M10 80 H70 L100 50 H300" />
+          <path d="M40 150 V110 L80 70" />
+        </g>
+        <g fill="#22a7e0">
+          <circle cx="110" cy="130" r="4" /><circle cx="150" cy="90" r="4" /><circle cx="250" cy="90" r="4" />
+          <circle cx="70" cy="80" r="4" /><circle cx="100" cy="50" r="4" /><circle cx="80" cy="70" r="4" />
+        </g>
+      </svg>
+    </aside>
+
+    <!-- Right form panel -->
+    <main class="login-form-panel">
+      <div class="login-form-card card card-pad">
+        <!-- Role toggle -->
+        <div class="segmented" id="roleToggle" role="tablist" aria-label="Choose account type">
+          <button type="button" class="active" data-role="student" role="tab" aria-selected="true">🎓 Student</button>
+          <button type="button" data-role="teacher" role="tab" aria-selected="false">👨‍🏫 Teacher</button>
+        </div>
+
+        <p class="kicker" id="rolePortal">Student Portal</p>
+        <h2 class="section-title" id="roleTitle" style="margin-bottom:6px;">Create Student Account</h2>
+        <p class="muted" style="margin:0 0 22px;font-size:14px;">Demo signup — no real account is created.</p>
+
+        <form id="registerForm" class="stack" autocomplete="off">
+          <div>
+            <label class="field-label" for="fullname">Full name</label>
+            <input class="input" id="fullname" type="text" placeholder="e.g. Youssef Hassan" required />
+          </div>
+          <div>
+            <label class="field-label" id="whoLabel" for="who">Email or Student ID</label>
+            <input class="input" id="who" type="text" placeholder="you@example.com" required />
+          </div>
+          <div>
+            <label class="field-label" for="pwd">Password</label>
+            <div class="password-field">
+              <input class="input" id="pwd" type="password" placeholder="At least 6 characters" minlength="6" required />
+              <button type="button" class="toggle-pass" id="togglePass" aria-label="Show password">👁️</button>
+            </div>
+          </div>
+          <div>
+            <label class="field-label" for="pwd2">Confirm password</label>
+            <input class="input" id="pwd2" type="password" placeholder="Re-enter password" required />
+            <p id="pwdError" class="muted" style="display:none;margin:6px 0 0;color:#c0392b;font-size:13px;font-weight:700;">Passwords do not match.</p>
+          </div>
+          <label class="login-row" style="justify-content:flex-start;gap:8px;">
+            <input type="checkbox" id="terms" required /> <span class="muted">I agree to the Terms &amp; Privacy Policy</span>
+          </label>
+          <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+          <div class="divider">or</div>
+          <p style="text-align:center;margin:0;font-size:14px;" class="muted">
+            Already have an account? <a href="login.html" style="color:var(--core-blue);font-weight:700;">Log in</a>
+          </p>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    var role = "student";
+    var copy = {
+      student: { portal: "Student Portal", title: "Create Student Account", who: "Email or Student ID", dest: "dashboard.html" },
+      teacher: { portal: "Instructor Portal", title: "Create Instructor Account", who: "Email or Instructor ID", dest: "teacher-dashboard.html" },
+    };
+
+    function setRole(r) {
+      role = r;
+      document.querySelectorAll("#roleToggle button").forEach(function (x) {
+        var on = x.getAttribute("data-role") === r;
+        x.classList.toggle("active", on);
+        x.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      document.getElementById("rolePortal").textContent = copy[r].portal;
+      document.getElementById("roleTitle").textContent = copy[r].title;
+      document.getElementById("whoLabel").textContent = copy[r].who;
+    }
+
+    // honor ?role= from the login page
+    var initial = new URLSearchParams(location.search).get("role");
+    setRole(initial === "teacher" ? "teacher" : "student");
+
+    document.getElementById("roleToggle").addEventListener("click", function (e) {
+      var b = e.target.closest("[data-role]"); if (!b) return;
+      setRole(b.getAttribute("data-role"));
+    });
+
+    // Show / hide password
+    document.getElementById("togglePass").addEventListener("click", function () {
+      var p = document.getElementById("pwd");
+      var show = p.type === "password";
+      p.type = show ? "text" : "password";
+      this.textContent = show ? "🙈" : "👁️";
+      this.setAttribute("aria-label", show ? "Hide password" : "Show password");
+    });
+
+    // Create account (frontend only): validate, set session, redirect by role
+    document.getElementById("registerForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var p1 = document.getElementById("pwd").value;
+      var p2 = document.getElementById("pwd2").value;
+      var err = document.getElementById("pwdError");
+      if (p1 !== p2) { err.style.display = "block"; return; }
+      err.style.display = "none";
+      try {
+        sessionStorage.setItem("loggedIn", "true");
+        sessionStorage.setItem("role", role);
+      } catch (err2) {}
+      window.location.href = copy[role].dest;
+    });
+  </script>
+</body>
+</html>
