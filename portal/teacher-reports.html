@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reports — CORE Academy Instructor</title>
+  <title>Reports — CORE Egypt Instructor</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
@@ -22,7 +22,7 @@
           <select class="select" id="rangeFilter">
             <option>Last 7 weeks</option><option>This term</option><option>All time</option>
           </select>
-          <div style="margin-left:auto;display:flex;gap:8px;">
+          <div style="margin-left:auto;display:flex;gap:8px;align-items:center;" id="exportControls">
             <button class="btn btn-light btn-sm" id="csv">Export CSV</button>
             <button class="btn btn-light btn-sm" id="pdf">Download PDF</button>
           </div>
@@ -141,8 +141,13 @@
         "<td>" + gradeBadge(s.grade) + "</td><td>" + s.attendanceRate + "%</td><td>" + s.progress + "%</td></tr>";
     }).join("");
 
-    document.getElementById("csv").addEventListener("click", function () { showToast("Exporting CSV… (demo)"); });
-    document.getElementById("pdf").addEventListener("click", function () { showToast("Generating PDF… (demo)"); });
+    // Downloads/exports are admin-only (see canDownload() in portal.js)
+    if (canDownload()) {
+      document.getElementById("csv").addEventListener("click", function () { showToast("Exporting CSV… (demo)"); });
+      document.getElementById("pdf").addEventListener("click", function () { showToast("Generating PDF… (demo)"); });
+    } else {
+      document.getElementById("exportControls").innerHTML = downloadLockHTML();
+    }
   </script>
 </body>
 </html>

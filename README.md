@@ -1,6 +1,6 @@
-# CORE Academy — Student Portal
+# CORE Egypt — Student Portal
 
-A frontend-only **Student Portal** prototype for CORE Academy, built with plain HTML, CSS, and vanilla JavaScript — no frameworks, no build step, no backend. All data is mocked.
+A frontend-only **Student Portal** prototype for CORE Egypt, built with plain HTML, CSS, and vanilla JavaScript — no frameworks, no build step, no backend. All data is mocked.
 
 ## Live demo (local)
 
@@ -18,7 +18,7 @@ Then open: <http://127.0.0.1:8000/portal/login.html>
 
 | File | Description |
 |------|-------------|
-| `portal/login.html` | Split-screen student login |
+| `portal/login.html` | Role chooser → student-login.html / teacher-login.html |
 | `portal/dashboard.html` | Stats, continue-learning, upcoming, activity feed |
 | `portal/courses.html` | Enrolled courses with progress + filters |
 | `portal/course-detail.html` | Overview + module accordion |

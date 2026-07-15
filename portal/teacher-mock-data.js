@@ -1,18 +1,19 @@
 /* =========================================================
-   CORE Academy — TEACHER (Instructor) MOCK DATA
+   CORE Egypt — TEACHER (Instructor) MOCK DATA
    Frontend-only. Cross-consistent with mock-data.js:
-   same course titles + the same student (Youssef Hassan).
+   same course titles + the same student (Youssef).
    ========================================================= */
 
 const currentInstructor = {
-  name: "Eng. Karim Adel",
+  name: "Eng. Karim",
   id: "IN-2019-014",
-  email: "karim.adel@coreacademy.com",
+  email: "karim@coreegypt.com",
   phone: "+20 100 444 0142",
   disciplines: ["Security Systems", "Networking", "Fire Safety"],
-  avatarInitials: "KA",
+  avatarInitials: "K",
   teachingSince: "Feb 2019",
-  bio: "Senior security & networking engineer turned instructor. 12 years of field experience across CCTV, access control, and enterprise networks.",
+  isAdmin: true, // Head of Academy — the only account allowed to download files (see canDownload())
+  bio: "Head of Academy. Senior security & networking engineer with 12 years of field experience across CCTV, access control, and enterprise networks.",
 };
 
 /* Courses owned by this instructor (subset of the 6 CORE programs) */
@@ -23,20 +24,20 @@ const teacherCourses = [
   { id: "tc4", title: "Building Management Systems", icon: "🏢", programType: "Automation", status: "draft", enrolledCount: 0, avgProgress: 0, avgGrade: "—", avgGradePct: 0, avgAttendance: 0 },
 ];
 
-/* Students taught by this instructor (Youssef Hassan = the student-side user) */
+/* Students taught by this instructor (Youssef = the student-side user) */
 const teacherStudents = [
-  { id: "CA-2024-0317", name: "Youssef Hassan",  avatarInitials: "YH", courseIds: ["tc1"],        progress: 75, grade: "A−", attendanceRate: 94 },
-  { id: "CA-2024-0291", name: "Nour Ibrahim",    avatarInitials: "NI", courseIds: ["tc1", "tc3"], progress: 82, grade: "A",  attendanceRate: 96 },
-  { id: "CA-2024-0334", name: "Omar Khaled",     avatarInitials: "OK", courseIds: ["tc2"],        progress: 47, grade: "B",  attendanceRate: 88 },
-  { id: "CA-2024-0302", name: "Salma Adel",      avatarInitials: "SA", courseIds: ["tc1"],        progress: 63, grade: "B+", attendanceRate: 91 },
-  { id: "CA-2024-0278", name: "Mariam Tarek",    avatarInitials: "MT", courseIds: ["tc3"],        progress: 90, grade: "A",  attendanceRate: 98 },
-  { id: "CA-2024-0345", name: "Ahmed Sami",      avatarInitials: "AS", courseIds: ["tc2", "tc3"], progress: 55, grade: "B−", attendanceRate: 79 },
-  { id: "CA-2024-0319", name: "Laila Mostafa",   avatarInitials: "LM", courseIds: ["tc1"],        progress: 38, grade: "C+", attendanceRate: 72 },
-  { id: "CA-2024-0263", name: "Khaled Nabil",    avatarInitials: "KN", courseIds: ["tc3"],        progress: 71, grade: "B+", attendanceRate: 90 },
-  { id: "CA-2024-0357", name: "Hana Yasser",     avatarInitials: "HY", courseIds: ["tc2"],        progress: 66, grade: "B",  attendanceRate: 85 },
-  { id: "CA-2024-0288", name: "Omar Fathy",      avatarInitials: "OF", courseIds: ["tc1", "tc2"], progress: 80, grade: "A−", attendanceRate: 93 },
-  { id: "CA-2024-0371", name: "Farida Gamal",    avatarInitials: "FG", courseIds: ["tc3"],        progress: 59, grade: "B",  attendanceRate: 87 },
-  { id: "CA-2024-0399", name: "Ziad Mahmoud",    avatarInitials: "ZM", courseIds: ["tc2"],        progress: 44, grade: "C",  attendanceRate: 68 },
+  { id: "CA-2024-0317", name: "Youssef", avatarInitials: "Y", courseIds: ["tc1"],        progress: 75, grade: "A−", attendanceRate: 94 },
+  { id: "CA-2024-0291", name: "Nour",    avatarInitials: "N", courseIds: ["tc1", "tc3"], progress: 82, grade: "A",  attendanceRate: 96 },
+  { id: "CA-2024-0334", name: "Omar",    avatarInitials: "O", courseIds: ["tc2"],        progress: 47, grade: "B",  attendanceRate: 88 },
+  { id: "CA-2024-0302", name: "Salma",   avatarInitials: "S", courseIds: ["tc1"],        progress: 63, grade: "B+", attendanceRate: 91 },
+  { id: "CA-2024-0278", name: "Mariam",  avatarInitials: "M", courseIds: ["tc3"],        progress: 90, grade: "A",  attendanceRate: 98 },
+  { id: "CA-2024-0345", name: "Ahmed",   avatarInitials: "A", courseIds: ["tc2", "tc3"], progress: 55, grade: "B−", attendanceRate: 79 },
+  { id: "CA-2024-0319", name: "Laila",   avatarInitials: "L", courseIds: ["tc1"],        progress: 38, grade: "C+", attendanceRate: 72 },
+  { id: "CA-2024-0263", name: "Khaled",  avatarInitials: "K", courseIds: ["tc3"],        progress: 71, grade: "B+", attendanceRate: 90 },
+  { id: "CA-2024-0357", name: "Hana",    avatarInitials: "H", courseIds: ["tc2"],        progress: 66, grade: "B",  attendanceRate: 85 },
+  { id: "CA-2024-0288", name: "Tamer",   avatarInitials: "T", courseIds: ["tc1", "tc2"], progress: 80, grade: "A−", attendanceRate: 93 },
+  { id: "CA-2024-0371", name: "Farida",  avatarInitials: "F", courseIds: ["tc3"],        progress: 59, grade: "B",  attendanceRate: 87 },
+  { id: "CA-2024-0399", name: "Ziad",    avatarInitials: "Z", courseIds: ["tc2"],        progress: 44, grade: "C",  attendanceRate: 68 },
 ];
 
 /* Submissions queue */

@@ -1,5 +1,5 @@
 /* =========================================================
-   CORE Academy — Student Portal SHELL + SHARED LOGIC
+   CORE Egypt — Student Portal SHELL + SHARED LOGIC
    Vanilla JS, no dependencies. Builds the sidebar + header,
    gates access, and provides render helpers used by pages.
    ========================================================= */
@@ -67,12 +67,22 @@ var TEACHER_PAGE_TITLES = {
 
 /* ---- Session helpers (role-aware) ---- */
 function portalLogout() {
+  var role;
+  try { role = sessionStorage.getItem("role"); } catch (e) {}
   try {
     sessionStorage.removeItem("loggedIn");
     sessionStorage.removeItem("role");
     sessionStorage.removeItem("coreSession");
   } catch (e) {}
-  window.location.href = "login.html";
+  window.location.href = role === "teacher" ? "teacher-login.html" : "student-login.html";
+}
+
+/* ---- Shared password rule (min 8) ---- */
+var PASSWORD_MIN = 8;
+function validatePassword(pw) { return String(pw || "").length >= PASSWORD_MIN; }
+function passwordTooShortMsg() {
+  var rtl = document.documentElement.getAttribute("dir") === "rtl";
+  return rtl ? "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل" : "Password must be at least 8 characters";
 }
 
 /* Toast notification (shared, used by save actions) */
@@ -145,7 +155,7 @@ function buildShell() {
   var titles = isTeacher ? TEACHER_PAGE_TITLES : PAGE_TITLES;
   var profileHref = isTeacher ? "teacher-profile.html" : "profile.html";
   var person = isTeacher
-    ? (typeof currentInstructor !== "undefined" ? currentInstructor : { name: "Instructor", avatarInitials: "IN" })
+    ? (typeof currentInstructor !== "undefined" ? currentInstructor : { name: "Instructor", avatarInitials: "I" })
     : (typeof currentStudent !== "undefined" ? currentStudent : { name: "Student", avatarInitials: "S" });
 
   var activeKey = page;
@@ -161,7 +171,7 @@ function buildShell() {
     }).join("");
     var pill = isTeacher ? ' <span class="teacher-pill">Instructor</span>' : "";
     sidebar.innerHTML =
-      '<div class="portal-brand"><span class="brand-mark">C</span><span>CORE Academy</span>' + pill + "</div>" +
+      '<div class="portal-brand"><span class="brand-mark">C</span><span>CORE Egypt</span>' + pill + "</div>" +
       '<ul class="portal-nav">' + navHTML + "</ul>" +
       '<div class="portal-userbox">' + avatarHTML(person.avatarInitials, "avatar-sm") +
         '<div class="meta"><b>' + esc(person.name) + "</b>" +
@@ -199,6 +209,90 @@ function buildShell() {
           "</div>" +
         "</div>" +
       "</div>";
+  }
+}
+
+/* =========================================================
+   CONTENT PROTECTION MODULE
+   SECURITY NOTE: Browser JavaScript CANNOT truly block OS-level
+   screenshots or a phone camera. Everything below is a DETERRENT +
+   TRACEABILITY layer only (anti-copy, watermark, print/keyboard hints).
+   All checks are centralized here so they can be swapped for real
+   server-side enforcement (Firebase Storage rules / signed URLs) in
+   the backend phase.
+   ========================================================= */
+
+/* Who is logged in right now (student or instructor mock user) */
+function getCurrentUser() {
+  var role;
+  try { role = sessionStorage.getItem("role"); } catch (e) {}
+  if (role === "teacher" && typeof currentInstructor !== "undefined") return currentInstructor;
+  if (typeof currentStudent !== "undefined") return currentStudent;
+  return { name: "User", id: "—" };
+}
+function firstName(n) { return String(n || "").trim().replace(/^Eng\.\s*/, "").split(/\s+/)[0] || "User"; }
+
+/* Admin-only download gate. Swap for a server check in the backend phase. */
+function canDownload() {
+  // admin-only: role === "teacher" && currentUser.isAdmin === true
+  var role;
+  try { role = sessionStorage.getItem("role"); } catch (e) {}
+  if (role !== "teacher") return false;
+  return (typeof currentInstructor !== "undefined") && currentInstructor.isAdmin === true;
+}
+function downloadLockHTML() {
+  var rtl = document.documentElement.getAttribute("dir") === "rtl";
+  return '<span class="download-lock">🔒 ' + (rtl ? "التنزيل يتطلب صلاحية المشرف" : "Downloads require admin access") + "</span>";
+}
+
+/* Wrap protected material: watermark + anti-copy + print/screenshot deterrents.
+   Scoped to .protected-content only — never touches the rest of the app. */
+function initContentProtection() {
+  var wraps = document.querySelectorAll(".protected-content");
+  if (!wraps.length) return;
+
+  var user = getCurrentUser();
+  var stamp = firstName(user.name) + " • " + (user.id || "—") + " • " + new Date().toLocaleDateString();
+
+  wraps.forEach(function (w) {
+    if (w.getAttribute("data-protected") === "1") return;
+    w.setAttribute("data-protected", "1");
+    // dynamic diagonal watermark (the real deterrent — traceable to the user)
+    var wm = document.createElement("div");
+    wm.className = "protected-watermark";
+    wm.setAttribute("aria-hidden", "true");
+    var cells = "";
+    for (var i = 0; i < 60; i++) cells += "<span>" + esc(stamp) + "</span>";
+    wm.innerHTML = cells;
+    w.appendChild(wm);
+    // block copy / cut / drag / right-click inside the wrapper
+    ["contextmenu", "copy", "cut", "dragstart"].forEach(function (ev) {
+      w.addEventListener(ev, function (e) { e.preventDefault(); });
+    });
+  });
+
+  // Ctrl/Cmd + S / P guards
+  document.addEventListener("keydown", function (e) {
+    var k = (e.key || "").toLowerCase();
+    if ((e.ctrlKey || e.metaKey) && (k === "s" || k === "p")) {
+      e.preventDefault();
+      showToast("Saving and printing are disabled for course materials");
+    }
+  });
+  // Best-effort screenshot deterrent (Windows PrintScreen only)
+  document.addEventListener("keyup", function (e) {
+    if (e.key === "PrintScreen") {
+      wraps.forEach(function (w) { w.classList.add("blurred"); });
+      showToast("Screenshots are not permitted.");
+      setTimeout(function () { wraps.forEach(function (w) { w.classList.remove("blurred"); }); }, 2000);
+    }
+  });
+  // Print-only "protected" message
+  if (!document.querySelector(".print-block")) {
+    var pb = document.createElement("div");
+    pb.className = "print-block";
+    pb.textContent = "This material is protected and cannot be printed.";
+    document.body.appendChild(pb);
   }
 }
 
@@ -266,3 +360,6 @@ document.addEventListener("keydown", function (e) {
 
 /* Build immediately (scripts are loaded at end of <body>, DOM is ready) */
 buildShell();
+/* Protect materials after page inline scripts have rendered their content */
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initContentProtection);
+else initContentProtection();

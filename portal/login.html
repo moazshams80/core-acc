@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login — CORE Academy Portal</title>
+  <title>Sign in — CORE Egypt Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
@@ -11,12 +11,10 @@
 </head>
 <body>
   <div class="login-wrap">
-    <!-- Left branded panel -->
     <aside class="login-aside">
       <span class="brand-mark">C</span>
-      <h1>Welcome back,<br />future engineer.</h1>
+      <h1>Welcome to<br />CORE Egypt.</h1>
       <p>One portal for students and instructors — courses, live sessions, grading, attendance, and verified certificates, all in one place.</p>
-      <!-- decorative circuit/network lines -->
       <svg width="320" height="160" viewBox="0 0 320 160" fill="none" aria-hidden="true" style="margin-top:36px;opacity:.5;">
         <g stroke="#22a7e0" stroke-width="1.5">
           <path d="M10 130 H110 L150 90 H250" />
@@ -30,85 +28,30 @@
       </svg>
     </aside>
 
-    <!-- Right form panel -->
     <main class="login-form-panel">
-      <div class="login-form-card card card-pad">
-        <!-- Role toggle -->
-        <div class="segmented" id="roleToggle" role="tablist" aria-label="Choose account type">
-          <button type="button" class="active" data-role="student" role="tab" aria-selected="true">🎓 Student</button>
-          <button type="button" data-role="teacher" role="tab" aria-selected="false">👨‍🏫 Teacher</button>
+      <div class="login-form-card">
+        <p class="kicker">Sign in</p>
+        <h2 class="section-title" style="margin-bottom:6px;">How would you like to sign in?</h2>
+        <p class="muted" style="margin:0 0 22px;font-size:14px;">Choose your account type to continue.</p>
+
+        <div class="chooser-grid">
+          <a class="chooser-card" href="student-login.html">
+            <span class="ci" aria-hidden="true">🎓</span>
+            <h3>I'm a Student</h3>
+            <p>Access your courses, assignments &amp; certificates.</p>
+          </a>
+          <a class="chooser-card" href="teacher-login.html">
+            <span class="ci" aria-hidden="true">👨‍🏫</span>
+            <h3>I'm a Teacher</h3>
+            <p>Manage courses, grading, sessions &amp; reports.</p>
+          </a>
         </div>
 
-        <p class="kicker" id="rolePortal">Student Portal</p>
-        <h2 class="section-title" id="roleTitle" style="margin-bottom:6px;">Student Login</h2>
-        <p class="muted" style="margin:0 0 22px;font-size:14px;">Enter any details — this is a demo portal.</p>
-
-        <form id="loginForm" class="stack" autocomplete="off">
-          <div>
-            <label class="field-label" id="whoLabel" for="who">Student ID or Email</label>
-            <input class="input" id="who" type="text" placeholder="CA-2024-0317" required />
-          </div>
-          <div>
-            <label class="field-label" for="pwd">Password</label>
-            <div class="password-field">
-              <input class="input" id="pwd" type="password" placeholder="••••••••" required />
-              <button type="button" class="toggle-pass" id="togglePass" aria-label="Show password">👁️</button>
-            </div>
-          </div>
-          <div class="login-row">
-            <label><input type="checkbox" id="remember" /> Remember me</label>
-            <a href="#">Forgot password?</a>
-          </div>
-          <button type="submit" class="btn btn-primary btn-block">Log In</button>
-          <div class="divider">or</div>
-          <p style="text-align:center;margin:0;font-size:14px;" class="muted" id="regLine">
-            New student? <a href="register.html?role=student" style="color:var(--core-blue);font-weight:700;">Create an account</a>
-          </p>
-        </form>
+        <p style="text-align:center;margin:22px 0 0;font-size:14px;" class="muted">
+          New here? <a href="register.html?role=student" style="color:var(--core-blue);font-weight:700;">Create an account</a>
+        </p>
       </div>
     </main>
   </div>
-
-  <script>
-    var role = "student";
-    var copy = {
-      student: { portal: "Student Portal", title: "Student Login", who: "Student ID or Email", reg: 'New student? <a href="register.html?role=student" style="color:var(--core-blue);font-weight:700;">Create an account</a>', dest: "dashboard.html" },
-      teacher: { portal: "Instructor Portal", title: "Instructor Login", who: "Instructor ID or Email", reg: 'New instructor? <a href="register.html?role=teacher" style="color:var(--core-blue);font-weight:700;">Create an account</a>', dest: "teacher-dashboard.html" },
-    };
-
-    // Role toggle
-    document.getElementById("roleToggle").addEventListener("click", function (e) {
-      var b = e.target.closest("[data-role]"); if (!b) return;
-      role = b.getAttribute("data-role");
-      this.querySelectorAll("button").forEach(function (x) {
-        var on = x === b;
-        x.classList.toggle("active", on);
-        x.setAttribute("aria-selected", on ? "true" : "false");
-      });
-      document.getElementById("rolePortal").textContent = copy[role].portal;
-      document.getElementById("roleTitle").textContent = copy[role].title;
-      document.getElementById("whoLabel").textContent = copy[role].who;
-      document.getElementById("regLine").innerHTML = copy[role].reg;
-    });
-
-    // Show / hide password
-    document.getElementById("togglePass").addEventListener("click", function () {
-      var p = document.getElementById("pwd");
-      var show = p.type === "password";
-      p.type = show ? "text" : "password";
-      this.textContent = show ? "🙈" : "👁️";
-      this.setAttribute("aria-label", show ? "Hide password" : "Show password");
-    });
-
-    // Login always "succeeds": store role + flag, redirect by role
-    document.getElementById("loginForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      try {
-        sessionStorage.setItem("loggedIn", "true");
-        sessionStorage.setItem("role", role);
-      } catch (err) {}
-      window.location.href = copy[role].dest;
-    });
-  </script>
 </body>
 </html>

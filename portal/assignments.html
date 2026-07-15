@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Assignments — CORE Academy Portal</title>
+  <title>Assignments — CORE Egypt Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
@@ -52,6 +52,15 @@
     </div>
   </div>
 
+  <!-- Protected brief modal -->
+  <div class="portal-modal" id="briefModal">
+    <div class="backdrop" data-modal-close></div>
+    <div class="modal-card">
+      <div class="modal-head"><h3 id="briefTitle">Assignment Brief</h3><button class="modal-close" data-modal-close aria-label="Close">×</button></div>
+      <div class="protected-content" id="briefProtected"><div id="briefBody"></div></div>
+    </div>
+  </div>
+
   <script src="mock-data.js"></script>
   <script src="portal.js"></script>
   <script>
@@ -73,7 +82,8 @@
         if (a.status === "graded") action = '<span class="badge badge-success">' + esc(a.grade) + "</span>";
         else if (a.status === "submitted") action = '<span class="muted">Awaiting grade</span>';
         else action = '<button class="btn btn-primary btn-sm" data-modal-open="submitModal" data-title="' + esc(a.title) + '">Submit</button>';
-        return "<tr><td><b>" + esc(a.title) + "</b></td>" +
+        return "<tr><td><b>" + esc(a.title) + "</b><br>" +
+            "<button type='button' class='card-link' data-brief='" + a.id + "' style='background:none;border:0;padding:0;cursor:pointer;color:var(--core-blue);font-weight:700;font-size:13px;'>View brief</button></td>" +
           '<td><span class="tag">' + esc(course.title) + "</span></td>" +
           "<td>" + due + "</td>" +
           "<td>" + badgeHTML(a.status) + "</td>" +
@@ -95,6 +105,17 @@
     document.addEventListener("click", function (e) {
       var b = e.target.closest('[data-modal-open="submitModal"]');
       if (b) document.getElementById("submitFor").textContent = b.getAttribute("data-title");
+    });
+    // Protected assignment brief viewer
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-brief]"); if (!b) return;
+      var a = assignments.find(function (x) { return x.id === b.getAttribute("data-brief"); });
+      var course = courseById(a.courseId);
+      document.getElementById("briefTitle").textContent = a.title;
+      document.getElementById("briefBody").innerHTML =
+        "<p class='muted' style='margin-top:0;'>" + esc(course.title) + " · due " + prettyDate(a.dueDate) + "</p>" +
+        "<p>Complete the tasks described in this brief and submit your work before the due date. This brief is protected course material — copying, printing, and screenshots are disabled, and it is watermarked to your account.</p>";
+      document.getElementById("briefModal").classList.add("open");
     });
     // honor ?filter= deep links (e.g. from the dashboard)
     var valid = ["all", "pending", "submitted", "graded"];

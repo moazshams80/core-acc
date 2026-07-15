@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Certificates — CORE Academy Portal</title>
+  <title>Certificates — CORE Egypt Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
@@ -47,19 +47,19 @@
       var course = courseById(cert.courseId);
       if (cert.earned) {
         return '<article class="cert-card">' +
-          '<div class="cert-brand"><span class="brand-mark" style="width:30px;height:30px;font-size:15px;" aria-hidden="true">C</span> CORE ACADEMY</div>' +
+          '<div class="cert-brand"><span class="brand-mark" style="width:30px;height:30px;font-size:15px;" aria-hidden="true">C</span> CORE EGYPT</div>' +
           '<div class="cert-kind">Certificate of Completion</div>' +
           '<div class="cert-prog">' + esc(course.title) + "</div>" +
           '<div class="cert-name">' + esc(currentStudent.name) + "</div>" +
           '<div class="cert-foot"><span class="qr" aria-hidden="true"></span>' +
             '<span class="cert-meta"><strong>Verification:</strong> ' + esc(cert.verificationCode) + "<br>" +
             '<strong>Issued:</strong> ' + esc(cert.dateEarned) + "</span></div>" +
-          '<div class="cert-actions"><button class="btn btn-primary btn-sm btn-block" onclick="alert(\'Downloading PDF… (demo)\')">Download PDF</button>' +
+          '<div class="cert-actions">' + (canDownload() ? '<button class="btn btn-primary btn-sm btn-block" onclick="showToast(\'Downloading PDF… (demo)\')">Download PDF</button>' : downloadLockHTML()) +
             '<button class="btn btn-light btn-sm btn-block" data-modal-open="verifyModal" data-code="' + esc(cert.verificationCode) + '" data-course="' + esc(course.title) + '">View Verification</button></div>' +
           "</article>";
       }
       return '<article class="cert-card locked">' +
-        '<div class="cert-brand"><span class="brand-mark" style="width:30px;height:30px;font-size:15px;background:#45525f;box-shadow:none;" aria-hidden="true">C</span> CORE ACADEMY</div>' +
+        '<div class="cert-brand"><span class="brand-mark" style="width:30px;height:30px;font-size:15px;background:#45525f;box-shadow:none;" aria-hidden="true">C</span> CORE EGYPT</div>' +
         '<div class="cert-kind">Certificate of Completion</div>' +
         '<div class="cert-prog">' + esc(course.title) + "</div>" +
         '<div class="cert-name">' + esc(currentStudent.name) + "</div>" +

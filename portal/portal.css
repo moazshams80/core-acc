@@ -1,5 +1,5 @@
 /* =========================================================
-   CORE Academy — Student Portal STYLES (self-contained)
+   CORE Egypt — Student Portal STYLES (self-contained)
    Reuses the CORE design language (navy / cyan / gold).
    Layout/shell classes prefixed `.portal-`.
    ========================================================= */
@@ -82,10 +82,16 @@ h1, h2, h3, h4 { margin: 0; }
 }
 .portal-brand { display: flex; align-items: center; gap: 12px; padding: 22px 22px; font-weight: 800; letter-spacing: .3px; }
 .brand-mark {
+  position: relative; overflow: hidden;
   width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center;
-  color: #fff; font-weight: 900;
+  color: transparent; font-weight: 900;
   background: linear-gradient(135deg, var(--core-blue), var(--core-cyan));
   box-shadow: 0 10px 25px rgba(15,103,177,.25);
+}
+/* CORE Egypt gear mark (recreated as SVG) sits inside the gradient tile */
+.brand-mark::after {
+  content: ""; position: absolute; inset: 0;
+  background: url("logo-mark.svg") center / 78% no-repeat;
 }
 .portal-nav { list-style: none; margin: 6px 0; padding: 0 12px; display: grid; gap: 4px; flex: 1; overflow-y: auto; }
 .portal-nav a {
@@ -481,6 +487,32 @@ table.data tbody tr:hover { background: var(--core-sky); }
 .accordion-item.is-builder.open .accordion-body { max-height: 2000px; }
 .lesson-row { display: grid; grid-template-columns: 1fr 130px 110px auto; gap: 8px; align-items: center; margin-bottom: 8px; }
 @media (max-width: 780px) { .lesson-row { grid-template-columns: 1fr; } .builder-row { grid-template-columns: 1fr; } }
+
+/* =========================================================
+   LOGIN ROLE CHOOSER (login.html)
+   ========================================================= */
+.chooser-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.chooser-card { display: block; text-align: center; padding: 34px 24px; border: 1px solid var(--core-border); border-radius: var(--core-radius); background: #fff; box-shadow: 0 8px 26px rgba(7,27,51,.06); transition: transform var(--core-transition), box-shadow var(--core-transition), border-color var(--core-transition); }
+.chooser-card:hover { transform: translateY(-6px); border-color: rgba(34,167,224,.45); box-shadow: var(--core-shadow); }
+.chooser-card .ci { width: 64px; height: 64px; margin: 0 auto 14px; border-radius: 18px; display: grid; place-items: center; font-size: 30px; color: #fff; background: linear-gradient(135deg, var(--core-blue), var(--core-cyan)); }
+.chooser-card h3 { color: var(--core-navy); margin-bottom: 6px; }
+.chooser-card p { color: var(--core-muted); font-size: 14px; margin: 0; }
+@media (max-width: 640px) { .chooser-grid { grid-template-columns: 1fr; } }
+
+/* =========================================================
+   CONTENT PROTECTION (materials only)
+   ========================================================= */
+.protected-content { position: relative; -webkit-user-select: none; -moz-user-select: none; user-select: none; }
+.protected-content img { -webkit-user-drag: none; user-drag: none; pointer-events: none; }
+.protected-content.blurred { filter: blur(9px); transition: filter .1s ease; }
+.protected-watermark { position: absolute; inset: 0; z-index: 6; pointer-events: none; overflow: hidden; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: 22px 46px; transform: rotate(-28deg) scale(1.4); opacity: .08; }
+.protected-watermark span { font-weight: 800; font-size: 13px; color: var(--core-navy); white-space: nowrap; }
+.download-lock { display: inline-flex; align-items: center; gap: 6px; color: var(--core-muted); font-weight: 700; font-size: 13px; background: var(--core-bg); border: 1px dashed var(--core-border); border-radius: 999px; padding: 8px 14px; }
+.print-block { display: none; }
+@media print {
+  .protected-content { display: none !important; }
+  .print-block { display: block !important; padding: 24px; font-weight: 800; color: #000; }
+}
 
 /* =========================================================
    RTL

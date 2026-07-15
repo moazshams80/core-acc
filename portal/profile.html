@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Profile — CORE Academy Portal</title>
+  <title>Profile — CORE Egypt Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
@@ -41,10 +41,11 @@
             </div>
 
             <div id="sec" class="tab-panel" data-tab-panel-group="pf">
-              <form class="stack" style="max-width:460px;" onsubmit="event.preventDefault(); alert('Password updated! (demo)');">
-                <div><label class="field-label">Current Password</label><input class="input" type="password" placeholder="••••••••" /></div>
-                <div><label class="field-label">New Password</label><input class="input" type="password" placeholder="••••••••" /></div>
-                <div><label class="field-label">Confirm New Password</label><input class="input" type="password" placeholder="••••••••" /></div>
+              <form id="pwdForm" class="stack" style="max-width:460px;">
+                <div><label class="field-label">Current Password</label><input class="input" type="password" placeholder="••••••••" required /></div>
+                <div><label class="field-label">New Password</label><input class="input" id="newPwd" type="password" placeholder="At least 8 characters" minlength="8" required /></div>
+                <div><label class="field-label">Confirm New Password</label><input class="input" id="confPwd" type="password" placeholder="Re-enter new password" required />
+                  <p id="pwdError" class="muted" style="display:none;margin:6px 0 0;color:#c0392b;font-size:13px;font-weight:700;"></p></div>
                 <button class="btn btn-primary" style="justify-self:start;">Update Password</button>
               </form>
             </div>
@@ -86,6 +87,18 @@
     document.getElementById("f-phone").value = s.phone;
     document.getElementById("f-dob").value = s.dob;
     document.getElementById("f-addr").value = s.address;
+
+    // change-password validation (min 8 chars)
+    document.getElementById("pwdForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var err = document.getElementById("pwdError");
+      var np = document.getElementById("newPwd").value;
+      var rtl = document.documentElement.getAttribute("dir") === "rtl";
+      if (!validatePassword(np)) { err.textContent = passwordTooShortMsg(); err.style.display = "block"; return; }
+      if (np !== document.getElementById("confPwd").value) { err.textContent = rtl ? "كلمتا المرور غير متطابقتين" : "Passwords do not match."; err.style.display = "block"; return; }
+      err.style.display = "none";
+      showToast("Password updated (demo)");
+    });
 
     // open Security tab if URL hash requests it
     if (location.hash === "#security") {

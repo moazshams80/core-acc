@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teacher Login — CORE Egypt Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body>
+  <div class="login-wrap">
+    <aside class="login-aside">
+      <span class="brand-mark">C</span>
+      <h1>Welcome back,<br />instructor.</h1>
+      <p>Manage your courses, grade submissions, host live sessions, mark attendance, and review reports — all in one place.</p>
+      <svg width="320" height="160" viewBox="0 0 320 160" fill="none" aria-hidden="true" style="margin-top:36px;opacity:.5;">
+        <g stroke="#22a7e0" stroke-width="1.5">
+          <path d="M10 130 H110 L150 90 H250" />
+          <path d="M10 80 H70 L100 50 H300" />
+          <path d="M40 150 V110 L80 70" />
+        </g>
+        <g fill="#22a7e0">
+          <circle cx="110" cy="130" r="4" /><circle cx="150" cy="90" r="4" /><circle cx="250" cy="90" r="4" />
+          <circle cx="70" cy="80" r="4" /><circle cx="100" cy="50" r="4" /><circle cx="80" cy="70" r="4" />
+        </g>
+      </svg>
+    </aside>
+
+    <main class="login-form-panel">
+      <div class="login-form-card card card-pad">
+        <p class="kicker">Instructor Portal</p>
+        <h2 class="section-title" style="margin-bottom:6px;">Teacher Login</h2>
+        <p class="muted" style="margin:0 0 22px;font-size:14px;">Enter any details — this is a demo portal.</p>
+
+        <form id="loginForm" class="stack" autocomplete="off">
+          <div>
+            <label class="field-label" for="who">Instructor ID or Email</label>
+            <input class="input" id="who" type="text" placeholder="IN-2019-014" required />
+          </div>
+          <div>
+            <label class="field-label" for="pwd">Password</label>
+            <div class="password-field">
+              <input class="input" id="pwd" type="password" placeholder="At least 8 characters" minlength="8" required />
+              <button type="button" class="toggle-pass" id="togglePass" aria-label="Show password">👁️</button>
+            </div>
+            <p id="pwdError" class="muted" style="display:none;margin:6px 0 0;color:#c0392b;font-size:13px;font-weight:700;"></p>
+          </div>
+          <div class="login-row">
+            <label><input type="checkbox" id="remember" /> Remember me</label>
+            <a href="#">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Log In</button>
+          <div class="divider">or</div>
+          <p style="text-align:center;margin:0;font-size:14px;" class="muted">
+            New instructor? <a href="register.html?role=teacher" style="color:var(--core-blue);font-weight:700;">Create an account</a>
+          </p>
+          <p style="text-align:center;margin:4px 0 0;font-size:13px;" class="muted">
+            Are you a student? <a href="student-login.html" style="color:var(--core-blue);font-weight:700;">Student login</a>
+          </p>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="portal.js"></script>
+  <script>
+    document.getElementById("togglePass").addEventListener("click", function () {
+      var p = document.getElementById("pwd");
+      var show = p.type === "password";
+      p.type = show ? "text" : "password";
+      this.textContent = show ? "🙈" : "👁️";
+      this.setAttribute("aria-label", show ? "Hide password" : "Show password");
+    });
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var err = document.getElementById("pwdError");
+      if (!validatePassword(document.getElementById("pwd").value)) { err.textContent = passwordTooShortMsg(); err.style.display = "block"; return; }
+      err.style.display = "none";
+      try { sessionStorage.setItem("loggedIn", "true"); sessionStorage.setItem("role", "teacher"); } catch (err2) {}
+      window.location.href = "teacher-dashboard.html";
+    });
+  </script>
+</body>
+</html>

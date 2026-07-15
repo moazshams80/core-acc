@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Course — CORE Academy Portal</title>
+  <title>Course — CORE Egypt Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
@@ -31,7 +31,12 @@
         <div id="tab-overview" class="tab-panel active" data-tab-panel-group="cd"></div>
         <div id="tab-modules" class="tab-panel" data-tab-panel-group="cd"></div>
         <div id="tab-materials" class="tab-panel" data-tab-panel-group="cd">
-          <div class="empty-state"><div class="es-ico">📂</div><h3>Materials coming soon</h3><p>Downloadable resources for this course will appear here.</p></div>
+          <div class="card card-pad protected-content" id="materialViewer">
+            <h3 style="color:var(--core-navy);margin-bottom:10px;">Course Handbook <span class="badge badge-cyan">Protected</span></h3>
+            <p>This handbook covers the key standards, diagrams, and reference tables for the course. It is licensed to the enrolled student only and is watermarked with your name and ID.</p>
+            <p style="margin:0;">Copying, printing, and screenshots are disabled for this material. Downloads are restricted to authorized administrators.</p>
+          </div>
+          <div style="margin-top:14px;" id="materialDownload"></div>
         </div>
         <div id="tab-discussion" class="tab-panel" data-tab-panel-group="cd">
           <div class="empty-state"><div class="es-ico">💬</div><h3>Discussion is quiet</h3><p>Start a thread with your instructor and classmates.</p></div>
@@ -80,6 +85,11 @@
         '<span class="muted" style="font-weight:700;font-size:13px;">' + doneCount + "/" + m.lessons.length + ' &nbsp;<span class="chev">▾</span></span></button>' +
         '<div class="accordion-body">' + lessons + "</div></div>";
     }).join("");
+
+    // Course materials are protected; downloads are admin-only (see canDownload())
+    document.getElementById("materialDownload").innerHTML = canDownload()
+      ? '<button class="btn btn-primary btn-sm" onclick="showToast(\'Downloading material… (demo)\')">Download material</button>'
+      : downloadLockHTML();
   </script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 /* =========================================================
-   CORE Academy — Student Portal MOCK DATA
+   CORE Egypt — Student Portal MOCK DATA
    Single source of truth for all portal pages.
    Frontend-only prototype — no backend.
    ========================================================= */
@@ -8,25 +8,25 @@
 const TODAY = new Date(2026, 5, 16); // 2026-06-16
 
 const currentStudent = {
-  name: "Youssef Hassan",
+  name: "Youssef",
   id: "CA-2024-0317",
-  email: "youssef.hassan@student.coreacademy.com",
+  email: "youssef@student.coreegypt.com",
   phone: "+20 100 555 0317",
   dob: "1999-03-12",
   address: "12 Nasr Road, Nasr City, Cairo, Egypt",
   program: "Security Systems Engineering",
-  avatarInitials: "YH",
+  avatarInitials: "Y",
   joinDate: "Sept 2024",
   dayOfJourney: 142,
 };
 
-/* The 6 CORE Academy engineering programs, used as enrolled courses */
+/* The 6 CORE Egypt engineering programs, used as enrolled courses */
 const courses = [
   {
     id: "c1",
     title: "Security Systems Engineering",
     icon: "🛡️",
-    instructor: "Eng. Karim Adel",
+    instructor: "Eng. Karim",
     progress: 75,
     status: "in-progress",
     enrolledOn: "Oct 2024",
@@ -84,7 +84,7 @@ const courses = [
     id: "c2",
     title: "Fire Alarm Systems Engineering",
     icon: "🔥",
-    instructor: "Eng. Mona Fathy",
+    instructor: "Eng. Mona",
     progress: 40,
     status: "in-progress",
     enrolledOn: "Nov 2024",
@@ -121,7 +121,7 @@ const courses = [
     id: "c3",
     title: "Network Engineering",
     icon: "🌐",
-    instructor: "Eng. Tarek Salah",
+    instructor: "Eng. Tarek",
     progress: 100,
     status: "completed",
     enrolledOn: "Sept 2024",
@@ -157,7 +157,7 @@ const courses = [
     id: "c4",
     title: "Audio Visual Systems",
     icon: "🎚️",
-    instructor: "Eng. Lina Hossam",
+    instructor: "Eng. Lina",
     progress: 0,
     status: "not-started",
     enrolledOn: "Jun 2026",
@@ -191,7 +191,7 @@ const courses = [
     id: "c5",
     title: "Building Management Systems",
     icon: "🏢",
-    instructor: "Eng. Omar Nabil",
+    instructor: "Eng. Omar",
     progress: 60,
     status: "in-progress",
     enrolledOn: "Oct 2024",
@@ -227,7 +227,7 @@ const courses = [
     id: "c6",
     title: "Data Center Infrastructure",
     icon: "🖥️",
-    instructor: "Eng. Sara Magdy",
+    instructor: "Eng. Sara",
     progress: 100,
     status: "completed",
     enrolledOn: "Sept 2024",
@@ -270,16 +270,16 @@ const assignments = [
 ];
 
 const liveSessions = [
-  { id: "s1", title: "Live Q&A: NFPA Standards", courseId: "c2", instructor: "Eng. Mona Fathy", when: "Today, 6:00 PM", joinable: true, countdown: "Starts in 15 min", past: false },
-  { id: "s2", title: "CCTV Network Integration", courseId: "c1", instructor: "Eng. Karim Adel", when: "Thu, Jun 18 — 5:00 PM", joinable: false, countdown: "Starts in 2 days", past: false },
-  { id: "s3", title: "BMS Controllers Workshop", courseId: "c5", instructor: "Eng. Omar Nabil", when: "Sat, Jun 20 — 4:00 PM", joinable: false, countdown: "Starts in 4 days", past: false },
-  { id: "s4", title: "Access Control Deep Dive", courseId: "c1", instructor: "Eng. Karim Adel", when: "Tue, Jun 23 — 6:00 PM", joinable: false, countdown: "Starts in 1 week", past: false },
-  { id: "s5", title: "Subnetting Masterclass", courseId: "c3", instructor: "Eng. Tarek Salah", when: "Jun 9 — 5:00 PM", duration: "58 min", past: true },
-  { id: "s6", title: "VLANs in Practice", courseId: "c3", instructor: "Eng. Tarek Salah", when: "Jun 4 — 5:00 PM", duration: "1h 04m", past: true },
-  { id: "s7", title: "Camera Selection Clinic", courseId: "c1", instructor: "Eng. Karim Adel", when: "Jun 2 — 6:00 PM", duration: "47 min", past: true },
-  { id: "s8", title: "Intro to BMS Points", courseId: "c5", instructor: "Eng. Omar Nabil", when: "May 28 — 4:00 PM", duration: "52 min", past: true },
-  { id: "s9", title: "Fire Panel Configuration", courseId: "c2", instructor: "Eng. Mona Fathy", when: "May 26 — 6:00 PM", duration: "1h 12m", past: true },
-  { id: "s10", title: "Data Center Cooling", courseId: "c6", instructor: "Eng. Sara Magdy", when: "May 21 — 5:00 PM", duration: "49 min", past: true },
+  { id: "s1", title: "Live Q&A: NFPA Standards", courseId: "c2", instructor: "Eng. Mona", when: "Today, 6:00 PM", joinable: true, countdown: "Starts in 15 min", past: false },
+  { id: "s2", title: "CCTV Network Integration", courseId: "c1", instructor: "Eng. Karim", when: "Thu, Jun 18 — 5:00 PM", joinable: false, countdown: "Starts in 2 days", past: false },
+  { id: "s3", title: "BMS Controllers Workshop", courseId: "c5", instructor: "Eng. Omar", when: "Sat, Jun 20 — 4:00 PM", joinable: false, countdown: "Starts in 4 days", past: false },
+  { id: "s4", title: "Access Control Deep Dive", courseId: "c1", instructor: "Eng. Karim", when: "Tue, Jun 23 — 6:00 PM", joinable: false, countdown: "Starts in 1 week", past: false },
+  { id: "s5", title: "Subnetting Masterclass", courseId: "c3", instructor: "Eng. Tarek", when: "Jun 9 — 5:00 PM", duration: "58 min", past: true },
+  { id: "s6", title: "VLANs in Practice", courseId: "c3", instructor: "Eng. Tarek", when: "Jun 4 — 5:00 PM", duration: "1h 04m", past: true },
+  { id: "s7", title: "Camera Selection Clinic", courseId: "c1", instructor: "Eng. Karim", when: "Jun 2 — 6:00 PM", duration: "47 min", past: true },
+  { id: "s8", title: "Intro to BMS Points", courseId: "c5", instructor: "Eng. Omar", when: "May 28 — 4:00 PM", duration: "52 min", past: true },
+  { id: "s9", title: "Fire Panel Configuration", courseId: "c2", instructor: "Eng. Mona", when: "May 26 — 6:00 PM", duration: "1h 12m", past: true },
+  { id: "s10", title: "Data Center Cooling", courseId: "c6", instructor: "Eng. Sara", when: "May 21 — 5:00 PM", duration: "49 min", past: true },
 ];
 
 /* Attendance for June 2026 — 16 sessions, 1 absent (~94%) */
