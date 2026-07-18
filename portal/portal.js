@@ -72,8 +72,10 @@ function portalLogout() {
   try {
     sessionStorage.removeItem("loggedIn");
     sessionStorage.removeItem("role");
+    sessionStorage.removeItem("firstName");
     sessionStorage.removeItem("coreSession");
   } catch (e) {}
+  if (typeof dbSignOut === "function") dbSignOut(); // real session too, when db.js is loaded
   window.location.href = role === "teacher" ? "teacher-login.html" : "student-login.html";
 }
 

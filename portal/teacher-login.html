@@ -64,6 +64,8 @@
     </main>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
   <script src="portal.js"></script>
   <script>
     document.getElementById("togglePass").addEventListener("click", function () {
@@ -76,8 +78,19 @@
     document.getElementById("loginForm").addEventListener("submit", function (e) {
       e.preventDefault();
       var err = document.getElementById("pwdError");
-      if (!validatePassword(document.getElementById("pwd").value)) { err.textContent = passwordTooShortMsg(); err.style.display = "block"; return; }
+      var pwd = document.getElementById("pwd").value;
+      function fail(msg) { err.textContent = msg; err.style.display = "block"; }
+      if (!validatePassword(pwd)) { fail(passwordTooShortMsg()); return; }
       err.style.display = "none";
+      if (dbReady()) {
+        // real accounts (Supabase) — see db.js
+        dbSignIn(document.getElementById("who").value.trim(), pwd, "teacher", function (msg) {
+          if (msg) { fail(msg); return; }
+          window.location.href = "teacher-dashboard.html";
+        });
+        return;
+      }
+      // demo mode (no database configured yet)
       try { sessionStorage.setItem("loggedIn", "true"); sessionStorage.setItem("role", "teacher"); } catch (err2) {}
       window.location.href = "teacher-dashboard.html";
     });

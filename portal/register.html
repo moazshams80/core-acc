@@ -76,6 +76,8 @@
     </main>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
   <script>
     var role = "student";
     var copy = {
@@ -120,9 +122,29 @@
       var p2 = document.getElementById("pwd2").value;
       var err = document.getElementById("pwdError");
       var rtl = document.documentElement.getAttribute("dir") === "rtl";
-      if (p1.length < 8) { err.textContent = rtl ? "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل" : "Password must be at least 8 characters"; err.style.display = "block"; return; }
-      if (p1 !== p2) { err.textContent = rtl ? "كلمتا المرور غير متطابقتين" : "Passwords do not match."; err.style.display = "block"; return; }
+      function fail(msg) { err.textContent = msg; err.style.display = "block"; }
+      if (p1.length < 8) { fail(rtl ? "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل" : "Password must be at least 8 characters"); return; }
+      if (p1 !== p2) { fail(rtl ? "كلمتا المرور غير متطابقتين" : "Passwords do not match."); return; }
       err.style.display = "none";
+
+      if (dbReady()) {
+        // real account (Supabase) — role lands in profiles via the signup trigger
+        var email = document.getElementById("who").value.trim();
+        if (email.indexOf("@") === -1) { fail(rtl ? "أدخل بريدك الإلكتروني" : "Enter your email address to register"); return; }
+        var firstName = document.getElementById("fullname").value.trim().split(/\s+/)[0];
+        dbSignUp(email, p1, firstName, role, function (msg, mode) {
+          if (msg) { fail(msg); return; }
+          if (mode === "confirm") {
+            err.style.display = "block"; err.style.color = "#1b8a4b";
+            err.textContent = rtl ? "تم إنشاء الحساب — تحقق من بريدك الإلكتروني لتأكيده ثم سجّل الدخول" : "Account created — check your email to confirm it, then log in.";
+            return;
+          }
+          window.location.href = copy[role].dest;
+        });
+        return;
+      }
+
+      // demo mode (no database configured yet)
       try {
         sessionStorage.setItem("loggedIn", "true");
         sessionStorage.setItem("role", role);
