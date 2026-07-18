@@ -56,9 +56,9 @@ let submissions = [
 
 /* Live sessions (instructor-hosted) */
 let teacherSessions = [
-  { id: "ts1", title: "CCTV Network Integration", courseId: "tc1", when: "Today — 5:00 PM",        time: "5:00 PM", today: true,  status: "upcoming", enrolledCount: 32, attendedCount: null },
-  { id: "ts2", title: "Live Q&A: NFPA Standards", courseId: "tc2", when: "Today — 6:30 PM",        time: "6:30 PM", today: true,  status: "upcoming", enrolledCount: 28, attendedCount: null },
-  { id: "ts3", title: "Routing Deep Dive",        courseId: "tc3", when: "Thu, Jun 18 — 5:00 PM",  time: "5:00 PM", today: false, status: "upcoming", enrolledCount: 27, attendedCount: null },
+  { id: "ts1", title: "CCTV Network Integration", courseId: "tc1", when: "Today — 5:00 PM",        time: "5:00 PM", today: true,  status: "upcoming", enrolledCount: 32, attendedCount: null, platform: "meet",  meetingUrl: "https://meet.google.com/kbd-ozxq-fce" },
+  { id: "ts2", title: "Live Q&A: NFPA Standards", courseId: "tc2", when: "Today — 6:30 PM",        time: "6:30 PM", today: true,  status: "upcoming", enrolledCount: 28, attendedCount: null, platform: "zoom",  meetingUrl: "https://zoom.us/j/94628731045" },
+  { id: "ts3", title: "Routing Deep Dive",        courseId: "tc3", when: "Thu, Jun 18 — 5:00 PM",  time: "5:00 PM", today: false, status: "upcoming", enrolledCount: 27, attendedCount: null, platform: "teams", meetingUrl: "https://teams.live.com/meet/9482031846127" },
   { id: "ts4", title: "Camera Selection Clinic",  courseId: "tc1", when: "Jun 2 — 6:00 PM",        status: "past", enrolledCount: 32, attendedCount: 29 },
   { id: "ts5", title: "VLANs in Practice",        courseId: "tc3", when: "Jun 4 — 5:00 PM",        status: "past", enrolledCount: 27, attendedCount: 25 },
   { id: "ts6", title: "Fire Panel Configuration", courseId: "tc2", when: "May 26 — 6:00 PM",       status: "past", enrolledCount: 28, attendedCount: 22 },

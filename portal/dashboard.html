@@ -86,7 +86,7 @@
     document.getElementById("upcoming").innerHTML = upItems.slice(0, 4).map(function (u) {
       return '<a class="mini-item" href="' + u.href + '"><div class="grow"><span class="badge ' + u.tag + '">' + u.kind + "</span>" +
         '<div style="font-weight:700;margin-top:6px;">' + esc(u.title) + "</div>" +
-        '<div class="when">' + esc(u.when) + "</div></div><span class="muted" aria-hidden="true">›</span></a>";
+        '<div class="when">' + esc(u.when) + '</div></div><span class="muted" aria-hidden="true">›</span></a>';
     }).join("");
 
     // Recent activity timeline (gold dot for certificate events)

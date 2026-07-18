@@ -218,6 +218,10 @@ a.portal-stat-card:hover { transform: translateY(-4px); border-color: rgba(34,16
 /* Tag pill */
 .tag { display: inline-block; font-size: 12px; font-weight: 700; padding: 5px 11px; border-radius: 999px; color: var(--core-blue); background: var(--core-sky); border: 1px solid var(--core-border); }
 
+/* Meeting platform badge (Zoom / Meet / Teams) — colored via --mtg */
+.mtg-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 5px 11px; border-radius: 999px; color: var(--mtg, var(--core-blue)); background: #fff; border: 1px solid var(--core-border); }
+.mtg-badge i { width: 8px; height: 8px; border-radius: 50%; background: var(--mtg, var(--core-blue)); }
+
 /* =========================================================
    FILTER TABS (pill)
    ========================================================= */

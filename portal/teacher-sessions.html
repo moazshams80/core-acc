@@ -49,23 +49,38 @@
         <div><label class="field-label">Session title</label><input class="input" id="sTitle" placeholder="e.g. CCTV Network Integration" /></div>
         <div><label class="field-label">Date &amp; time</label><input class="input" id="sWhen" type="datetime-local" /></div>
         <div><label class="field-label">Duration (minutes)</label><input class="input" id="sDuration" type="number" placeholder="60" /></div>
+        <div><label class="field-label">Meeting platform</label><select class="select" id="sPlatform"></select></div>
+        <div>
+          <label class="field-label">Meeting link</label>
+          <div style="display:flex;gap:8px;">
+            <input class="input" id="sLink" placeholder="Paste the meeting link…" style="flex:1;" />
+            <button type="button" class="btn btn-light btn-sm" id="sNewMeeting" title="Create a meeting on the selected platform, then paste its link here">Get link ↗</button>
+          </div>
+          <p class="muted" style="margin:6px 0 0;font-size:12px;">"Get link" opens the platform to create the meeting with your account — then paste the link here.</p>
+        </div>
         <button class="btn btn-primary btn-block" id="sSave">Schedule Session</button>
       </div>
     </div>
   </div>
 
   <script src="teacher-mock-data.js"></script>
+  <script src="integrations.js"></script>
   <script src="portal.js"></script>
   <script>
     var sc = document.getElementById("sCourse");
     sc.innerHTML = teacherCourses.filter(function (c) { return c.status === "published"; }).map(function (c) {
       return '<option value="' + c.id + '">' + esc(c.title) + "</option>";
     }).join("");
+    document.getElementById("sPlatform").innerHTML = platformOptionsHTML("zoom");
+    document.getElementById("sNewMeeting").addEventListener("click", function () {
+      createInstantMeeting(document.getElementById("sPlatform").value);
+    });
 
     function render() {
       document.getElementById("upcoming").innerHTML = teacherSessions.filter(function (s) { return s.status === "upcoming"; }).map(function (s) {
         var c = teacherCourseById(s.courseId);
-        return '<article class="course-card"><span class="tag">' + esc(c.title) + "</span>" +
+        return '<article class="course-card"><span class="corner">' + platformBadgeHTML(s.platform) + "</span>" +
+          '<span class="tag">' + esc(c.title) + "</span>" +
           '<h3 style="margin-top:12px;">' + esc(s.title) + "</h3>" +
           '<p style="font-size:17px;font-weight:800;color:var(--core-blue);margin:4px 0;">' + esc(s.when) + "</p>" +
           '<p class="muted" style="font-size:13px;margin:0 0 16px;">👥 ' + s.enrolledCount + " enrolled</p>" +
@@ -82,13 +97,17 @@
           '<td><span class="tag">' + esc(c.title) + "</span></td>" +
           "<td>" + esc(s.when) + "</td>" +
           "<td>" + s.attendedCount + "/" + s.enrolledCount + " attended</td>" +
-          '<td><a class="card-link" style="color:var(--core-blue);font-weight:800;" href="#">⬆ Upload Recording</a></td></tr>";
+          '<td><a class="card-link" style="color:var(--core-blue);font-weight:800;" href="#">⬆ Upload Recording</a></td></tr>';
       }).join("");
     }
 
     document.addEventListener("click", function (e) {
       var st = e.target.closest("[data-start]");
-      if (st) { showToast("Starting session… (demo)"); return; }
+      if (st) {
+        var s = teacherSessions.find(function (x) { return x.id === st.getAttribute("data-start"); });
+        joinMeeting(s); // host opens their own meeting link to start it
+        return;
+      }
       var ed = e.target.closest("[data-edit]");
       if (ed) { showToast("Edit session (demo)"); return; }
       var ca = e.target.closest("[data-cancel]");
@@ -106,10 +125,13 @@
       var whenRaw = document.getElementById("sWhen").value;
       var when = whenRaw ? new Date(whenRaw).toLocaleString("en-US", { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "To be scheduled";
       var c = teacherCourseById(courseId);
-      teacherSessions.unshift({ id: "ts" + Date.now(), title: title, courseId: courseId, when: when, status: "upcoming", enrolledCount: c.enrolledCount, attendedCount: null });
+      var platform = document.getElementById("sPlatform").value;
+      var link = document.getElementById("sLink").value.trim();
+      teacherSessions.unshift({ id: "ts" + Date.now(), title: title, courseId: courseId, when: when, status: "upcoming", enrolledCount: c.enrolledCount, attendedCount: null, platform: platform, meetingUrl: link || null });
       document.getElementById("scheduleModal").classList.remove("open");
       document.getElementById("sTitle").value = "";
-      showToast("Session scheduled");
+      document.getElementById("sLink").value = "";
+      showToast(link ? "Session scheduled on " + platformOf(platform).name : "Session scheduled — add the meeting link before it starts");
       render();
     });
 

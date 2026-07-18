@@ -35,22 +35,30 @@
   </div>
 
   <script src="mock-data.js"></script>
+  <script src="integrations.js"></script>
   <script src="portal.js"></script>
   <script>
     // Upcoming cards
     document.getElementById("upcoming").innerHTML = liveSessions.filter(function (s) { return !s.past; }).map(function (s) {
       var course = courseById(s.courseId);
       var btn = s.joinable
-        ? '<a class="btn btn-primary btn-sm btn-block" href="#">Join Session</a>'
+        ? '<button class="btn btn-primary btn-sm btn-block" data-join="' + s.id + '">Join Session</button>'
         : '<button class="btn btn-primary btn-sm btn-block is-disabled" disabled>Join Session</button>';
       var cd = '<span class="badge ' + (s.joinable ? "badge-cyan" : "badge-neutral") + '">' + esc(s.countdown) + "</span>";
       return '<article class="course-card"><span class="corner">' + cd + "</span>" +
-        '<span class="tag">' + esc(course.title) + "</span>" +
+        '<span class="tag">' + esc(course.title) + "</span> " + platformBadgeHTML(s.platform) +
         '<h3 style="margin-top:12px;">' + esc(s.title) + "</h3>" +
         '<p style="font-size:18px;font-weight:800;color:var(--core-blue);margin:4px 0;">' + esc(s.when) + "</p>" +
         '<p class="muted" style="font-size:13px;margin:0 0 16px;">' + esc(s.instructor) + "</p>" +
         btn + "</article>";
     }).join("");
+
+    // Join opens the session's real meeting link (Zoom / Meet / Teams)
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-join]"); if (!b) return;
+      var s = liveSessions.find(function (x) { return x.id === b.getAttribute("data-join"); });
+      joinMeeting(s);
+    });
 
     // Past sessions table
     document.getElementById("past").innerHTML = liveSessions.filter(function (s) { return s.past; }).map(function (s) {
@@ -59,7 +67,7 @@
         '<td><span class="tag">' + esc(course.title) + "</span></td>" +
         "<td>" + esc(s.when) + "</td>" +
         "<td>" + esc(s.duration) + "</td>" +
-        '<td><a class="card-link" style="color:var(--core-blue);font-weight:800;" href="#">▶ Watch Recording</a></td></tr>";
+        '<td><a class="card-link" style="color:var(--core-blue);font-weight:800;" href="#">▶ Watch Recording</a></td></tr>';
     }).join("");
   </script>
 </body>
