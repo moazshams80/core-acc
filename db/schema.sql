@@ -2,6 +2,15 @@
 -- CORE Egypt — Database schema (Supabase / Postgres)
 -- Run this in the Supabase SQL Editor (whole file at once).
 -- Includes tables, triggers, and Row Level Security policies.
+--
+-- A failed run rolls back completely — just fix and re-run.
+-- If you ever need a full reset first, uncomment and run:
+-- drop table if exists public.certificates, public.attendance,
+--   public.live_sessions, public.submissions, public.assignments,
+--   public.lesson_completions, public.enrollments, public.lessons,
+--   public.modules, public.courses, public.profiles cascade;
+-- drop function if exists public.handle_new_user(), public.my_role(),
+--   public.is_teacher_of(uuid), public.verify_certificate(text) cascade;
 -- =========================================================
 
 -- ---------- PROFILES (extends Supabase auth.users) ----------
@@ -43,19 +52,10 @@ begin
   return new;
 end $$;
 
+drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute function public.handle_new_user();
-
--- ---------- HELPERS (security definer avoids RLS recursion) ----------
-create or replace function public.my_role()
-returns text language sql stable security definer set search_path = public as
-$$ select role from public.profiles where id = auth.uid() $$;
-
-create or replace function public.is_teacher_of(cid uuid)
-returns boolean language sql stable security definer set search_path = public as
-$$ select exists (select 1 from public.courses c where c.id = cid and c.instructor_id = auth.uid())
-       or public.my_role() = 'admin' $$;
 
 -- ---------- COURSES ----------
 create table public.courses (
@@ -165,6 +165,18 @@ language sql stable security definer set search_path = public as $$
   where ce.verification_code = code
 $$;
 grant execute on function public.verify_certificate(text) to anon;
+
+-- ---------- HELPERS (security definer avoids RLS recursion) ----------
+-- Defined AFTER the tables: sql-language function bodies are validated
+-- at creation time, so the tables they reference must already exist.
+create or replace function public.my_role()
+returns text language sql stable security definer set search_path = public as
+$$ select role from public.profiles where id = auth.uid() $$;
+
+create or replace function public.is_teacher_of(cid uuid)
+returns boolean language sql stable security definer set search_path = public as
+$$ select exists (select 1 from public.courses c where c.id = cid and c.instructor_id = auth.uid())
+       or public.my_role() = 'admin' $$;
 
 -- =========================================================
 -- ROW LEVEL SECURITY
