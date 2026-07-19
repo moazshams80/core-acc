@@ -41,8 +41,11 @@
   </div>
 
   <script src="teacher-mock-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
   <script src="portal.js"></script>
   <script>
+    portalBoot(function () {
     var published = teacherCourses.filter(function (c) { return c.status === "published"; });
     var totalStudents = published.reduce(function (s, c) { return s + c.enrolledCount; }, 0);
     var pending = submissions.filter(function (s) { return s.status === "ungraded"; }).length;
@@ -96,6 +99,7 @@
         '<div class="hbar-track"><div class="hbar-fill" style="width:' + c.avgGradePct + '%"></div></div>' +
         '<span class="hbar-val">' + esc(c.avgGrade) + "</span></div>";
     }).join("");
+    });
   </script>
 </body>
 </html>

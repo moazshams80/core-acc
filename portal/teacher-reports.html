@@ -72,8 +72,11 @@
   </div>
 
   <script src="teacher-mock-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
   <script src="portal.js"></script>
   <script>
+    portalBoot(function () {
     function gradeBadge(g) {
       var cls = "badge-neutral";
       if (g[0] === "A") cls = "badge-success"; else if (g[0] === "B") cls = "badge-info"; else if (g[0] === "C") cls = "badge-warning";
@@ -148,6 +151,7 @@
     } else {
       document.getElementById("exportControls").innerHTML = downloadLockHTML();
     }
+    });
   </script>
 </body>
 </html>

@@ -360,6 +360,27 @@ document.addEventListener("keydown", function (e) {
   if (e.key === "Escape") document.querySelectorAll(".portal-modal.open").forEach(function (m) { m.classList.remove("open"); });
 });
 
+/* ---- Page bootstrap ----
+   Pages wrap their render code in portalBoot(render). With a live
+   database it loads real data first (overwriting the mock globals),
+   rebuilds the shell with the real user, then renders. In demo mode
+   it renders immediately from the mock data. */
+function portalBoot(render) {
+  var isDb = typeof dbReady === "function" && dbReady();
+  if (!isDb) { render(); return; }
+  var pageRole = document.body.getAttribute("data-role") === "teacher" ? "teacher" : "student";
+  var loader = pageRole === "teacher" ? dbLoadTeacherData : dbLoadStudentData;
+  loader(function (err) {
+    if (err) {
+      console.warn("Database load failed — showing demo data:", err);
+      showToast("Could not load live data — showing demo data");
+    }
+    buildShell(); // refresh sidebar/header with the real user
+    render();
+    initContentProtection(); // protect any material the render created
+  });
+}
+
 /* Build immediately (scripts are loaded at end of <body>, DOM is ready) */
 buildShell();
 /* Protect materials after page inline scripts have rendered their content */

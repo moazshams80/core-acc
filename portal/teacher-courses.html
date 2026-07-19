@@ -29,8 +29,11 @@
   </div>
 
   <script src="teacher-mock-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
   <script src="portal.js"></script>
   <script>
+    portalBoot(function () {
     document.getElementById("grid").innerHTML = teacherCourses.map(function (c) {
       var badge = c.status === "published" ? '<span class="badge badge-success">Published</span>' : '<span class="badge badge-neutral">Draft</span>';
       var progress = c.status === "published"
@@ -47,6 +50,7 @@
           '<a class="btn btn-light btn-sm" href="teacher-students.html?course=' + c.id + '">View Students</a>' +
         "</div></article>";
     }).join("");
+    });
   </script>
 </body>
 </html>

@@ -49,7 +49,7 @@
         <div>
           <p class="muted" style="margin-top:0;font-size:13px;" id="gmMeta"></p>
           <div class="card card-pad protected-content" style="background:var(--core-bg);box-shadow:none;">
-            <p style="margin:0 0 12px;">Submission notes from the student would appear here. For this demo it's placeholder text describing the work submitted.</p>
+            <p style="margin:0 0 12px;" id="gmNotes">Submission notes from the student would appear here.</p>
             <button type="button" class="card-link" style="color:var(--core-blue);font-weight:800;background:none;border:0;padding:0;cursor:pointer;font:inherit;" onclick="showToast('Attachment opens in the protected viewer')">📎 View attached file</button>
           </div>
         </div>
@@ -64,8 +64,11 @@
   </div>
 
   <script src="teacher-mock-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
   <script src="portal.js"></script>
   <script>
+    portalBoot(function () {
     var currentSub = null;
     function letterFromPct(p) {
       if (p >= 93) return "A"; if (p >= 90) return "A−"; if (p >= 87) return "B+"; if (p >= 83) return "B";
@@ -126,6 +129,7 @@
       document.getElementById("gmMax").textContent = currentSub.maxPoints;
       document.getElementById("gmScore").value = currentSub.score == null ? "" : currentSub.score;
       document.getElementById("gmScore").max = currentSub.maxPoints;
+      document.getElementById("gmNotes").textContent = currentSub.notes || "No notes were added with this submission.";
       document.getElementById("gmFeedback").value = "";
       updateLetter();
       document.getElementById("gradeModal").classList.add("open");
@@ -142,14 +146,25 @@
       if (!currentSub) return;
       var v = parseFloat(document.getElementById("gmScore").value);
       if (isNaN(v)) { showToast("Enter a score first"); return; }
-      currentSub.status = "graded";
-      currentSub.score = v;
-      document.getElementById("gradeModal").classList.remove("open");
-      showToast("Grade saved for " + teacherStudentById(currentSub.studentId).name);
-      render();
+      function apply() {
+        currentSub.status = "graded";
+        currentSub.score = v;
+        document.getElementById("gradeModal").classList.remove("open");
+        showToast("Grade saved for " + teacherStudentById(currentSub.studentId).name);
+        render();
+      }
+      if (dbReady()) {
+        dbGradeSubmission(currentSub.id, v, document.getElementById("gmFeedback").value.trim(), function (err) {
+          if (err) { showToast("Could not save grade: " + err); return; }
+          apply();
+        });
+        return;
+      }
+      apply(); // demo mode
     });
 
     render();
+    });
   </script>
 </body>
 </html>

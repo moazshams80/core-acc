@@ -5,9 +5,9 @@
    ========================================================= */
 
 /* Deterministic "today" for the prototype */
-const TODAY = new Date(2026, 5, 16); // 2026-06-16
+var TODAY = new Date(2026, 5, 16); // 2026-06-16
 
-const currentStudent = {
+var currentStudent = {
   name: "Youssef",
   id: "CA-2024-0317",
   email: "youssef@student.coreegypt.com",
@@ -21,7 +21,7 @@ const currentStudent = {
 };
 
 /* The 6 CORE Egypt engineering programs, used as enrolled courses */
-const courses = [
+var courses = [
   {
     id: "c1",
     title: "Security Systems Engineering",
@@ -259,7 +259,7 @@ const courses = [
   },
 ];
 
-const assignments = [
+var assignments = [
   { id: "a1", title: "CCTV Coverage Plan", courseId: "c1", dueDate: "2026-06-17", status: "pending", grade: null },
   { id: "a2", title: "Fire Detection Layout (NFPA 72)", courseId: "c2", dueDate: "2026-06-22", status: "pending", grade: null },
   { id: "a3", title: "BMS Points List", courseId: "c5", dueDate: "2026-06-17", status: "pending", grade: null },
@@ -269,7 +269,7 @@ const assignments = [
   { id: "a7", title: "Subnetting Worksheet", courseId: "c3", dueDate: "2026-05-20", status: "graded", grade: "A" },
 ];
 
-const liveSessions = [
+var liveSessions = [
   { id: "s1", title: "Live Q&A: NFPA Standards", courseId: "c2", instructor: "Eng. Mona", when: "Today, 6:00 PM", joinable: true, countdown: "Starts in 15 min", past: false, platform: "zoom", meetingUrl: "https://zoom.us/j/94628731045" },
   { id: "s2", title: "CCTV Network Integration", courseId: "c1", instructor: "Eng. Karim", when: "Thu, Jun 18 — 5:00 PM", joinable: false, countdown: "Starts in 2 days", past: false, platform: "meet", meetingUrl: "https://meet.google.com/kbd-ozxq-fce" },
   { id: "s3", title: "BMS Controllers Workshop", courseId: "c5", instructor: "Eng. Omar", when: "Sat, Jun 20 — 4:00 PM", joinable: false, countdown: "Starts in 4 days", past: false, platform: "teams", meetingUrl: "https://teams.live.com/meet/9482031846127" },
@@ -283,7 +283,7 @@ const liveSessions = [
 ];
 
 /* Attendance for June 2026 — 16 sessions, 1 absent (~94%) */
-const attendanceRecords = [
+var attendanceRecords = [
   { date: "2026-06-01", courseId: "c1", status: "present" },
   { date: "2026-06-02", courseId: "c3", status: "present" },
   { date: "2026-06-03", courseId: "c5", status: "present" },
@@ -301,18 +301,18 @@ const attendanceRecords = [
   { date: "2026-06-21", courseId: "c5", status: "present" },
   { date: "2026-06-22", courseId: "c2", status: "present" },
 ];
-const overallAttendance = 94;
+var overallAttendance = 94;
 
-const grades = [
+var grades = [
   { courseId: "c1", assignmentsAvg: "A−", labsAvg: "A", finalGrade: "—", overallGrade: "A−" },
   { courseId: "c2", assignmentsAvg: "B+", labsAvg: "B", finalGrade: "—", overallGrade: "B+" },
   { courseId: "c3", assignmentsAvg: "A", labsAvg: "A−", finalGrade: "A", overallGrade: "A" },
   { courseId: "c5", assignmentsAvg: "B", labsAvg: "B+", finalGrade: "—", overallGrade: "B+" },
   { courseId: "c6", assignmentsAvg: "A−", labsAvg: "A", finalGrade: "A−", overallGrade: "A−" },
 ];
-const overallGrade = "A−";
+var overallGrade = "A−";
 
-const certificates = [
+var certificates = [
   { id: "cert3", courseId: "c3", earned: true, dateEarned: "May 2026", verificationCode: "CORE-2026-NE318" },
   { id: "cert6", courseId: "c6", earned: true, dateEarned: "Jun 2026", verificationCode: "CORE-2026-DC742" },
   { id: "cert1", courseId: "c1", earned: false, dateEarned: null, verificationCode: null },
@@ -321,7 +321,7 @@ const certificates = [
   { id: "cert4", courseId: "c4", earned: false, dateEarned: null, verificationCode: null },
 ];
 
-const recentActivity = [
+var recentActivity = [
   { icon: "🎓", text: "Earned the <strong>Data Center Infrastructure</strong> certificate", time: "2 days ago", cert: true, link: "certificates.html" },
   { icon: "📝", text: "Submitted assignment <strong>Energy Optimization Case Study</strong>", time: "3 days ago", link: "assignments.html?filter=submitted" },
   { icon: "🎥", text: "Joined live session <strong>Subnetting Masterclass</strong>", time: "1 week ago", link: "live-sessions.html" },

@@ -47,10 +47,18 @@
   </div>
 
   <script src="mock-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
   <script src="portal.js"></script>
   <script>
+    portalBoot(function () {
     var id = new URLSearchParams(location.search).get("id");
     var course = courseById(id) || courses[0];
+    if (!course) {
+      document.querySelector(".portal-main").innerHTML =
+        '<div class="empty-state"><div class="es-ico">📚</div><h3>No courses yet</h3><p>Once courses are published you\'ll find them here.</p><a class="btn btn-primary btn-sm" href="courses.html">Back to courses</a></div>';
+      return;
+    }
     document.body.setAttribute("data-title", course.title);
     var h1 = document.querySelector("#portalHeader h1"); if (h1) h1.textContent = course.title;
 
@@ -90,6 +98,7 @@
     document.getElementById("materialDownload").innerHTML = canDownload()
       ? '<button class="btn btn-primary btn-sm" onclick="showToast(\'Downloading material… (demo)\')">Download material</button>'
       : downloadLockHTML();
+    });
   </script>
 </body>
 </html>

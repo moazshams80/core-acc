@@ -30,7 +30,7 @@
             </div>
 
             <div id="pi" class="tab-panel active" data-tab-panel-group="pf">
-              <form class="stack" style="max-width:560px;" onsubmit="event.preventDefault(); alert('Changes saved! (demo)');">
+              <form class="stack" style="max-width:560px;" id="piForm">
                 <div><label class="field-label">Full Name</label><input class="input" id="f-name" /></div>
                 <div><label class="field-label">Email</label><input class="input" id="f-email" type="email" /></div>
                 <div><label class="field-label">Phone</label><input class="input" id="f-phone" /></div>
@@ -68,8 +68,11 @@
   </div>
 
   <script src="mock-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
   <script src="portal.js"></script>
   <script>
+    portalBoot(function () {
     var s = currentStudent;
     document.getElementById("profileCard").innerHTML =
       avatarHTML(s.avatarInitials, "avatar-lg") +
@@ -87,6 +90,24 @@
     document.getElementById("f-phone").value = s.phone;
     document.getElementById("f-dob").value = s.dob;
     document.getElementById("f-addr").value = s.address;
+    if (dbReady()) document.getElementById("f-email").readOnly = true; // email changes need re-verification — later phase
+
+    document.getElementById("piForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (dbReady()) {
+        dbUpdateProfile({
+          first_name: document.getElementById("f-name").value.trim().split(/\s+/)[0] || s.name,
+          phone: document.getElementById("f-phone").value.trim(),
+          dob: document.getElementById("f-dob").value || null,
+          address: document.getElementById("f-addr").value.trim(),
+        }, function (err) {
+          if (err) { showToast("Could not save: " + err); return; }
+          showToast("Changes saved!");
+        });
+        return;
+      }
+      showToast("Changes saved! (demo)");
+    });
 
     // change-password validation (min 8 chars)
     document.getElementById("pwdForm").addEventListener("submit", function (e) {
@@ -104,6 +125,7 @@
     if (location.hash === "#security") {
       document.querySelector('[data-tab="sec"]').click();
     }
+    });
   </script>
 </body>
 </html>

@@ -46,8 +46,11 @@
   </div>
 
   <script src="teacher-mock-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
   <script src="portal.js"></script>
   <script>
+    portalBoot(function () {
     var state = {}; // studentId -> present|absent|late
 
     var courseSel = document.getElementById("courseSel");
@@ -59,8 +62,8 @@
     function fillSessions() {
       var cid = courseSel.value;
       var list = teacherSessions.filter(function (s) { return s.courseId === cid; });
-      sessionSel.innerHTML = list.length ? list.map(function (s) { return '<option>' + esc(s.title) + " — " + esc(s.when) + "</option>"; }).join("")
-        : '<option>No sessions</option>';
+      sessionSel.innerHTML = list.length ? list.map(function (s) { return '<option value="' + s.id + '">' + esc(s.title) + " — " + esc(s.when) + "</option>"; }).join("")
+        : '<option value="">No sessions</option>';
     }
 
     function roster() { return teacherStudents.filter(function (s) { return s.courseIds.indexOf(courseSel.value) !== -1; }); }
@@ -103,7 +106,21 @@
       renderRoster();
       showToast("All marked present");
     });
-    document.getElementById("saveAtt").addEventListener("click", function () { showToast("Attendance saved"); });
+    document.getElementById("saveAtt").addEventListener("click", function () {
+      if (dbReady()) {
+        var sessionId = sessionSel.value;
+        if (!sessionId) { showToast("Schedule a session for this course first"); return; }
+        var rows = roster().map(function (s) { return { student_id: s.uid, status: state[s.id] }; })
+          .filter(function (r) { return r.student_id; });
+        if (!rows.length) { showToast("No students to mark"); return; }
+        dbSaveAttendance(sessionId, rows, function (err) {
+          if (err) { showToast("Could not save: " + err); return; }
+          showToast("Attendance saved");
+        });
+        return;
+      }
+      showToast("Attendance saved"); // demo mode
+    });
 
     courseSel.addEventListener("change", function () { fillSessions(); buildState(); renderRoster(); });
 
@@ -116,6 +133,7 @@
     }).join("");
 
     fillSessions(); buildState(); renderRoster();
+    });
   </script>
 </body>
 </html>

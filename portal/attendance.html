@@ -23,14 +23,14 @@
             <div class="donut-wrap">
               <div class="donut" id="donut"></div>
               <div>
-                <p style="margin:0 0 6px;font-weight:800;color:var(--core-navy);font-size:18px;">Great consistency!</p>
-                <p class="muted" style="margin:0;">You've attended 15 of 16 scheduled sessions this month.</p>
+                <p style="margin:0 0 6px;font-weight:800;color:var(--core-navy);font-size:18px;" id="attHeadline">Great consistency!</p>
+                <p class="muted" style="margin:0;" id="attSummary">You've attended 15 of 16 scheduled sessions.</p>
               </div>
             </div>
           </section>
 
           <section class="card card-pad">
-            <h2 class="section-title" style="font-size:20px;margin-bottom:18px;">June 2026</h2>
+            <h2 class="section-title" style="font-size:20px;margin-bottom:18px;" id="calTitle">June 2026</h2>
             <div class="calendar" id="calendar"></div>
             <div class="legend">
               <span><i style="background:#e4f6ec;border:1px solid #bfe6cd;"></i> Present</span>
@@ -56,8 +56,11 @@
   </div>
 
   <script src="mock-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
   <script src="portal.js"></script>
   <script>
+    portalBoot(function () {
     // Donut
     var r = 54, C = 2 * Math.PI * r, dash = (overallAttendance / 100) * C;
     document.getElementById("donut").innerHTML =
@@ -68,18 +71,25 @@
       "</svg>" +
       '<div class="center"><strong>' + overallAttendance + '%</strong><span>Attendance</span></div>';
 
-    // Calendar (June 2026)
+    // Calendar — follows TODAY (real date in database mode, fixed demo date otherwise)
     var byDate = {};
     attendanceRecords.forEach(function (rec) { byDate[rec.date] = rec.status; });
-    var year = 2026, month = 5; // June (0-indexed)
+    var year = TODAY.getFullYear(), month = TODAY.getMonth();
+    var mm = String(month + 1).padStart(2, "0");
+    document.getElementById("calTitle").textContent = TODAY.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    var attended = attendanceRecords.filter(function (r) { return r.status === "present"; }).length;
+    document.getElementById("attSummary").textContent = attendanceRecords.length
+      ? "You've attended " + attended + " of " + attendanceRecords.length + " scheduled sessions."
+      : "No attendance has been recorded yet.";
+    if (!attendanceRecords.length) document.getElementById("attHeadline").textContent = "Nothing recorded yet";
     var firstDow = new Date(year, month, 1).getDay();
     var days = new Date(year, month + 1, 0).getDate();
-    var todayStr = "2026-06-16";
+    var todayStr = year + "-" + mm + "-" + String(TODAY.getDate()).padStart(2, "0");
     var heads = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(function (h) { return '<div class="cal-h">' + h + "</div>"; }).join("");
     var cells = "";
     for (var i = 0; i < firstDow; i++) cells += '<div class="cal-day empty"></div>';
     for (var d = 1; d <= days; d++) {
-      var ds = year + "-06-" + String(d).padStart(2, "0");
+      var ds = year + "-" + mm + "-" + String(d).padStart(2, "0");
       var st = byDate[ds] || "";
       var cls = "cal-day " + st + (ds === todayStr ? " today" : "");
       cells += '<div class="' + cls.trim() + '">' + d + "</div>";
@@ -94,6 +104,7 @@
         "<td>Class Session</td>" +
         "<td>" + badgeHTML(rec.status) + "</td></tr>";
     }).join("");
+    });
   </script>
 </body>
 </html>

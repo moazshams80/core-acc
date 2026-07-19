@@ -35,7 +35,7 @@
                 <option>Audio Visual Systems</option>
               </select>
             </div>
-            <div><label class="field-label">Description</label><textarea class="textarea" placeholder="What will students learn in this course?"></textarea></div>
+            <div><label class="field-label">Description</label><textarea class="textarea" id="cDesc" placeholder="What will students learn in this course?"></textarea></div>
             <div><label class="field-label">Course icon</label>
               <div class="icon-picker">
                 <input type="radio" name="icon" id="i1" checked /><label for="i1">🛡️</label>
@@ -77,8 +77,11 @@
   </div>
 
   <script src="teacher-mock-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
   <script src="portal.js"></script>
   <script>
+    portalBoot(function () {
     // Prefill if editing
     var id = new URLSearchParams(location.search).get("id");
     var editing = id ? teacherCourseById(id) : null;
@@ -144,11 +147,50 @@
 
     document.getElementById("addModule").addEventListener("click", function () { addModule(); });
     document.getElementById("addAssignment").addEventListener("click", addAssignment);
-    document.getElementById("saveCourse").addEventListener("click", function () { showToast("Course saved (demo)"); });
+    var iconOf = { i1: "🛡️", i2: "🔥", i3: "🏢", i4: "🖥️", i5: "🌐", i6: "🎚️" };
+    document.getElementById("saveCourse").addEventListener("click", function () {
+      if (!dbReady()) { showToast("Course saved (demo)"); return; }
+      if (editing) { showToast("Editing existing courses arrives in the next phase — create new courses for now"); return; }
+      var title = document.getElementById("cTitle").value.trim();
+      if (!title) { showToast("Give the course a title first"); return; }
+      var iconRadio = document.querySelector('input[name="icon"]:checked');
+      var course = {
+        title: title,
+        icon: iconOf[iconRadio ? iconRadio.id : "i1"] || "📚",
+        description: document.getElementById("cDesc").value.trim(),
+        status: document.getElementById("cPublished").checked ? "published" : "draft",
+      };
+      var modulesArr = [];
+      document.querySelectorAll("#modules .accordion-item").forEach(function (item) {
+        var mTitle = item.querySelector(".module-title").value.trim();
+        if (!mTitle) return;
+        var lessons = [];
+        item.querySelectorAll(".lessons .lesson-row").forEach(function (row) {
+          var t = row.querySelector("input").value.trim();
+          if (!t) return;
+          lessons.push({ title: t, type: row.querySelector("select").value.toLowerCase(), duration: row.querySelectorAll("input")[1].value.trim() });
+        });
+        modulesArr.push({ title: mTitle, lessons: lessons });
+      });
+      var assignmentsArr = [];
+      document.querySelectorAll("#assignments .lesson-row").forEach(function (row) {
+        var ins = row.querySelectorAll("input");
+        var t = ins[0].value.trim();
+        if (!t) return;
+        assignmentsArr.push({ title: t, due_date: ins[1].value || null, max_points: parseInt(ins[2].value, 10) || 100 });
+      });
+      var btn = this; btn.disabled = true;
+      dbCreateCourse(course, modulesArr, assignmentsArr, function (err) {
+        if (err) { btn.disabled = false; showToast("Could not save: " + err); return; }
+        showToast("Course created!");
+        setTimeout(function () { window.location.href = "teacher-courses.html"; }, 700);
+      });
+    });
 
     // seed with one module + one assignment
     addModule(editing ? "Module 1" : "");
     addAssignment();
+    });
   </script>
 </body>
 </html>

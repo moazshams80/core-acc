@@ -65,8 +65,11 @@
 
   <script src="teacher-mock-data.js"></script>
   <script src="integrations.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
   <script src="portal.js"></script>
   <script>
+    portalBoot(function () {
     var sc = document.getElementById("sCourse");
     sc.innerHTML = teacherCourses.filter(function (c) { return c.status === "published"; }).map(function (c) {
       return '<option value="' + c.id + '">' + esc(c.title) + "</option>";
@@ -112,9 +115,14 @@
       if (ed) { showToast("Edit session (demo)"); return; }
       var ca = e.target.closest("[data-cancel]");
       if (ca) {
-        teacherSessions = teacherSessions.filter(function (s) { return s.id !== ca.getAttribute("data-cancel"); });
-        showToast("Session cancelled");
-        render();
+        var cid = ca.getAttribute("data-cancel");
+        function drop() {
+          teacherSessions = teacherSessions.filter(function (s) { return s.id !== cid; });
+          showToast("Session cancelled");
+          render();
+        }
+        if (dbReady()) { dbCancelSession(cid, function (err) { if (err) { showToast("Could not cancel: " + err); return; } drop(); }); }
+        else drop();
         return;
       }
     });
@@ -127,15 +135,32 @@
       var c = teacherCourseById(courseId);
       var platform = document.getElementById("sPlatform").value;
       var link = document.getElementById("sLink").value.trim();
+      function applied() {
+        document.getElementById("scheduleModal").classList.remove("open");
+        document.getElementById("sTitle").value = "";
+        document.getElementById("sLink").value = "";
+        showToast(link ? "Session scheduled on " + platformOf(platform).name : "Session scheduled — add the meeting link before it starts");
+      }
+      if (dbReady()) {
+        dbCreateSession({
+          course_id: courseId, title: title,
+          starts_at: whenRaw ? new Date(whenRaw).toISOString() : new Date(Date.now() + 86400000).toISOString(),
+          duration_min: parseInt(document.getElementById("sDuration").value, 10) || 60,
+          platform: platform, meeting_url: link || null,
+        }, function (err) {
+          if (err) { showToast("Could not schedule: " + err); return; }
+          applied();
+          setTimeout(function () { location.reload(); }, 700); // reload to pick up the real session id
+        });
+        return;
+      }
       teacherSessions.unshift({ id: "ts" + Date.now(), title: title, courseId: courseId, when: when, status: "upcoming", enrolledCount: c.enrolledCount, attendedCount: null, platform: platform, meetingUrl: link || null });
-      document.getElementById("scheduleModal").classList.remove("open");
-      document.getElementById("sTitle").value = "";
-      document.getElementById("sLink").value = "";
-      showToast(link ? "Session scheduled on " + platformOf(platform).name : "Session scheduled — add the meeting link before it starts");
+      applied();
       render();
     });
 
     render();
+    });
   </script>
 </body>
 </html>

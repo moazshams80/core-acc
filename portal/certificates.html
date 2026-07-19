@@ -41,9 +41,16 @@
   </div>
 
   <script src="mock-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
   <script src="portal.js"></script>
   <script>
-    document.getElementById("certGrid").innerHTML = certificates.map(function (cert) {
+    portalBoot(function () {
+    if (!certificates.length) {
+      document.getElementById("certGrid").innerHTML =
+        '<div class="empty-state" style="grid-column:1/-1;"><div class="es-ico">🎓</div><h3>No certificates yet</h3><p>Complete a course to earn your first verified certificate.</p></div>';
+    }
+    document.getElementById("certGrid").innerHTML += certificates.map(function (cert) {
       var course = courseById(cert.courseId);
       if (cert.earned) {
         return '<article class="cert-card">' +
@@ -74,6 +81,7 @@
       var b = e.target.closest('[data-modal-open="verifyModal"]'); if (!b) return;
       document.getElementById("vCode").textContent = b.getAttribute("data-code");
       document.getElementById("vCourse").textContent = b.getAttribute("data-course");
+    });
     });
   </script>
 </body>

@@ -4,7 +4,7 @@
    same course titles + the same student (Youssef).
    ========================================================= */
 
-const currentInstructor = {
+var currentInstructor = {
   name: "Eng. Karim",
   id: "IN-2019-014",
   email: "karim@coreegypt.com",
@@ -17,7 +17,7 @@ const currentInstructor = {
 };
 
 /* Courses owned by this instructor (subset of the 6 CORE programs) */
-const teacherCourses = [
+var teacherCourses = [
   { id: "tc1", title: "Security Systems Engineering", icon: "🛡️", programType: "Security", status: "published", enrolledCount: 32, avgProgress: 68, avgGrade: "A−", avgGradePct: 90, avgAttendance: 93 },
   { id: "tc2", title: "Fire Alarm Systems Engineering", icon: "🔥", programType: "Fire Safety", status: "published", enrolledCount: 28, avgProgress: 54, avgGrade: "B", avgGradePct: 83, avgAttendance: 78 },
   { id: "tc3", title: "Network Engineering", icon: "🌐", programType: "Networking", status: "published", enrolledCount: 27, avgProgress: 81, avgGrade: "A", avgGradePct: 95, avgAttendance: 90 },
@@ -25,7 +25,7 @@ const teacherCourses = [
 ];
 
 /* Students taught by this instructor (Youssef = the student-side user) */
-const teacherStudents = [
+var teacherStudents = [
   { id: "CA-2024-0317", name: "Youssef", avatarInitials: "Y", courseIds: ["tc1"],        progress: 75, grade: "A−", attendanceRate: 94 },
   { id: "CA-2024-0291", name: "Nour",    avatarInitials: "N", courseIds: ["tc1", "tc3"], progress: 82, grade: "A",  attendanceRate: 96 },
   { id: "CA-2024-0334", name: "Omar",    avatarInitials: "O", courseIds: ["tc2"],        progress: 47, grade: "B",  attendanceRate: 88 },
@@ -41,7 +41,7 @@ const teacherStudents = [
 ];
 
 /* Submissions queue */
-let submissions = [
+var submissions = [
   { id: "sub1", studentId: "CA-2024-0317", assignmentTitle: "CCTV Coverage Plan",            courseId: "tc1", submittedDate: "2026-06-15", status: "ungraded", score: null, maxPoints: 100 },
   { id: "sub2", studentId: "CA-2024-0302", assignmentTitle: "Access Control Matrix",          courseId: "tc1", submittedDate: "2026-06-15", status: "ungraded", score: null, maxPoints: 100 },
   { id: "sub3", studentId: "CA-2024-0334", assignmentTitle: "Fire Detection Layout (NFPA 72)", courseId: "tc2", submittedDate: "2026-06-14", status: "ungraded", score: null, maxPoints: 50 },
@@ -55,7 +55,7 @@ let submissions = [
 ];
 
 /* Live sessions (instructor-hosted) */
-let teacherSessions = [
+var teacherSessions = [
   { id: "ts1", title: "CCTV Network Integration", courseId: "tc1", when: "Today — 5:00 PM",        time: "5:00 PM", today: true,  status: "upcoming", enrolledCount: 32, attendedCount: null, platform: "meet",  meetingUrl: "https://meet.google.com/kbd-ozxq-fce" },
   { id: "ts2", title: "Live Q&A: NFPA Standards", courseId: "tc2", when: "Today — 6:30 PM",        time: "6:30 PM", today: true,  status: "upcoming", enrolledCount: 28, attendedCount: null, platform: "zoom",  meetingUrl: "https://zoom.us/j/94628731045" },
   { id: "ts3", title: "Routing Deep Dive",        courseId: "tc3", when: "Thu, Jun 18 — 5:00 PM",  time: "5:00 PM", today: false, status: "upcoming", enrolledCount: 27, attendedCount: null, platform: "teams", meetingUrl: "https://teams.live.com/meet/9482031846127" },
@@ -67,7 +67,7 @@ let teacherSessions = [
 ];
 
 /* Reporting metrics */
-const reportMetrics = {
+var reportMetrics = {
   avgGrade: "B+",
   completionRate: 74,
   avgAttendance: 88,

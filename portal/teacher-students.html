@@ -46,8 +46,11 @@
   </div>
 
   <script src="teacher-mock-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
   <script src="portal.js"></script>
   <script>
+    portalBoot(function () {
     function gradeBadge(g) {
       var cls = "badge-neutral";
       if (g[0] === "A") cls = "badge-success"; else if (g[0] === "B") cls = "badge-info"; else if (g[0] === "C") cls = "badge-warning";
@@ -111,6 +114,7 @@
           "<div class='callout' style='display:block;'><div class='muted' style='font-size:12px;'>Attendance</div><b style='font-size:20px;'>" + s.attendanceRate + "%</b></div>" +
         "</div>" +
         "<h4 style='color:var(--core-navy);margin-bottom:6px;'>Recent Submissions</h4>" + subsHTML;
+    });
     });
   </script>
 </body>

@@ -31,8 +31,11 @@
   </div>
 
   <script src="mock-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
   <script src="portal.js"></script>
   <script>
+    portalBoot(function () {
     var actionFor = { "in-progress": "Continue", completed: "Review", "not-started": "Start" };
     function render(filter) {
       var list = courses.filter(function (c) { return filter === "all" || c.status === filter; });
@@ -45,7 +48,9 @@
           "<h3>" + esc(c.title) + "</h3>" +
           '<p class="muted" style="font-size:13px;margin:0 0 14px;">' + esc(c.instructor) + "</p>" +
           progressHTML(c.progress, true) +
-          '<a class="btn btn-primary btn-sm btn-block" style="margin-top:16px;" href="course-detail.html?id=' + c.id + '">' + actionFor[c.status] + "</a>" +
+          (dbReady() && c.enrolled === false
+            ? '<button class="btn btn-primary btn-sm btn-block" style="margin-top:16px;" data-enroll="' + c.id + '">Enroll</button>'
+            : '<a class="btn btn-primary btn-sm btn-block" style="margin-top:16px;" href="course-detail.html?id=' + c.id + '">' + actionFor[c.status] + "</a>") +
           "</article>";
       }).join("");
     }
@@ -60,12 +65,24 @@
       setActive(b.getAttribute("data-filter"));
       render(b.getAttribute("data-filter"));
     });
+    // real enrollment (database mode)
+    document.addEventListener("click", function (e) {
+      var b = e.target.closest("[data-enroll]"); if (!b) return;
+      b.disabled = true;
+      dbEnroll(b.getAttribute("data-enroll"), function (err) {
+        if (err) { b.disabled = false; showToast("Could not enroll: " + err); return; }
+        showToast("Enrolled! Loading your course…");
+        setTimeout(function () { location.reload(); }, 700);
+      });
+    });
+
     // honor ?filter= deep links (e.g. from the dashboard)
     var valid = ["all", "in-progress", "completed", "not-started"];
     var initial = new URLSearchParams(location.search).get("filter");
     if (valid.indexOf(initial) === -1) initial = "all";
     setActive(initial);
     render(initial);
+    });
   </script>
 </body>
 </html>

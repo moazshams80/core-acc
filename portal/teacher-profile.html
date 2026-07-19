@@ -28,7 +28,7 @@
             </div>
 
             <div id="pi" class="tab-panel active" data-tab-panel-group="pf">
-              <form class="stack" style="max-width:560px;" onsubmit="event.preventDefault(); showToast('Changes saved (demo)');">
+              <form class="stack" style="max-width:560px;" id="piForm">
                 <div><label class="field-label">Full Name</label><input class="input" id="f-name" /></div>
                 <div><label class="field-label">Email</label><input class="input" id="f-email" type="email" /></div>
                 <div><label class="field-label">Phone</label><input class="input" id="f-phone" /></div>
@@ -69,8 +69,11 @@
   </div>
 
   <script src="teacher-mock-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
   <script src="portal.js"></script>
   <script>
+    portalBoot(function () {
     var t = currentInstructor;
     document.getElementById("profileCard").innerHTML =
       avatarHTML(t.avatarInitials, "avatar-lg") +
@@ -87,6 +90,24 @@
     document.getElementById("f-email").value = t.email;
     document.getElementById("f-phone").value = t.phone;
     document.getElementById("f-bio").value = t.bio;
+    if (dbReady()) document.getElementById("f-email").readOnly = true; // email changes need re-verification — later phase
+
+    document.getElementById("piForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (dbReady()) {
+        dbUpdateProfile({
+          first_name: document.getElementById("f-name").value.trim().replace(/^Eng\.\s*/, "").split(/\s+/)[0] || t.name,
+          phone: document.getElementById("f-phone").value.trim(),
+          bio: document.getElementById("f-bio").value.trim(),
+          disciplines: t.disciplines,
+        }, function (err) {
+          if (err) { showToast("Could not save: " + err); return; }
+          showToast("Changes saved!");
+        });
+        return;
+      }
+      showToast("Changes saved (demo)");
+    });
 
     // Expertise tag input
     var tagBox = document.getElementById("tagBox");
@@ -117,6 +138,7 @@
     });
 
     if (location.hash === "#security") document.querySelector('[data-tab="sec"]').click();
+    });
   </script>
 </body>
 </html>
