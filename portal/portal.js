@@ -47,6 +47,9 @@ var TEACHER_NAV = [
   { key: "teacher-profile",    label: "Profile",       icon: "👤", href: "teacher-profile.html" },
 ];
 
+/* Admin-only nav entry, appended for admins in buildShell() */
+var TEACHER_ADMIN_NAV = { key: "teacher-approvals", label: "Approvals", icon: "🛡️", href: "teacher-approvals.html" };
+
 var TEACHER_NOTIFS = [
   { icon: "✍️", text: "<strong>7 submissions</strong> awaiting your grading", href: "teacher-grading.html" },
   { icon: "🎥", text: "<strong>CCTV Network Integration</strong> session starts soon", href: "teacher-sessions.html" },
@@ -63,6 +66,7 @@ var TEACHER_PAGE_TITLES = {
   "teacher-attendance": "Attendance",
   "teacher-reports": "Reports",
   "teacher-profile": "Profile",
+  "teacher-approvals": "Instructor Approvals",
 };
 
 /* ---- Session helpers (role-aware) ---- */
@@ -153,6 +157,10 @@ function buildShell() {
 
   var isTeacher = pageRole === "teacher";
   var nav = isTeacher ? TEACHER_NAV : PORTAL_NAV;
+  /* admins also get the instructor-approval screen */
+  if (isTeacher && typeof currentInstructor !== "undefined" && currentInstructor.isAdmin) {
+    nav = nav.concat([TEACHER_ADMIN_NAV]);
+  }
   var notifs = isTeacher ? TEACHER_NOTIFS : PORTAL_NOTIFS;
   var titles = isTeacher ? TEACHER_PAGE_TITLES : PAGE_TITLES;
   var profileHref = isTeacher ? "teacher-profile.html" : "profile.html";

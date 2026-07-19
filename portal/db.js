@@ -29,6 +29,11 @@ function dbSignIn(email, password, wantedRole, done) {
     if (res.error) { done(res.error.message); return; }
     sb.from("profiles").select("role, first_name").eq("id", res.data.user.id).single().then(function (p) {
       if (p.error) { done("Could not load your profile — try again"); return; }
+      if (p.data.role === "pending_teacher") {
+        sb.auth.signOut();
+        done("Your instructor account is awaiting approval by an administrator.");
+        return;
+      }
       var role = p.data.role === "admin" ? "teacher" : p.data.role; // admins use the teacher portal
       if (role !== wantedRole) {
         sb.auth.signOut();
@@ -429,4 +434,126 @@ function dbCreateCourse(course, modulesArr, assignmentsArr, done) {
       Promise.all(work).then(function () { done(null, courseId); }).catch(function (e) { done(String(e)); });
     });
   });
+}
+
+/* =========================================================
+   TEACHER APPROVAL (admin only)
+   ========================================================= */
+
+function dbPendingTeachers(done) {
+  sb.from("profiles").select("id, first_name, code, created_at")
+    .eq("role", "pending_teacher").order("created_at")
+    .then(function (r) { done(r.error && r.error.message, r.data || []); });
+}
+
+/* approve=true -> teacher, approve=false -> demoted to student.
+   The RPC itself re-checks that the caller is an admin. */
+function dbReviewTeacher(userId, approve, done) {
+  sb.rpc("approve_teacher", { target: userId, approve: approve })
+    .then(function (r) { done(r.error && r.error.message); });
+}
+
+/* =========================================================
+   COURSE EDITING — load one course, then diff-sync on save
+   ========================================================= */
+
+function dbLoadCourseForEdit(courseId, done) {
+  Promise.all([
+    sb.from("courses").select("*, modules(*, lessons(*))").eq("id", courseId).single(),
+    sb.from("assignments").select("*").eq("course_id", courseId),
+  ]).then(function (r) {
+    if (r[0].error) { done(r[0].error.message); return; }
+    if (r[1].error) { done(r[1].error.message); return; }
+    var c = r[0].data;
+    c.modules = (c.modules || []).sort(function (a, b) { return a.position - b.position; });
+    c.modules.forEach(function (m) {
+      m.lessons = (m.lessons || []).sort(function (a, b) { return a.position - b.position; });
+    });
+    c.assignmentsList = r[1].data || [];
+    done(null, c);
+  }).catch(function (e) { done(String(e)); });
+}
+
+/* Sync the edited course to the database.
+   modulesArr:     [{ id?, title, lessons: [{ id?, title, type, duration }] }]
+   assignmentsArr: [{ id?, title, due_date, max_points }]
+   Rows present in the database but missing from these arrays are DELETED
+   (cascading to lesson_completions / submissions) — the page warns first. */
+function dbUpdateCourse(courseId, course, modulesArr, assignmentsArr, done) {
+  var chain = sb.from("courses").update(course).eq("id", courseId).then(function (r) {
+    if (r.error) throw new Error(r.error.message);
+    return Promise.all([
+      sb.from("modules").select("id").eq("course_id", courseId),
+      sb.from("assignments").select("id").eq("course_id", courseId),
+    ]);
+  });
+
+  chain.then(function (res) {
+    if (res[0].error) throw new Error(res[0].error.message);
+    if (res[1].error) throw new Error(res[1].error.message);
+    var existingModuleIds = res[0].data.map(function (m) { return m.id; });
+    var existingAsgIds = res[1].data.map(function (a) { return a.id; });
+    var keptModuleIds = modulesArr.filter(function (m) { return m.id; }).map(function (m) { return m.id; });
+    var keptAsgIds = assignmentsArr.filter(function (a) { return a.id; }).map(function (a) { return a.id; });
+    var removedModules = existingModuleIds.filter(function (id) { return keptModuleIds.indexOf(id) === -1; });
+    var removedAsgs = existingAsgIds.filter(function (id) { return keptAsgIds.indexOf(id) === -1; });
+
+    var work = [];
+    if (removedModules.length) work.push(sb.from("modules").delete().in("id", removedModules));
+    if (removedAsgs.length) work.push(sb.from("assignments").delete().in("id", removedAsgs));
+
+    /* modules: update kept, insert new, then sync each module's lessons */
+    modulesArr.forEach(function (m, i) {
+      if (m.id) {
+        work.push(
+          sb.from("modules").update({ title: m.title, position: i + 1 }).eq("id", m.id)
+            .then(function () { return syncLessons(m.id, m.lessons); })
+        );
+      } else {
+        work.push(
+          sb.from("modules").insert({ course_id: courseId, title: m.title, position: i + 1 }).select().single()
+            .then(function (mr) {
+              if (mr.error) throw new Error(mr.error.message);
+              return insertLessons(mr.data.id, m.lessons);
+            })
+        );
+      }
+    });
+
+    /* assignments: update kept, insert new */
+    assignmentsArr.forEach(function (a) {
+      var row = { title: a.title, due_date: a.due_date || null, max_points: a.max_points || 100 };
+      if (a.id) work.push(sb.from("assignments").update(row).eq("id", a.id));
+      else { row.course_id = courseId; work.push(sb.from("assignments").insert(row)); }
+    });
+
+    return Promise.all(work);
+  }).then(function () { done(null); })
+    .catch(function (e) { done(e.message || String(e)); });
+
+  function insertLessons(moduleId, lessons) {
+    if (!lessons.length) return Promise.resolve();
+    return sb.from("lessons").insert(lessons.map(function (l, j) {
+      return { module_id: moduleId, title: l.title, type: l.type, duration: l.duration, position: j + 1 };
+    }));
+  }
+
+  function syncLessons(moduleId, lessons) {
+    return sb.from("lessons").select("id").eq("module_id", moduleId).then(function (lr) {
+      if (lr.error) throw new Error(lr.error.message);
+      var existing = lr.data.map(function (l) { return l.id; });
+      var kept = lessons.filter(function (l) { return l.id; }).map(function (l) { return l.id; });
+      var removed = existing.filter(function (id) { return kept.indexOf(id) === -1; });
+      var jobs = [];
+      if (removed.length) jobs.push(sb.from("lessons").delete().in("id", removed));
+      var fresh = [];
+      lessons.forEach(function (l, j) {
+        var row = { title: l.title, type: l.type, duration: l.duration, position: j + 1 };
+        if (l.id) jobs.push(sb.from("lessons").update(row).eq("id", l.id));
+        else { row.module_id = moduleId; fresh.push(row); }
+      });
+      if (fresh.length) jobs.push(sb.from("lessons").insert(fresh));
+      return Promise.all(jobs);
+    });
+  }
 }

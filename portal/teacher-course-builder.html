@@ -82,39 +82,46 @@
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {
-    // Prefill if editing
-    var id = new URLSearchParams(location.search).get("id");
-    var editing = id ? teacherCourseById(id) : null;
-    if (editing) {
-      document.getElementById("builderTitle").textContent = "Edit Course";
-      document.getElementById("cTitle").value = editing.title;
-      document.getElementById("cDiscipline").value = editing.title;
-      document.getElementById("cPublished").checked = editing.status === "published";
-    }
-
+    var courseId = new URLSearchParams(location.search).get("id");
+    var isEdit = !!courseId;
     var modules = document.getElementById("modules");
     var assignments = document.getElementById("assignments");
     var modCount = 0;
+    var iconOf = { i1: "🛡️", i2: "🔥", i3: "🏢", i4: "🖥️", i5: "🌐", i6: "🎚️" };
+    /* what the course looked like when loaded — used to warn about deletions */
+    var originalLessonIds = [], originalAssignmentIds = [];
 
-    function lessonRow() {
+    /* lesson: existing rows carry data-id so the save can update instead of re-insert */
+    function lessonRow(lesson) {
       var row = document.createElement("div");
       row.className = "lesson-row";
+      if (lesson && lesson.id) row.setAttribute("data-id", lesson.id);
       row.innerHTML =
         '<input class="input" placeholder="Lesson title" />' +
         '<select class="select"><option>Video</option><option>Reading</option><option>Lab</option><option>Quiz</option></select>' +
         '<input class="input" placeholder="Duration" />' +
         '<button type="button" class="row-remove" aria-label="Remove lesson">✕</button>';
+      if (lesson) {
+        var ins = row.querySelectorAll("input");
+        ins[0].value = lesson.title || "";
+        ins[1].value = lesson.duration || "";
+        var sel = row.querySelector("select");
+        var want = (lesson.type || "video").toLowerCase();
+        for (var i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].value.toLowerCase() === want) { sel.selectedIndex = i; break; }
+        }
+      }
       row.querySelector(".row-remove").addEventListener("click", function () { row.remove(); });
       return row;
     }
 
-    function addModule(title) {
+    function addModule(mod) {
       modCount++;
-      var n = modCount;
       var item = document.createElement("div");
       item.className = "accordion-item is-builder open";
+      if (mod && mod.id) item.setAttribute("data-id", mod.id);
       item.innerHTML =
-        '<button class="accordion-head" type="button"><span>Module ' + n + '</span><span class="chev">▾</span></button>' +
+        '<button class="accordion-head" type="button"><span>Module ' + modCount + '</span><span class="chev">▾</span></button>' +
         '<div class="accordion-body" style="padding:16px 18px;">' +
           '<label class="field-label">Module title</label>' +
           '<input class="input module-title" placeholder="e.g. CCTV Design" style="margin-bottom:12px;" />' +
@@ -124,38 +131,45 @@
             '<button type="button" class="btn btn-light btn-sm remove-module" style="color:#c0392b;">Remove module</button>' +
           '</div>' +
         '</div>';
-      if (title) item.querySelector(".module-title").value = title;
       var lessons = item.querySelector(".lessons");
-      lessons.appendChild(lessonRow());
+      if (mod) {
+        item.querySelector(".module-title").value = mod.title || "";
+        (mod.lessons || []).forEach(function (l) { lessons.appendChild(lessonRow(l)); });
+      }
+      if (!lessons.children.length) lessons.appendChild(lessonRow());
       item.querySelector(".add-lesson").addEventListener("click", function () { lessons.appendChild(lessonRow()); });
       item.querySelector(".remove-module").addEventListener("click", function () { item.remove(); });
       modules.appendChild(item);
     }
 
-    function addAssignment() {
+    function addAssignment(a) {
       var row = document.createElement("div");
       row.className = "lesson-row";
       row.style.gridTemplateColumns = "1fr 160px 110px auto";
+      if (a && a.id) row.setAttribute("data-id", a.id);
       row.innerHTML =
         '<input class="input" placeholder="Assignment title" />' +
         '<input class="input" type="date" />' +
         '<input class="input" type="number" placeholder="Max pts" />' +
         '<button type="button" class="row-remove" aria-label="Remove assignment">✕</button>';
+      if (a) {
+        var ins = row.querySelectorAll("input");
+        ins[0].value = a.title || "";
+        ins[1].value = a.due_date || "";
+        ins[2].value = a.max_points || 100;
+      }
       row.querySelector(".row-remove").addEventListener("click", function () { row.remove(); });
       assignments.appendChild(row);
     }
 
     document.getElementById("addModule").addEventListener("click", function () { addModule(); });
-    document.getElementById("addAssignment").addEventListener("click", addAssignment);
-    var iconOf = { i1: "🛡️", i2: "🔥", i3: "🏢", i4: "🖥️", i5: "🌐", i6: "🎚️" };
-    document.getElementById("saveCourse").addEventListener("click", function () {
-      if (!dbReady()) { showToast("Course saved (demo)"); return; }
-      if (editing) { showToast("Editing existing courses arrives in the next phase — create new courses for now"); return; }
-      var title = document.getElementById("cTitle").value.trim();
-      if (!title) { showToast("Give the course a title first"); return; }
+    document.getElementById("addAssignment").addEventListener("click", function () { addAssignment(); });
+
+    /* read the whole form back out */
+    function collect() {
       var iconRadio = document.querySelector('input[name="icon"]:checked');
       var course = {
-        title: title,
+        title: document.getElementById("cTitle").value.trim(),
         icon: iconOf[iconRadio ? iconRadio.id : "i1"] || "📚",
         description: document.getElementById("cDesc").value.trim(),
         status: document.getElementById("cPublished").checked ? "published" : "draft",
@@ -166,30 +180,98 @@
         if (!mTitle) return;
         var lessons = [];
         item.querySelectorAll(".lessons .lesson-row").forEach(function (row) {
-          var t = row.querySelector("input").value.trim();
+          var ins = row.querySelectorAll("input");
+          var t = ins[0].value.trim();
           if (!t) return;
-          lessons.push({ title: t, type: row.querySelector("select").value.toLowerCase(), duration: row.querySelectorAll("input")[1].value.trim() });
+          lessons.push({ id: row.getAttribute("data-id") || null, title: t,
+            type: row.querySelector("select").value.toLowerCase(), duration: ins[1].value.trim() });
         });
-        modulesArr.push({ title: mTitle, lessons: lessons });
+        modulesArr.push({ id: item.getAttribute("data-id") || null, title: mTitle, lessons: lessons });
       });
       var assignmentsArr = [];
       document.querySelectorAll("#assignments .lesson-row").forEach(function (row) {
         var ins = row.querySelectorAll("input");
         var t = ins[0].value.trim();
         if (!t) return;
-        assignmentsArr.push({ title: t, due_date: ins[1].value || null, max_points: parseInt(ins[2].value, 10) || 100 });
+        assignmentsArr.push({ id: row.getAttribute("data-id") || null, title: t,
+          due_date: ins[1].value || null, max_points: parseInt(ins[2].value, 10) || 100 });
       });
-      var btn = this; btn.disabled = true;
-      dbCreateCourse(course, modulesArr, assignmentsArr, function (err) {
+      return { course: course, modulesArr: modulesArr, assignmentsArr: assignmentsArr };
+    }
+
+    document.getElementById("saveCourse").addEventListener("click", function () {
+      if (!dbReady()) { showToast("Course saved (demo)"); return; }
+      var data = collect();
+      if (!data.course.title) { showToast("Give the course a title first"); return; }
+      var btn = this;
+
+      if (!isEdit) {
+        btn.disabled = true;
+        dbCreateCourse(data.course, data.modulesArr, data.assignmentsArr, function (err) {
+          if (err) { btn.disabled = false; showToast("Could not save: " + err); return; }
+          showToast("Course created!");
+          setTimeout(function () { window.location.href = "teacher-courses.html"; }, 700);
+        });
+        return;
+      }
+
+      /* editing: warn before anything that destroys student data */
+      var keptLessons = [], keptAsgs = [];
+      data.modulesArr.forEach(function (m) {
+        m.lessons.forEach(function (l) { if (l.id) keptLessons.push(l.id); });
+      });
+      data.assignmentsArr.forEach(function (a) { if (a.id) keptAsgs.push(a.id); });
+      var lostLessons = originalLessonIds.filter(function (x) { return keptLessons.indexOf(x) === -1; }).length;
+      var lostAsgs = originalAssignmentIds.filter(function (x) { return keptAsgs.indexOf(x) === -1; }).length;
+      if (lostLessons || lostAsgs) {
+        var warn = "You are about to permanently delete:\n";
+        if (lostAsgs) warn += "\n• " + lostAsgs + " assignment(s) — along with every student submission and grade for them";
+        if (lostLessons) warn += "\n• " + lostLessons + " lesson(s) — along with students' completion progress";
+        warn += "\n\nThis cannot be undone. Continue?";
+        if (!confirm(warn)) return;
+      }
+
+      btn.disabled = true;
+      dbUpdateCourse(courseId, data.course, data.modulesArr, data.assignmentsArr, function (err) {
         if (err) { btn.disabled = false; showToast("Could not save: " + err); return; }
-        showToast("Course created!");
+        showToast("Course updated!");
         setTimeout(function () { window.location.href = "teacher-courses.html"; }, 700);
       });
     });
 
-    // seed with one module + one assignment
-    addModule(editing ? "Module 1" : "");
-    addAssignment();
+    /* ---- initial state ---- */
+    if (isEdit && dbReady()) {
+      document.getElementById("builderTitle").textContent = "Loading course…";
+      dbLoadCourseForEdit(courseId, function (err, c) {
+        if (err || !c) {
+          document.getElementById("builderTitle").textContent = "Course not found";
+          showToast(err || "That course could not be loaded");
+          return;
+        }
+        document.getElementById("builderTitle").textContent = "Edit Course";
+        document.getElementById("cTitle").value = c.title || "";
+        document.getElementById("cDesc").value = c.description || "";
+        document.getElementById("cPublished").checked = c.status === "published";
+        var sel = document.getElementById("cDiscipline");
+        for (var i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].value === c.title) { sel.selectedIndex = i; break; }
+        }
+        Object.keys(iconOf).forEach(function (k) {
+          if (iconOf[k] === c.icon) { var el = document.getElementById(k); if (el) el.checked = true; }
+        });
+        (c.modules || []).forEach(function (m) {
+          addModule(m);
+          (m.lessons || []).forEach(function (l) { originalLessonIds.push(l.id); });
+        });
+        (c.assignmentsList || []).forEach(function (a) { addAssignment(a); originalAssignmentIds.push(a.id); });
+        if (!modules.children.length) addModule();
+        if (!assignments.children.length) addAssignment();
+      });
+    } else {
+      if (isEdit) document.getElementById("builderTitle").textContent = "Edit Course";
+      addModule();
+      addAssignment();
+    }
     });
   </script>
 </body>

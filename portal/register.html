@@ -40,7 +40,10 @@
 
         <p class="kicker" id="rolePortal">Student Portal</p>
         <h2 class="section-title" id="roleTitle" style="margin-bottom:6px;">Create Student Account</h2>
-        <p class="muted" style="margin:0 0 22px;font-size:14px;">Demo signup — no real account is created.</p>
+        <p class="muted" style="margin:0 0 10px;font-size:14px;">Create your CORE Egypt account.</p>
+        <p id="roleNote" style="display:none;margin:0 0 18px;font-size:13px;font-weight:650;color:var(--core-blue);background:var(--core-sky);border:1px solid var(--core-border);border-radius:12px;padding:10px 13px;">
+          🛡️ Instructor accounts are reviewed by an administrator before they can be used.
+        </p>
 
         <form id="registerForm" class="stack" autocomplete="off">
           <div>
@@ -95,6 +98,8 @@
       document.getElementById("rolePortal").textContent = copy[r].portal;
       document.getElementById("roleTitle").textContent = copy[r].title;
       document.getElementById("whoLabel").textContent = copy[r].who;
+      var note = document.getElementById("roleNote");
+      note.style.display = r === "teacher" ? "block" : "none";
     }
 
     // honor ?role= from the login page
@@ -134,6 +139,14 @@
         var firstName = document.getElementById("fullname").value.trim().split(/\s+/)[0];
         dbSignUp(email, p1, firstName, role, function (msg, mode) {
           if (msg) { fail(msg); return; }
+          // Instructor accounts need an admin to approve them before first login
+          if (role === "teacher") {
+            err.style.display = "block"; err.style.color = "#1b8a4b";
+            err.textContent = rtl
+              ? "تم إنشاء الحساب — بانتظار موافقة الإدارة. سيتم إشعارك عند تفعيله."
+              : "Account created — an administrator must approve your instructor access before you can log in.";
+            return;
+          }
           if (mode === "confirm") {
             err.style.display = "block"; err.style.color = "#1b8a4b";
             err.textContent = rtl ? "تم إنشاء الحساب — تحقق من بريدك الإلكتروني لتأكيده ثم سجّل الدخول" : "Account created — check your email to confirm it, then log in.";

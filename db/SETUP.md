@@ -23,6 +23,10 @@ Total time: ~10 minutes. Everything is on Supabase's **free tier**.
    You should see "Success. No rows returned".
 3. Do the same with [`seed.sql`](seed.sql) — this loads the 6 CORE programs,
    modules, lessons, assignments, and upcoming sessions.
+4. Do the same with [`migration-002-teacher-approval.sql`](migration-002-teacher-approval.sql)
+   — **important for security**: without it, anyone who visits your site can
+   register as a teacher and immediately create courses and grade real
+   students. After it, instructor signups wait for an admin's approval.
 
 ## Step 3 — Connect the frontend
 
@@ -61,20 +65,33 @@ update public.courses set instructor_id =
   (select id from auth.users where email = 'YOUR-EMAIL@example.com');
 ```
 
+## Instructor approvals (after migration 002)
+
+- Someone registering as a **Teacher** gets the `pending_teacher` role. They can
+  **not** log in, create courses, grade, or see student data.
+- An **admin** sees an extra **🛡️ Approvals** item in the instructor sidebar
+  (`teacher-approvals.html`), listing everyone waiting, with Approve / Reject.
+  Approve → `teacher`. Reject → they keep a plain student account.
+- Role changes go through the `approve_teacher()` function, which re-checks that
+  the caller is an admin — so this can't be faked from the browser.
+- Accounts created **before** the migration keep whatever role they had.
+
 ## Security notes (honest ones)
 
-- Anyone can currently self-register as a **teacher** from the site. That's fine
-  while testing; before launch, either remove the teacher option from the public
-  register page or add an approval step (`role` stays `student` until an admin
-  promotes it).
 - The `admin` role can **never** be self-assigned — only via SQL/dashboard.
 - Row Level Security is ON for every table; the anon key alone can read nothing
   except the public certificate-verification function.
+- Email confirmation: if it's off, anyone can sign up with an address they don't
+  own. Turn it on before a public launch.
 
 ## What's wired vs. what still uses mock data
 
 | Area | Status after setup |
 |---|---|
 | Registration / Login / Logout | **Real** (Supabase Auth, role-checked) |
-| Portal pages (dashboard, courses, grades…) | Still mock data — wiring them to the database is the next phase |
-| File storage (course materials) | Later phase (Supabase Storage + admin-only download policies) |
+| Instructor approvals | **Real** (admin-gated, after migration 002) |
+| All portal pages (dashboard, courses, grades, attendance…) | **Real** live data |
+| Assignment submission, grading, sessions, attendance, profiles, enrollment | **Real** writes |
+| Course builder — create **and edit** courses/modules/lessons/assignments | **Real** |
+| Certificate QR verification page | Not built yet |
+| File storage (course materials, assignment uploads) | Not built yet (Supabase Storage + admin-only download policies) |

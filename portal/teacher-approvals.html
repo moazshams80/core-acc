@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Instructor Approvals — CORE Egypt</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="teacher-approvals" data-role="teacher">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <div class="page-head">
+          <h2 class="section-title" style="font-size:22px;">Instructor Approvals</h2>
+          <p>People who signed up as instructors. They cannot create courses, grade, or see student data until you approve them.</p>
+        </div>
+
+        <section class="card card-pad">
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Name</th><th>Instructor ID</th><th>Requested</th><th>Decision</th></tr></thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+          <div id="empty"></div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="teacher-mock-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    portalBoot(function () {
+      var main = document.querySelector(".portal-main");
+
+      // Admin-only screen. Non-admins never see the nav link; this blocks direct URLs.
+      if (!currentInstructor.isAdmin) {
+        main.innerHTML = '<div class="empty-state"><div class="es-ico">🛡️</div><h3>Admins only</h3>' +
+          '<p>Only administrators can review instructor requests.</p>' +
+          '<a class="btn btn-primary btn-sm" href="teacher-dashboard.html">Back to dashboard</a></div>';
+        return;
+      }
+
+      if (!dbReady()) {
+        main.innerHTML = '<div class="empty-state"><div class="es-ico">🔌</div><h3>Database not connected</h3>' +
+          '<p>Instructor approvals need the live database.</p></div>';
+        return;
+      }
+
+      function render() {
+        dbPendingTeachers(function (err, list) {
+          var tbody = document.getElementById("rows"), empty = document.getElementById("empty");
+          if (err) { tbody.innerHTML = ""; empty.innerHTML = '<div class="empty-state"><div class="es-ico">⚠️</div><h3>Could not load requests</h3><p>' + esc(err) + "</p></div>"; return; }
+          if (!list.length) {
+            tbody.innerHTML = "";
+            empty.innerHTML = '<div class="empty-state"><div class="es-ico">✅</div><h3>Nothing to review</h3><p>No instructor requests are waiting.</p></div>';
+            return;
+          }
+          empty.innerHTML = "";
+          tbody.innerHTML = list.map(function (p) {
+            var initials = (p.first_name || "?").charAt(0).toUpperCase();
+            return "<tr><td><div style='display:flex;align-items:center;gap:10px;'>" +
+              avatarHTML(initials, "avatar-sm") + "<b>" + esc(p.first_name) + "</b></div></td>" +
+              "<td>" + esc(p.code || "—") + "</td>" +
+              "<td>" + prettyDate(ymd(p.created_at)) + "</td>" +
+              '<td><div style="display:flex;gap:8px;">' +
+                '<button class="btn btn-primary btn-sm" data-approve="' + p.id + '" data-name="' + esc(p.first_name) + '">Approve</button>' +
+                '<button class="btn btn-light btn-sm" data-reject="' + p.id + '" data-name="' + esc(p.first_name) + '" style="color:#c0392b;">Reject</button>' +
+              "</div></td></tr>";
+          }).join("");
+        });
+      }
+
+      document.addEventListener("click", function (e) {
+        var ap = e.target.closest("[data-approve]");
+        var rj = e.target.closest("[data-reject]");
+        var btn = ap || rj;
+        if (!btn) return;
+        var approve = !!ap;
+        var name = btn.getAttribute("data-name");
+        if (!approve && !confirm("Reject " + name + "'s instructor request?\n\nThey will keep a student account.")) return;
+        btn.disabled = true;
+        dbReviewTeacher(btn.getAttribute(approve ? "data-approve" : "data-reject"), approve, function (err) {
+          if (err) { btn.disabled = false; showToast("Could not save: " + err); return; }
+          showToast(approve ? name + " is now an instructor" : name + "'s request was rejected");
+          render();
+        });
+      });
+
+      render();
+    });
+  </script>
+</body>
+</html>
