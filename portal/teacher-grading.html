@@ -50,7 +50,7 @@
           <p class="muted" style="margin-top:0;font-size:13px;" id="gmMeta"></p>
           <div class="card card-pad protected-content" style="background:var(--core-bg);box-shadow:none;">
             <p style="margin:0 0 12px;" id="gmNotes">Submission notes from the student would appear here.</p>
-            <button type="button" class="card-link" style="color:var(--core-blue);font-weight:800;background:none;border:0;padding:0;cursor:pointer;font:inherit;" onclick="showToast('Attachment opens in the protected viewer')">📎 View attached file</button>
+            <button type="button" id="gmFile" class="card-link" style="color:var(--core-blue);font-weight:800;background:none;border:0;padding:0;cursor:pointer;font:inherit;">📎 Open attached file</button>
           </div>
         </div>
         <div class="stack">
@@ -130,6 +130,8 @@
       document.getElementById("gmScore").value = currentSub.score == null ? "" : currentSub.score;
       document.getElementById("gmScore").max = currentSub.maxPoints;
       document.getElementById("gmNotes").textContent = currentSub.notes || "No notes were added with this submission.";
+      var fileBtn = document.getElementById("gmFile");
+      fileBtn.style.display = currentSub.filePath ? "" : "none";
       document.getElementById("gmFeedback").value = "";
       updateLetter();
       document.getElementById("gradeModal").classList.add("open");
@@ -141,6 +143,12 @@
       document.getElementById("gmLetter").value = letter;
     }
     document.getElementById("gmScore").addEventListener("input", updateLetter);
+
+    // open the student's uploaded work (private bucket, short-lived signed link)
+    document.getElementById("gmFile").addEventListener("click", function () {
+      if (currentSub && currentSub.filePath) dbOpenFile("submissions", currentSub.filePath);
+      else showToast("No file was attached to this submission");
+    });
 
     document.getElementById("gmSave").addEventListener("click", function () {
       if (!currentSub) return;

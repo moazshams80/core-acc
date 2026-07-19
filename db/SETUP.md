@@ -23,7 +23,10 @@ Total time: ~10 minutes. Everything is on Supabase's **free tier**.
    You should see "Success. No rows returned".
 3. Do the same with [`seed.sql`](seed.sql) — this loads the 6 CORE programs,
    modules, lessons, assignments, and upcoming sessions.
-4. Do the same with [`migration-002-teacher-approval.sql`](migration-002-teacher-approval.sql)
+4. Do the same with [`migration-003-storage.sql`](migration-003-storage.sql) — creates the
+   three private file buckets (course materials, submissions, certificates)
+   and the rules for who may open each file.
+5. Do the same with [`migration-002-teacher-approval.sql`](migration-002-teacher-approval.sql)
    — **important for security**: without it, anyone who visits your site can
    register as a teacher and immediately create courses and grade real
    students. After it, instructor signups wait for an admin's approval.
@@ -76,6 +79,38 @@ update public.courses set instructor_id =
   the caller is an admin — so this can't be faked from the browser.
 - Accounts created **before** the migration keep whatever role they had.
 
+## Email delivery (do this before real users sign up)
+
+Supabase's built-in email sender is rate-limited (a few messages per hour) and
+usually lands in spam. Signup confirmations and **password resets will silently
+fail** for your users until you connect a real provider.
+
+1. Create a free account with **Resend** (easiest), SendGrid, or Amazon SES.
+2. Verify your sending domain there (they walk you through the DNS records).
+3. In Supabase: **Project Settings → Authentication → SMTP Settings** → enable
+   custom SMTP and paste the host, port, username and password they give you.
+4. Set the sender to something like `no-reply@yourdomain.com`.
+
+Until this is done, use the SQL workaround to confirm accounts manually:
+
+```sql
+update auth.users set email_confirmed_at = now() where email = 'someone@example.com';
+```
+
+## File storage (after migration 003)
+
+Three **private** buckets. Nothing is served by public URL — files open through
+short-lived signed links, and the storage rules decide who may request one.
+
+| Bucket | Who can upload | Who can open |
+|---|---|---|
+| `course-materials` | Course instructor | Enrolled students + the instructor |
+| `submissions` | The student (own folder) | That student + the course instructor |
+| `certificates` | Course instructor | The graduate + the instructor |
+
+Downloading materials remains **admin-only** in the UI (`canDownload()`), while
+enrolled students can view them in the protected, watermarked viewer.
+
 ## Security notes (honest ones)
 
 - The `admin` role can **never** be self-assigned — only via SQL/dashboard.
@@ -93,5 +128,9 @@ update public.courses set instructor_id =
 | All portal pages (dashboard, courses, grades, attendance…) | **Real** live data |
 | Assignment submission, grading, sessions, attendance, profiles, enrollment | **Real** writes |
 | Course builder — create **and edit** courses/modules/lessons/assignments | **Real** |
-| Certificate QR verification page | Not built yet |
-| File storage (course materials, assignment uploads) | Not built yet (Supabase Storage + admin-only download policies) |
+| Course materials, assignment file uploads, certificate files | **Real** (private buckets, signed links) |
+| Certificates issued by instructors + public verification page | **Real** (`verify.html?code=…`, no login needed) |
+| Password reset | **Real** (needs SMTP configured to actually deliver) |
+| Lesson-level progress tracking | Deliberately not tracked — progress reflects assignments submitted |
+| Payments | Handled outside the platform |
+| Admin user management | Not built yet |

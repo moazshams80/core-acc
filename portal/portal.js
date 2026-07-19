@@ -43,6 +43,7 @@ var TEACHER_NAV = [
   { key: "teacher-grading",    label: "Grading",       icon: "✍️", href: "teacher-grading.html" },
   { key: "teacher-sessions",   label: "Live Sessions", icon: "🎥", href: "teacher-sessions.html" },
   { key: "teacher-attendance", label: "Attendance",    icon: "📅", href: "teacher-attendance.html" },
+  { key: "teacher-certificates", label: "Certificates", icon: "🎓", href: "teacher-certificates.html" },
   { key: "teacher-reports",    label: "Reports",       icon: "📊", href: "teacher-reports.html" },
   { key: "teacher-profile",    label: "Profile",       icon: "👤", href: "teacher-profile.html" },
 ];
@@ -64,6 +65,7 @@ var TEACHER_PAGE_TITLES = {
   "teacher-grading": "Grading",
   "teacher-sessions": "Live Sessions",
   "teacher-attendance": "Attendance",
+  "teacher-certificates": "Certificates",
   "teacher-reports": "Reports",
   "teacher-profile": "Profile",
   "teacher-approvals": "Instructor Approvals",

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Issue Certificates — CORE Egypt Instructor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body data-page="teacher-certificates" data-role="teacher">
+  <div class="portal-shell">
+    <aside class="portal-sidebar" id="portalSidebar"></aside>
+    <div class="portal-overlay" id="portalOverlay"></div>
+    <div class="portal-content">
+      <header class="portal-header" id="portalHeader"></header>
+      <main class="portal-main">
+
+        <div class="page-head">
+          <h2 class="section-title" style="font-size:22px;">Issue Certificates</h2>
+          <p>Upload a completed certificate for a student. Each one gets a unique verification code that anyone can check publicly.</p>
+        </div>
+
+        <section class="card card-pad" style="margin-bottom:22px;">
+          <h3 style="color:var(--core-navy);margin-bottom:14px;">Issue a certificate</h3>
+          <div class="stack" style="max-width:620px;">
+            <div><label class="field-label">Course</label><select class="select" id="cCourse"></select></div>
+            <div><label class="field-label">Student</label><select class="select" id="cStudent"></select></div>
+            <div><label class="field-label">Certificate file (PDF or image)</label><input class="input" type="file" id="cFile" accept=".pdf,image/*" /></div>
+            <button class="btn btn-primary" style="justify-self:start;" id="cIssue">Issue Certificate</button>
+          </div>
+        </section>
+
+        <section class="card card-pad">
+          <h3 style="color:var(--core-navy);margin-bottom:14px;">Issued for this course</h3>
+          <div class="table-wrap">
+            <table class="data">
+              <thead><tr><th>Student</th><th>Verification code</th><th>Issued</th><th></th></tr></thead>
+              <tbody id="rows"></tbody>
+            </table>
+          </div>
+          <div id="empty"></div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="teacher-mock-data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="db.js"></script>
+  <script src="portal.js"></script>
+  <script>
+    portalBoot(function () {
+      var main = document.querySelector(".portal-main");
+      if (!dbReady()) {
+        main.innerHTML = '<div class="empty-state"><div class="es-ico">🔌</div><h3>Database not connected</h3><p>Certificates need the live database.</p></div>';
+        return;
+      }
+      var published = teacherCourses;
+      if (!published.length) {
+        main.innerHTML = '<div class="empty-state"><div class="es-ico">📚</div><h3>No courses yet</h3><p>Create a course before issuing certificates.</p>' +
+          '<a class="btn btn-primary btn-sm" href="teacher-courses.html">My Courses</a></div>';
+        return;
+      }
+
+      var cCourse = document.getElementById("cCourse");
+      cCourse.innerHTML = published.map(function (c) {
+        return '<option value="' + c.id + '">' + esc(c.title) + "</option>";
+      }).join("");
+
+      function loadRoster() {
+        dbCourseRoster(cCourse.value, function (err, rows) {
+          var sel = document.getElementById("cStudent");
+          if (err || !rows.length) {
+            sel.innerHTML = '<option value="">No students enrolled</option>';
+            return;
+          }
+          sel.innerHTML = rows.map(function (r) {
+            var n = r.student ? r.student.first_name : "Student";
+            var code = r.student && r.student.code ? " (" + r.student.code + ")" : "";
+            return '<option value="' + r.student_id + '">' + esc(n + code) + "</option>";
+          }).join("");
+        });
+      }
+
+      function loadIssued() {
+        dbIssuedCertificates(cCourse.value, function (err, list) {
+          var tbody = document.getElementById("rows"), empty = document.getElementById("empty");
+          if (err) { tbody.innerHTML = ""; empty.innerHTML = '<p class="muted">' + esc(err) + "</p>"; return; }
+          if (!list.length) {
+            tbody.innerHTML = "";
+            empty.innerHTML = '<div class="empty-state"><div class="es-ico">🎓</div><h3>None issued yet</h3><p>Certificates you issue for this course appear here.</p></div>';
+            return;
+          }
+          empty.innerHTML = "";
+          tbody._items = list;
+          tbody.innerHTML = list.map(function (c) {
+            var n = c.student ? c.student.first_name : "Student";
+            return "<tr><td><b>" + esc(n) + "</b></td>" +
+              "<td><code>" + esc(c.verification_code) + "</code></td>" +
+              "<td>" + prettyDate(ymd(c.issued_at)) + "</td>" +
+              '<td><div style="display:flex;gap:8px;">' +
+                (c.file_path ? '<button class="btn btn-light btn-sm" data-view="' + c.id + '">View</button>' : "") +
+                '<button class="btn btn-light btn-sm" data-revoke="' + c.id + '" style="color:#c0392b;">Revoke</button>' +
+              "</div></td></tr>";
+          }).join("");
+        });
+      }
+
+      cCourse.addEventListener("change", function () { loadRoster(); loadIssued(); });
+
+      document.getElementById("cIssue").addEventListener("click", function () {
+        var studentId = document.getElementById("cStudent").value;
+        var file = document.getElementById("cFile").files[0];
+        if (!studentId) { showToast("No student selected"); return; }
+        if (!file) { showToast("Choose the certificate file first"); return; }
+        if (file.size > 20 * 1024 * 1024) { showToast("File is larger than 20 MB"); return; }
+        var btn = this; btn.disabled = true; btn.textContent = "Issuing…";
+        dbIssueCertificate(cCourse.value, studentId, file, function (err, code) {
+          btn.disabled = false; btn.textContent = "Issue Certificate";
+          if (err) { showToast(err); return; }
+          document.getElementById("cFile").value = "";
+          showToast("Certificate issued — code " + code);
+          loadIssued();
+        });
+      });
+
+      document.getElementById("rows").addEventListener("click", function (e) {
+        var items = this._items || [];
+        var v = e.target.closest("[data-view]");
+        if (v) {
+          var cert = items.find(function (x) { return x.id === v.getAttribute("data-view"); });
+          if (cert && cert.file_path) dbOpenFile("certificates", cert.file_path);
+          return;
+        }
+        var r = e.target.closest("[data-revoke]");
+        if (r) {
+          var c2 = items.find(function (x) { return x.id === r.getAttribute("data-revoke"); });
+          if (!c2) return;
+          var who = c2.student ? c2.student.first_name : "this student";
+          if (!confirm("Revoke " + who + "'s certificate?\n\nThe file is deleted and code " + c2.verification_code + " will no longer verify.")) return;
+          r.disabled = true;
+          dbRevokeCertificate(c2, function (err) {
+            if (err) { r.disabled = false; showToast("Could not revoke: " + err); return; }
+            showToast("Certificate revoked");
+            loadIssued();
+          });
+        }
+      });
+
+      loadRoster();
+      loadIssued();
+    });
+  </script>
+</body>
+</html>

@@ -60,6 +60,20 @@
           <div id="modules"></div>
         </section>
 
+        <!-- Course materials (edit mode only — needs a saved course to attach to) -->
+        <section class="card card-pad" style="margin-bottom:20px;display:none;" id="materialsSection">
+          <div class="between" style="margin-bottom:6px;"><h3 style="color:var(--core-navy);">Course Materials</h3></div>
+          <p class="muted" style="margin:0 0 14px;font-size:13px;">
+            PDFs, slides, or video files. Only students enrolled in this course can open them, and downloading stays admin-only.
+          </p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;">
+            <input class="input" type="file" id="matFile" style="flex:1;min-width:220px;" />
+            <input class="input" id="matTitle" placeholder="Display name (optional)" style="flex:1;min-width:180px;" />
+            <button class="btn btn-primary btn-sm" id="matUpload">Upload</button>
+          </div>
+          <div id="matList"></div>
+        </section>
+
         <!-- Assignments -->
         <section class="card card-pad" style="margin-bottom:20px;">
           <div class="between" style="margin-bottom:14px;"><h3 style="color:var(--core-navy);">Assignments</h3>
@@ -239,7 +253,65 @@
       });
     });
 
+    /* ---- course materials (real file storage) ---- */
+    function renderMaterials() {
+      dbListMaterials(courseId, function (err, list) {
+        var box = document.getElementById("matList");
+        if (err) { box.innerHTML = '<p class="muted">Could not load materials: ' + esc(err) + "</p>"; return; }
+        if (!list.length) { box.innerHTML = '<p class="muted" style="margin:0;">No materials uploaded yet.</p>'; return; }
+        box.innerHTML = list.map(function (m) {
+          return '<div class="list-row" style="margin-bottom:8px;">' +
+            '<span class="course-icon" style="width:38px;height:38px;font-size:16px;margin:0;border-radius:10px;" aria-hidden="true">📄</span>' +
+            '<div class="grow"><b>' + esc(m.title) + "</b>" +
+            '<div class="muted" style="font-size:12px;">' + esc(humanSize(m.size_bytes)) + " &middot; " + prettyDate(ymd(m.uploaded_at)) + "</div></div>" +
+            '<button class="btn btn-light btn-sm" data-openmat="' + m.id + '">Open</button>' +
+            '<button class="btn btn-light btn-sm" data-delmat="' + m.id + '" style="color:#c0392b;">Remove</button></div>';
+        }).join("");
+        box._items = list;
+      });
+    }
+
+    document.getElementById("matUpload").addEventListener("click", function () {
+      var f = document.getElementById("matFile").files[0];
+      if (!f) { showToast("Choose a file first"); return; }
+      if (f.size > 50 * 1024 * 1024) { showToast("File is larger than 50 MB"); return; }
+      var btn = this; btn.disabled = true; btn.textContent = "Uploading…";
+      dbUploadMaterial(courseId, f, document.getElementById("matTitle").value.trim(), function (err) {
+        btn.disabled = false; btn.textContent = "Upload";
+        if (err) { showToast("Upload failed: " + err); return; }
+        document.getElementById("matFile").value = "";
+        document.getElementById("matTitle").value = "";
+        showToast("Material uploaded");
+        renderMaterials();
+      });
+    });
+
+    document.getElementById("matList").addEventListener("click", function (e) {
+      var items = this._items || [];
+      var open = e.target.closest("[data-openmat]");
+      if (open) {
+        var m = items.find(function (x) { return x.id === open.getAttribute("data-openmat"); });
+        if (m) dbOpenFile("course-materials", m.file_path);
+        return;
+      }
+      var del = e.target.closest("[data-delmat]");
+      if (del) {
+        var mm = items.find(function (x) { return x.id === del.getAttribute("data-delmat"); });
+        if (!mm || !confirm('Remove "' + mm.title + '"? Students will lose access to it.')) return;
+        del.disabled = true;
+        dbDeleteMaterial(mm, function (err) {
+          if (err) { del.disabled = false; showToast("Could not remove: " + err); return; }
+          showToast("Material removed");
+          renderMaterials();
+        });
+      }
+    });
+
     /* ---- initial state ---- */
+    if (isEdit && dbReady()) {
+      document.getElementById("materialsSection").style.display = "";
+      renderMaterials();
+    }
     if (isEdit && dbReady()) {
       document.getElementById("builderTitle").textContent = "Loading course…";
       dbLoadCourseForEdit(courseId, function (err, c) {

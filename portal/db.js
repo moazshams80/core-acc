@@ -166,15 +166,17 @@ function dbLoadStudentData(done) {
       enrolls.forEach(function (e) { if (e.student_id === user.id) enrolledIds[e.course_id] = e; });
 
       courses = allCourses.map(function (c) {
-        var total = 0, doneN = 0;
         var modules = (c.modules || []).sort(function (a, b) { return a.position - b.position; }).map(function (m) {
           return { title: m.title, lessons: (m.lessons || []).sort(function (a, b) { return a.position - b.position; }).map(function (l) {
-            total++; if (doneLessons[l.id]) doneN++;
             return { title: l.title, type: l.type === "video" ? "video" : "reading", length: l.duration || "", done: !!doneLessons[l.id] };
           }) };
         });
         var enr = enrolledIds[c.id];
-        var progress = total ? Math.round((doneN / total) * 100) : 0;
+        /* Progress = coursework handed in. Reading is deliberately not tracked,
+           so progress reflects submitted assignments rather than lessons opened. */
+        var courseAsgIds = asgs.filter(function (a) { return a.course_id === c.id; }).map(function (a) { return a.id; });
+        var doneAsgs = subs.filter(function (s) { return courseAsgIds.indexOf(s.assignment_id) !== -1; }).length;
+        var progress = courseAsgIds.length ? Math.round((doneAsgs / courseAsgIds.length) * 100) : 0;
         return {
           id: c.id, title: c.title, icon: c.icon || "📚",
           instructor: c.instructor ? "Eng. " + c.instructor.first_name : "CORE Egypt",
@@ -231,7 +233,8 @@ function dbLoadStudentData(done) {
 
       certificates = [];
       certs.forEach(function (c) {
-        certificates.push({ id: c.id, courseId: c.course_id, earned: true, dateEarned: monthYear(c.issued_at), verificationCode: c.verification_code });
+        certificates.push({ id: c.id, courseId: c.course_id, earned: true, dateEarned: monthYear(c.issued_at),
+          verificationCode: c.verification_code, filePath: c.file_path });
       });
       enrolledCourseIds.forEach(function (cid) {
         if (!certs.some(function (c) { return c.course_id === cid; }))
@@ -333,7 +336,7 @@ function dbLoadTeacherData(done) {
         return { id: s.id, studentId: codeOf[s.student_id] || (s.student && s.student.code) || "—",
           assignmentTitle: s.assignment.title, courseId: s.assignment.course_id,
           submittedDate: ymd(s.submitted_at), status: s.status === "graded" ? "graded" : "ungraded",
-          score: s.score, maxPoints: s.assignment.max_points, notes: s.notes || "" };
+          score: s.score, maxPoints: s.assignment.max_points, notes: s.notes || "", filePath: s.file_path || null };
       });
 
       teacherSessions = sess.filter(function (s) { return myCourseIds.indexOf(s.course_id) !== -1; }).map(function (s) {
@@ -556,4 +559,158 @@ function dbUpdateCourse(courseId, course, modulesArr, assignmentsArr, done) {
       return Promise.all(jobs);
     });
   }
+}
+
+/* =========================================================
+   FILE STORAGE (Supabase Storage)
+
+   All three buckets are PRIVATE. Files are never exposed by URL —
+   they are opened through short-lived signed links, and the storage
+   policies in db/migration-003-storage.sql decide who may request one.
+
+   Path convention the policies rely on:
+     course-materials/{course_id}/{filename}
+     submissions/{course_id}/{student_id}/{filename}
+     certificates/{course_id}/{student_id}/{filename}
+   ========================================================= */
+
+/* strip anything that could break a storage path */
+function safeFileName(name) {
+  return String(name || "file")
+    .replace(/[^\w.\- ]+/g, "")
+    .replace(/\s+/g, "-")
+    .slice(-80) || "file";
+}
+
+function humanSize(bytes) {
+  if (!bytes && bytes !== 0) return "";
+  if (bytes < 1024) return bytes + " B";
+  if (bytes < 1048576) return Math.round(bytes / 1024) + " KB";
+  return (bytes / 1048576).toFixed(1) + " MB";
+}
+
+/* Open a private file. Signed links expire so they can't be shared onward. */
+function dbSignedUrl(bucket, path, done, seconds) {
+  sb.storage.from(bucket).createSignedUrl(path, seconds || 300)
+    .then(function (r) { done(r.error && r.error.message, r.data && r.data.signedUrl); });
+}
+
+function dbOpenFile(bucket, path) {
+  dbSignedUrl(bucket, path, function (err, url) {
+    if (err) { showToast("Could not open file: " + err); return; }
+    window.open(url, "_blank", "noopener");
+  });
+}
+
+/* ---------- COURSE MATERIALS ---------- */
+
+function dbListMaterials(courseId, done) {
+  sb.from("materials").select("*").eq("course_id", courseId).order("uploaded_at", { ascending: false })
+    .then(function (r) { done(r.error && r.error.message, r.data || []); });
+}
+
+function dbUploadMaterial(courseId, file, title, done) {
+  var path = courseId + "/" + Date.now() + "-" + safeFileName(file.name);
+  sb.storage.from("course-materials").upload(path, file).then(function (up) {
+    if (up.error) { done(up.error.message); return; }
+    sb.from("materials").insert({
+      course_id: courseId,
+      title: title || file.name,
+      file_path: path,
+      mime_type: file.type || null,
+      size_bytes: file.size || null,
+    }).then(function (r) {
+      if (r.error) { sb.storage.from("course-materials").remove([path]); done(r.error.message); return; }
+      done(null);
+    });
+  });
+}
+
+function dbDeleteMaterial(material, done) {
+  sb.storage.from("course-materials").remove([material.file_path]).then(function () {
+    sb.from("materials").delete().eq("id", material.id)
+      .then(function (r) { done(r.error && r.error.message); });
+  });
+}
+
+/* ---------- ASSIGNMENT SUBMISSIONS (with an attached file) ---------- */
+
+function dbSubmitAssignmentWithFile(assignmentId, courseId, notes, file, done) {
+  sb.auth.getUser().then(function (u) {
+    var uid = u.data.user.id;
+    function insertRow(filePath) {
+      sb.from("submissions").insert({
+        assignment_id: assignmentId,
+        student_id: uid,
+        notes: notes,
+        file_path: filePath,
+      }).then(function (r) { done(r.error && r.error.message); });
+    }
+    if (!file) { insertRow(null); return; }
+    var path = courseId + "/" + uid + "/" + Date.now() + "-" + safeFileName(file.name);
+    sb.storage.from("submissions").upload(path, file).then(function (up) {
+      if (up.error) { done("Upload failed: " + up.error.message); return; }
+      insertRow(path);
+    });
+  });
+}
+
+/* ---------- CERTIFICATES (uploaded by the instructor) ---------- */
+
+/* Students the teacher can issue to, for one course */
+function dbCourseRoster(courseId, done) {
+  sb.from("enrollments").select("student_id, student:profiles(first_name, code)").eq("course_id", courseId)
+    .then(function (r) { done(r.error && r.error.message, r.data || []); });
+}
+
+function dbIssuedCertificates(courseId, done) {
+  sb.from("certificates").select("*, student:profiles(first_name, code)").eq("course_id", courseId)
+    .then(function (r) { done(r.error && r.error.message, r.data || []); });
+}
+
+/* Upload the certificate file and record it with a unique verification code */
+function dbIssueCertificate(courseId, studentId, file, done) {
+  var year = new Date().getFullYear();
+  var code = "CORE-" + year + "-" + Math.random().toString(36).slice(2, 8).toUpperCase();
+  var path = courseId + "/" + studentId + "/" + code + "-" + safeFileName(file.name);
+  sb.storage.from("certificates").upload(path, file).then(function (up) {
+    if (up.error) { done("Upload failed: " + up.error.message); return; }
+    sb.from("certificates").insert({
+      course_id: courseId,
+      student_id: studentId,
+      verification_code: code,
+      file_path: path,
+    }).then(function (r) {
+      if (r.error) {
+        sb.storage.from("certificates").remove([path]);
+        done(r.error.message.indexOf("duplicate") !== -1
+          ? "This student already has a certificate for this course."
+          : r.error.message);
+        return;
+      }
+      done(null, code);
+    });
+  });
+}
+
+function dbRevokeCertificate(cert, done) {
+  function delRow() {
+    sb.from("certificates").delete().eq("id", cert.id)
+      .then(function (r) { done(r.error && r.error.message); });
+  }
+  if (cert.file_path) sb.storage.from("certificates").remove([cert.file_path]).then(delRow);
+  else delRow();
+}
+
+/* ---------- PASSWORD RESET ---------- */
+
+function dbSendPasswordReset(email, done) {
+  sb.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + window.location.pathname.replace(/[^/]*$/, "") + "reset-password.html",
+  }).then(function (r) { done(r.error && r.error.message); });
+}
+
+function dbUpdatePassword(newPassword, done) {
+  sb.auth.updateUser({ password: newPassword })
+    .then(function (r) { done(r.error && r.error.message); });
 }

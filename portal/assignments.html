@@ -46,7 +46,8 @@
       <p class="muted" id="submitFor" style="margin-top:0;"></p>
       <form class="stack" id="submitForm">
         <div><label class="field-label">Notes for your instructor</label><textarea class="textarea" id="submitNotes" placeholder="Add any notes about your submission…"></textarea></div>
-        <div><label class="field-label">Upload file</label><input class="input" type="file" /></div>
+        <div><label class="field-label">Attach your work</label><input class="input" type="file" id="submitFile" />
+          <p class="muted" style="margin:6px 0 0;font-size:12px;">PDF, images, documents or archives — up to 50 MB. Only you and your instructor can open it.</p></div>
         <button type="submit" class="btn btn-primary btn-block">Submit Assignment</button>
       </form>
     </div>
@@ -84,7 +85,7 @@
         var action;
         if (a.status === "graded") action = '<span class="badge badge-success">' + esc(a.grade) + "</span>";
         else if (a.status === "submitted") action = '<span class="muted">Awaiting grade</span>';
-        else action = '<button class="btn btn-primary btn-sm" data-modal-open="submitModal" data-aid="' + a.id + '" data-title="' + esc(a.title) + '">Submit</button>';
+        else action = '<button class="btn btn-primary btn-sm" data-modal-open="submitModal" data-aid="' + a.id + '" data-cid="' + a.courseId + '" data-title="' + esc(a.title) + '">Submit</button>';
         return "<tr><td><b>" + esc(a.title) + "</b><br>" +
             "<button type='button' class='card-link' data-brief='" + a.id + "' style='background:none;border:0;padding:0;cursor:pointer;color:var(--core-blue);font-weight:700;font-size:13px;'>View brief</button></td>" +
           '<td><span class="tag">' + esc(course.title) + "</span></td>" +
@@ -106,11 +107,12 @@
       render(activeFilter);
     });
     // set modal subtitle + remember which assignment is being submitted
-    var submittingId = null;
+    var submittingId = null, submittingCourse = null;
     document.addEventListener("click", function (e) {
       var b = e.target.closest('[data-modal-open="submitModal"]');
       if (b) {
         submittingId = b.getAttribute("data-aid");
+        submittingCourse = b.getAttribute("data-cid");
         document.getElementById("submitFor").textContent = b.getAttribute("data-title");
       }
     });
@@ -118,14 +120,21 @@
     document.getElementById("submitForm").addEventListener("submit", function (e) {
       e.preventDefault();
       var notes = document.getElementById("submitNotes").value.trim();
+      var fileInput = document.getElementById("submitFile");
+      var file = fileInput.files[0];
+      var btn = this.querySelector('button[type="submit"]');
       function finish() {
         document.getElementById("submitModal").classList.remove("open");
         document.getElementById("submitNotes").value = "";
+        fileInput.value = "";
+        btn.disabled = false; btn.textContent = "Submit Assignment";
         showToast("Assignment submitted!");
       }
+      if (file && file.size > 50 * 1024 * 1024) { showToast("File is larger than 50 MB"); return; }
       if (dbReady() && submittingId) {
-        dbSubmitAssignment(submittingId, notes, function (err) {
-          if (err) { showToast("Could not submit: " + err); return; }
+        btn.disabled = true; btn.textContent = file ? "Uploading…" : "Submitting…";
+        dbSubmitAssignmentWithFile(submittingId, submittingCourse, notes, file, function (err) {
+          if (err) { btn.disabled = false; btn.textContent = "Submit Assignment"; showToast("Could not submit: " + err); return; }
           var a = assignments.find(function (x) { return x.id === submittingId; });
           if (a) a.status = "submitted";
           finish();

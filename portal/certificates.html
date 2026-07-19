@@ -36,7 +36,9 @@
       <div class="qr qr-lg" style="margin:8px auto 16px;" aria-hidden="true"></div>
       <p style="margin:0 0 4px;font-weight:800;color:var(--core-navy);" id="vCode"></p>
       <p class="muted" id="vCourse" style="margin:0 0 14px;"></p>
-      <p style="display:inline-flex;align-items:center;gap:8px;background:#e4f6ec;color:#1b8a4b;font-weight:800;padding:10px 16px;border-radius:999px;margin:0;">✅ This certificate is authentic</p>
+      <p style="display:inline-flex;align-items:center;gap:8px;background:#e4f6ec;color:#1b8a4b;font-weight:800;padding:10px 16px;border-radius:999px;margin:0 0 14px;">✅ This certificate is authentic</p>
+      <p style="margin:0;font-size:14px;"><a id="vLink" href="#" target="_blank" rel="noopener" style="color:var(--core-blue);font-weight:700;"></a></p>
+      <p class="muted" style="margin:8px 0 0;font-size:12px;">Share this link (or the QR code) with an employer — it works without logging in.</p>
     </div>
   </div>
 
@@ -61,8 +63,9 @@
           '<div class="cert-foot"><span class="qr" aria-hidden="true"></span>' +
             '<span class="cert-meta"><strong>Verification:</strong> ' + esc(cert.verificationCode) + "<br>" +
             '<strong>Issued:</strong> ' + esc(cert.dateEarned) + "</span></div>" +
-          '<div class="cert-actions">' + (canDownload() ? '<button class="btn btn-primary btn-sm btn-block" onclick="showToast(\'Downloading PDF… (demo)\')">Download PDF</button>' : downloadLockHTML()) +
-            '<button class="btn btn-light btn-sm btn-block" data-modal-open="verifyModal" data-code="' + esc(cert.verificationCode) + '" data-course="' + esc(course.title) + '">View Verification</button></div>' +
+          '<div class="cert-actions">' +
+            (cert.filePath ? '<button class="btn btn-primary btn-sm btn-block" data-viewcert="' + esc(cert.filePath) + '">View Certificate</button>' : "") +
+            '<button class="btn btn-light btn-sm btn-block" data-modal-open="verifyModal" data-code="' + esc(cert.verificationCode) + '" data-course="' + esc(course.title) + '">Verify</button></div>' +
           "</article>";
       }
       return '<article class="cert-card locked">' +
@@ -76,11 +79,23 @@
         "</article>";
     }).join("");
 
+    // open the issued certificate file (private bucket, signed link)
+    document.addEventListener("click", function (e) {
+      var v = e.target.closest("[data-viewcert]"); if (!v) return;
+      dbOpenFile("certificates", v.getAttribute("data-viewcert"));
+    });
+
     // populate verification modal on open
     document.addEventListener("click", function (e) {
       var b = e.target.closest('[data-modal-open="verifyModal"]'); if (!b) return;
-      document.getElementById("vCode").textContent = b.getAttribute("data-code");
+      var code = b.getAttribute("data-code");
+      document.getElementById("vCode").textContent = code;
       document.getElementById("vCourse").textContent = b.getAttribute("data-course");
+      // public link anyone can open to check this certificate
+      var url = location.origin + location.pathname.replace(/[^/]*$/, "") + "verify.html?code=" + encodeURIComponent(code);
+      var link = document.getElementById("vLink");
+      link.href = url;
+      link.textContent = "Open public verification page";
     });
     });
   </script>
