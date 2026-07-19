@@ -11,8 +11,8 @@
    (db/schema.sql), never in this file.
    ========================================================= */
 
-var SUPABASE_URL = "";       // e.g. "https://abcdefgh.supabase.co"
-var SUPABASE_ANON_KEY = "";  // the long "anon / public" key
+var SUPABASE_URL = "https://xvlgczudaxdxtxhckvlu.supabase.co";
+var SUPABASE_ANON_KEY = "sb_publishable_xCGMJkUhqsCJLgD3YwZg_Q_cmD-aFrM"; // publishable key — public by design
 
 var sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
   ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
