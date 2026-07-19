@@ -1,21 +1,31 @@
 -- =========================================================
 -- CORE Egypt — MAKE ME ADMIN
 --
--- Run this AFTER you have registered your teacher account on the site.
+-- Run this AFTER registering your teacher account on the site.
 --
--- ⬇️  REPLACE the email on the next line with the one you registered with.
+-- ⬇️  Replace ONLY the email inside the quotes on the line marked below.
+--     Keep the single quotes.
 -- =========================================================
 
--- 1) Make yourself an admin (also lifts the "awaiting approval" state,
---    so you can log in immediately and approve other instructors).
-update public.profiles set role = 'admin'
-where id = (select id from auth.users where email = 'YOUR-EMAIL@gmail.com');
+do $$
+declare
+  me uuid;
+  my_email text := 'YOUR-EMAIL@gmail.com';   -- ⬅️  CHANGE THIS ONE LINE ONLY
+begin
+  select id into me from auth.users where lower(email) = lower(trim(my_email));
 
--- 2) Make yourself the instructor of all 6 seeded courses,
---    so they show up under "My Courses" in the teacher portal.
-update public.courses set instructor_id =
-  (select id from auth.users where email = 'YOUR-EMAIL@gmail.com');
+  if me is null then
+    raise exception 'No account found for "%". Register on the site first, then re-run this.', my_email;
+  end if;
 
--- 3) Check it worked — should show your name with role = admin.
-select first_name, role, code from public.profiles
-where id = (select id from auth.users where email = 'YOUR-EMAIL@gmail.com');
+  -- become an admin (this also clears the "awaiting approval" state)
+  update public.profiles set role = 'admin' where id = me;
+
+  -- take ownership of the 6 seeded courses so they appear in "My Courses"
+  update public.courses set instructor_id = me;
+
+  raise notice 'Done — % is now an admin and owns all seeded courses.', my_email;
+end $$;
+
+-- Check: should show one row with role = admin
+select first_name, role, code from public.profiles where role = 'admin';
