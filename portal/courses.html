@@ -19,9 +19,9 @@
 
         <div class="filter-tabs" id="filters">
           <button class="active" data-filter="all">All</button>
-          <button data-filter="in-progress">In Progress</button>
-          <button data-filter="completed">Completed</button>
-          <button data-filter="not-started">Not Started</button>
+          <button data-filter="in-progress" data-i18n="In Progress">In Progress</button>
+          <button data-filter="completed" data-i18n="Completed">Completed</button>
+          <button data-filter="not-started" data-i18n="Not Started">Not Started</button>
         </div>
 
         <div class="grid grid-3" id="courseGrid"></div>
@@ -33,6 +33,8 @@
   <script src="mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {
@@ -40,7 +42,7 @@
     function render(filter) {
       var list = courses.filter(function (c) { return filter === "all" || c.status === filter; });
       var grid = document.getElementById("courseGrid");
-      if (!list.length) { grid.innerHTML = '<div class="empty-state"><div class="es-ico">📭</div><h3>No courses here</h3><p>Try a different filter.</p></div>'; return; }
+      if (!list.length) { grid.innerHTML = '<div class="empty-state"><div class="es-ico">' + ICON("inbox") + '</div><h3>No courses here</h3><p>Try a different filter.</p></div>'; return; }
       grid.innerHTML = list.map(function (c) {
         return '<article class="course-card">' +
           '<span class="corner">' + badgeHTML(c.status) + "</span>" +

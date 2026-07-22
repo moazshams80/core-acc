@@ -22,17 +22,17 @@
         <section class="card card-pad" id="courseHead" style="margin-bottom:22px;"></section>
 
         <div class="tabs">
-          <button class="active" data-tab="tab-overview" data-tab-group="cd">Overview</button>
-          <button data-tab="tab-modules" data-tab-group="cd">Modules</button>
-          <button data-tab="tab-materials" data-tab-group="cd">Materials</button>
-          <button data-tab="tab-discussion" data-tab-group="cd">Discussion</button>
+          <button class="active" data-tab="tab-overview" data-tab-group="cd" data-i18n="Overview">Overview</button>
+          <button data-tab="tab-modules" data-tab-group="cd" data-i18n="Modules">Modules</button>
+          <button data-tab="tab-materials" data-tab-group="cd" data-i18n="Materials">Materials</button>
+          <button data-tab="tab-discussion" data-tab-group="cd" data-i18n="Discussion">Discussion</button>
         </div>
 
         <div id="tab-overview" class="tab-panel active" data-tab-panel-group="cd"></div>
         <div id="tab-modules" class="tab-panel" data-tab-panel-group="cd"></div>
         <div id="tab-materials" class="tab-panel" data-tab-panel-group="cd">
           <div class="card card-pad protected-content" id="materialViewer">
-            <h3 style="color:var(--core-navy);margin-bottom:10px;">Course Materials <span class="badge badge-cyan">Protected</span></h3>
+            <h3 style="color:var(--core-navy);margin-bottom:10px;">Course Materials <span class="badge badge-cyan" data-i18n="Protected">Protected</span></h3>
             <p class="muted" style="margin:0 0 14px;font-size:13px;">
               Licensed to you only — each file is watermarked with your name and ID. Copying, printing and screenshots are disabled.
             </p>
@@ -41,7 +41,7 @@
           <div style="margin-top:14px;" id="materialDownload"></div>
         </div>
         <div id="tab-discussion" class="tab-panel" data-tab-panel-group="cd">
-          <div class="empty-state"><div class="es-ico">💬</div><h3>Discussion is quiet</h3><p>Start a thread with your instructor and classmates.</p></div>
+          <div class="empty-state"><div class="es-ico"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div><h3>Discussion is quiet</h3><p>Start a thread with your instructor and classmates.</p></div>
         </div>
 
       </main>
@@ -51,6 +51,8 @@
   <script src="mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {
@@ -58,7 +60,7 @@
     var course = courseById(id) || courses[0];
     if (!course) {
       document.querySelector(".portal-main").innerHTML =
-        '<div class="empty-state"><div class="es-ico">📚</div><h3>No courses yet</h3><p>Once courses are published you\'ll find them here.</p><a class="btn btn-primary btn-sm" href="courses.html">Back to courses</a></div>';
+        '<div class="empty-state"><div class="es-ico">' + ICON("book") + '</div><h3>No courses yet</h3><p>Once courses are published you\'ll find them here.</p><a class="btn btn-primary btn-sm" href="courses.html">Back to courses</a></div>';
       return;
     }
     document.body.setAttribute("data-title", course.title);
@@ -83,7 +85,7 @@
       '<div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap;">' + course.tags.map(function (tg) { return '<span class="tag">' + esc(tg) + "</span>"; }).join("") + "</div></div>";
 
     // Modules accordion
-    var lessonIcon = { video: "▶", reading: "📄" };
+    var lessonIcon = { video: "▶", reading: "" + ICON('doc') + "" };
     document.getElementById("tab-modules").innerHTML = course.modules.map(function (m, i) {
       var lessons = m.lessons.map(function (l) {
         var ic = l.done ? '<span class="lic done">✓</span>' : '<span class="lic">' + lessonIcon[l.type] + "</span>";
@@ -105,7 +107,7 @@
       dbListMaterials(course.id, function (err, list) {
         if (err) { matBox.innerHTML = '<p class="muted" style="margin:0;">Could not load materials.</p>'; return; }
         if (!list.length) {
-          matBox.innerHTML = '<div class="empty-state" style="padding:24px;"><div class="es-ico">📂</div><h3>No materials yet</h3><p>Your instructor hasn\'t uploaded anything for this course.</p></div>';
+          matBox.innerHTML = '<div class="empty-state" style="padding:24px;"><div class="es-ico">' + ICON("folder") + '</div><h3>No materials yet</h3><p>Your instructor hasn\'t uploaded anything for this course.</p></div>';
           return;
         }
         matBox._items = list;
@@ -114,7 +116,7 @@
             ? '<button class="btn btn-light btn-sm" data-openmat="' + m.id + '">Download</button>'
             : '<button class="btn btn-light btn-sm" data-openmat="' + m.id + '">Open</button>';
           return '<div class="list-row" style="margin-bottom:8px;">' +
-            '<span class="course-icon" style="width:38px;height:38px;font-size:16px;margin:0;border-radius:10px;" aria-hidden="true">📄</span>' +
+            '<span class="course-icon" style="width:38px;height:38px;font-size:16px;margin:0;border-radius:10px;" aria-hidden="true">' + ICON("doc") + '</span>' +
             '<div class="grow"><b>' + esc(m.title) + "</b>" +
             '<div class="muted" style="font-size:12px;">' + esc(humanSize(m.size_bytes)) + "</div></div>" + action + "</div>";
         }).join("");

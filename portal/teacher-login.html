@@ -30,34 +30,34 @@
 
     <main class="login-form-panel">
       <div class="login-form-card card card-pad">
-        <p class="kicker">Instructor Portal</p>
-        <h2 class="section-title" style="margin-bottom:6px;">Teacher Login</h2>
-        <p class="muted" style="margin:0 0 22px;font-size:14px;">Sign in with your CORE Egypt account.</p>
+        <p class="kicker" data-i18n="Instructor Portal">Instructor Portal</p>
+        <h2 class="section-title" style="margin-bottom:6px;" data-i18n="Teacher Login">Teacher Login</h2>
+        <p class="muted" style="margin:0 0 22px;font-size:14px;" data-i18n="Sign in with your CORE Egypt account.">Sign in with your CORE Egypt account.</p>
 
         <form id="loginForm" class="stack" autocomplete="off">
           <div>
-            <label class="field-label" for="who">Instructor ID or Email</label>
+            <label class="field-label" for="who" data-i18n="Instructor ID or Email">Instructor ID or Email</label>
             <input class="input" id="who" type="text" placeholder="IN-2019-014" required />
           </div>
           <div>
-            <label class="field-label" for="pwd">Password</label>
+            <label class="field-label" for="pwd" data-i18n="Password">Password</label>
             <div class="password-field">
-              <input class="input" id="pwd" type="password" placeholder="At least 8 characters" minlength="8" required />
-              <button type="button" class="toggle-pass" id="togglePass" aria-label="Show password">👁️</button>
+              <input class="input" id="pwd" type="password" placeholder="At least 8 characters" data-i18n-ph="At least 8 characters" minlength="8" required />
+              <button type="button" class="toggle-pass" id="togglePass" aria-label="Show password"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
             </div>
             <p id="pwdError" class="muted" style="display:none;margin:6px 0 0;color:#c0392b;font-size:13px;font-weight:700;"></p>
           </div>
           <div class="login-row">
             <label><input type="checkbox" id="remember" /> Remember me</label>
-            <a href="forgot-password.html">Forgot password?</a>
+            <a href="forgot-password.html" data-i18n="Forgot password?">Forgot password?</a>
           </div>
-          <button type="submit" class="btn btn-primary btn-block">Log In</button>
+          <button type="submit" class="btn btn-primary btn-block" data-i18n="Log In">Log In</button>
           <div class="divider">or</div>
           <p style="text-align:center;margin:0;font-size:14px;" class="muted">
-            New instructor? <a href="register.html?role=teacher" style="color:var(--core-blue);font-weight:700;">Create an account</a>
+            New instructor? <a href="register.html?role=teacher" style="color:var(--core-blue);font-weight:700;" data-i18n="Create an account">Create an account</a>
           </p>
           <p style="text-align:center;margin:4px 0 0;font-size:13px;" class="muted">
-            Are you a student? <a href="student-login.html" style="color:var(--core-blue);font-weight:700;">Student login</a>
+            Are you a student? <a href="student-login.html" style="color:var(--core-blue);font-weight:700;" data-i18n="Student login">Student login</a>
           </p>
         </form>
       </div>
@@ -66,13 +66,15 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     document.getElementById("togglePass").addEventListener("click", function () {
       var p = document.getElementById("pwd");
       var show = p.type === "password";
       p.type = show ? "text" : "password";
-      this.textContent = show ? "🙈" : "👁️";
+      this.innerHTML = show ? ICON("eye-off") : ICON("eye");
       this.setAttribute("aria-label", show ? "Hide password" : "Show password");
     });
     document.getElementById("loginForm").addEventListener("submit", function (e) {

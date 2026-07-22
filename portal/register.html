@@ -34,45 +34,45 @@
       <div class="login-form-card card card-pad">
         <!-- Role toggle -->
         <div class="segmented" id="roleToggle" role="tablist" aria-label="Choose account type">
-          <button type="button" class="active" data-role="student" role="tab" aria-selected="true">🎓 Student</button>
-          <button type="button" data-role="teacher" role="tab" aria-selected="false">👨‍🏫 Teacher</button>
+          <button type="button" class="active" data-role="student" role="tab" aria-selected="true"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="6"/><polyline points="8.21 13.89 7 22 12 19 17 22 15.79 13.88"/></svg> Student</button>
+          <button type="button" data-role="teacher" role="tab" aria-selected="false"><svg class="icon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Teacher</button>
         </div>
 
-        <p class="kicker" id="rolePortal">Student Portal</p>
+        <p class="kicker" id="rolePortal" data-i18n="Student Portal">Student Portal</p>
         <h2 class="section-title" id="roleTitle" style="margin-bottom:6px;">Create Student Account</h2>
-        <p class="muted" style="margin:0 0 10px;font-size:14px;">Create your CORE Egypt account.</p>
+        <p class="muted" style="margin:0 0 10px;font-size:14px;" data-i18n="Create your CORE Egypt account.">Create your CORE Egypt account.</p>
         <p id="roleNote" style="display:none;margin:0 0 18px;font-size:13px;font-weight:650;color:var(--core-blue);background:var(--core-sky);border:1px solid var(--core-border);border-radius:12px;padding:10px 13px;">
-          🛡️ Instructor accounts are reviewed by an administrator before they can be used.
+          <svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Instructor accounts are reviewed by an administrator before they can be used.
         </p>
 
         <form id="registerForm" class="stack" autocomplete="off">
           <div>
-            <label class="field-label" for="fullname">Full name</label>
+            <label class="field-label" for="fullname" data-i18n="Full name">Full name</label>
             <input class="input" id="fullname" type="text" placeholder="e.g. Youssef" required />
           </div>
           <div>
-            <label class="field-label" id="whoLabel" for="who">Email or Student ID</label>
+            <label class="field-label" id="whoLabel" for="who" data-i18n="Email or Student ID">Email or Student ID</label>
             <input class="input" id="who" type="text" placeholder="you@example.com" required />
           </div>
           <div>
-            <label class="field-label" for="pwd">Password</label>
+            <label class="field-label" for="pwd" data-i18n="Password">Password</label>
             <div class="password-field">
-              <input class="input" id="pwd" type="password" placeholder="At least 8 characters" minlength="8" required />
-              <button type="button" class="toggle-pass" id="togglePass" aria-label="Show password">👁️</button>
+              <input class="input" id="pwd" type="password" placeholder="At least 8 characters" data-i18n-ph="At least 8 characters" minlength="8" required />
+              <button type="button" class="toggle-pass" id="togglePass" aria-label="Show password"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
             </div>
           </div>
           <div>
-            <label class="field-label" for="pwd2">Confirm password</label>
-            <input class="input" id="pwd2" type="password" placeholder="Re-enter password" required />
+            <label class="field-label" for="pwd2" data-i18n="Confirm password">Confirm password</label>
+            <input class="input" id="pwd2" type="password" placeholder="Re-enter password" data-i18n-ph="Re-enter password" required />
             <p id="pwdError" class="muted" style="display:none;margin:6px 0 0;color:#c0392b;font-size:13px;font-weight:700;"></p>
           </div>
           <label class="login-row" style="justify-content:flex-start;gap:8px;">
             <input type="checkbox" id="terms" required /> <span class="muted">I agree to the Terms &amp; Privacy Policy</span>
           </label>
-          <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+          <button type="submit" class="btn btn-primary btn-block" data-i18n="Create Account">Create Account</button>
           <div class="divider">or</div>
           <p style="text-align:center;margin:0;font-size:14px;" class="muted">
-            Already have an account? <a href="login.html" style="color:var(--core-blue);font-weight:700;">Log in</a>
+            Already have an account? <a href="login.html" style="color:var(--core-blue);font-weight:700;" data-i18n="Log in">Log in</a>
           </p>
         </form>
       </div>
@@ -116,7 +116,7 @@
       var p = document.getElementById("pwd");
       var show = p.type === "password";
       p.type = show ? "text" : "password";
-      this.textContent = show ? "🙈" : "👁️";
+      this.innerHTML = show ? ICON("eye-off") : ICON("eye");
       this.setAttribute("aria-label", show ? "Hide password" : "Show password");
     });
 
@@ -165,5 +165,7 @@
       window.location.href = copy[role].dest;
     });
   </script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
 </body>
 </html>

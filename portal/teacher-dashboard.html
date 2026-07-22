@@ -22,17 +22,17 @@
 
         <div class="row-2">
           <section class="card card-pad">
-            <h2 class="section-title" style="font-size:20px;margin-bottom:16px;">Needs Your Attention</h2>
+            <h2 class="section-title" style="font-size:20px;margin-bottom:16px;" data-i18n="Needs Your Attention">Needs Your Attention</h2>
             <div class="stack" id="attention"></div>
           </section>
           <section class="card card-pad">
-            <h2 class="section-title" style="font-size:20px;margin-bottom:8px;">Today's Schedule</h2>
+            <h2 class="section-title" style="font-size:20px;margin-bottom:8px;" data-i18n="Today's Schedule">Today's Schedule</h2>
             <div id="schedule"></div>
           </section>
         </div>
 
         <section class="card card-pad" style="margin-top:22px;">
-          <h2 class="section-title" style="font-size:20px;margin-bottom:18px;">Course Performance Snapshot</h2>
+          <h2 class="section-title" style="font-size:20px;margin-bottom:18px;" data-i18n="Course Performance Snapshot">Course Performance Snapshot</h2>
           <div id="perf"></div>
         </section>
 
@@ -43,6 +43,8 @@
   <script src="teacher-mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {
@@ -52,14 +54,14 @@
     var upcoming = teacherSessions.filter(function (s) { return s.status === "upcoming"; });
 
     document.getElementById("banner").innerHTML =
-      '<div class="portal-banner"><h2>Welcome back, ' + esc(currentInstructor.name) + ' 👋</h2>' +
+      '<div class="portal-banner"><h2>Welcome back, ' + esc(currentInstructor.name) + ' ' + ICON("wave") + '</h2>' +
       '<p>' + published.length + ' active courses &middot; ' + totalStudents + ' students taught</p></div>';
 
     var statData = [
-      { ico: "📚", num: published.length, label: "Active Courses", href: "teacher-courses.html" },
-      { ico: "👥", num: totalStudents, label: "Total Students", href: "teacher-students.html" },
-      { ico: "✍️", num: pending, label: "Pending Grading", href: "teacher-grading.html" },
-      { ico: "🎥", num: upcoming.length, label: "Upcoming Sessions", href: "teacher-sessions.html" },
+      { ico: "" + ICON('book') + "", num: published.length, label: "Active Courses", href: "teacher-courses.html" },
+      { ico: "" + ICON('users') + "", num: totalStudents, label: "Total Students", href: "teacher-students.html" },
+      { ico: "" + ICON('edit') + "", num: pending, label: "Pending Grading", href: "teacher-grading.html" },
+      { ico: "" + ICON('video') + "", num: upcoming.length, label: "Upcoming Sessions", href: "teacher-sessions.html" },
     ];
     document.getElementById("stats").innerHTML = statData.map(function (s) {
       return '<a class="portal-stat-card" href="' + s.href + '"><span class="ico" aria-hidden="true">' + s.ico + "</span>" +
@@ -70,13 +72,13 @@
     var items = [];
     published.forEach(function (c) {
       var n = submissions.filter(function (s) { return s.status === "ungraded" && s.courseId === c.id; }).length;
-      if (n) items.push({ icon: "✍️", text: "<strong>" + n + " submissions</strong> to grade in " + esc(c.title), btn: "Grade now", href: "teacher-grading.html?course=" + c.id });
+      if (n) items.push({ icon: "" + ICON('edit') + "", text: "<strong>" + n + " submissions</strong> to grade in " + esc(c.title), btn: "Grade now", href: "teacher-grading.html?course=" + c.id });
     });
     teacherSessions.filter(function (s) { return s.today; }).forEach(function (s) {
-      items.push({ icon: "🎥", text: "Host <strong>" + esc(s.title) + "</strong> at " + esc(s.time), btn: "Start session", href: "teacher-sessions.html" });
+      items.push({ icon: "" + ICON('video') + "", text: "Host <strong>" + esc(s.title) + "</strong> at " + esc(s.time), btn: "Start session", href: "teacher-sessions.html" });
     });
     published.filter(function (c) { return c.avgAttendance < 80; }).forEach(function (c) {
-      items.push({ icon: "📅", text: "Low attendance in <strong>" + esc(c.title) + "</strong> (" + c.avgAttendance + "%)", btn: "View", href: "teacher-reports.html" });
+      items.push({ icon: "" + ICON('calendar') + "", text: "Low attendance in <strong>" + esc(c.title) + "</strong> (" + c.avgAttendance + "%)", btn: "View", href: "teacher-reports.html" });
     });
     document.getElementById("attention").innerHTML = items.map(function (i) {
       return '<div class="list-row"><span class="course-icon" style="width:42px;height:42px;font-size:18px;margin:0;border-radius:12px;" aria-hidden="true">' + i.icon + "</span>" +
@@ -91,7 +93,7 @@
       return '<div class="mini-item"><div class="grow"><div style="font-weight:700;">' + esc(s.title) + "</div>" +
         '<div class="when">' + esc(c.title) + " &middot; " + s.enrolledCount + ' enrolled</div></div>' +
         '<span class="badge badge-cyan">' + esc(s.time) + "</span></div>";
-    }).join("") : '<div class="empty-state"><div class="es-ico">☕</div><h3>No sessions today</h3><p>Enjoy the breather.</p></div>';
+    }).join("") : '<div class="empty-state"><div class="es-ico">' + ICON("coffee") + '</div><h3>No sessions today</h3><p>Enjoy the breather.</p></div>';
 
     // Course performance snapshot (avg grade per course)
     document.getElementById("perf").innerHTML = published.map(function (c) {

@@ -38,16 +38,16 @@
             <div><label class="field-label">Description</label><textarea class="textarea" id="cDesc" placeholder="What will students learn in this course?"></textarea></div>
             <div><label class="field-label">Course icon</label>
               <div class="icon-picker">
-                <input type="radio" name="icon" id="i1" checked /><label for="i1">🛡️</label>
-                <input type="radio" name="icon" id="i2" /><label for="i2">🔥</label>
-                <input type="radio" name="icon" id="i3" /><label for="i3">🏢</label>
-                <input type="radio" name="icon" id="i4" /><label for="i4">🖥️</label>
-                <input type="radio" name="icon" id="i5" /><label for="i5">🌐</label>
-                <input type="radio" name="icon" id="i6" /><label for="i6">🎚️</label>
+                <input type="radio" name="icon" id="i1" checked /><label for="i1"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></label>
+                <input type="radio" name="icon" id="i2" /><label for="i2"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2s4 4 4 8a4 4 0 0 1-8 0c0-1.5.5-2.5 1-3.5C10 8 12 6 12 2z"/><path d="M9 14a3 3 0 0 0 6 0c0-2-2-3-3-5-1 2-3 3-3 5z"/></svg></label>
+                <input type="radio" name="icon" id="i3" /><label for="i3"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="1"/><line x1="9" y1="6" x2="9" y2="6.01"/><line x1="15" y1="6" x2="15" y2="6.01"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/><path d="M9 22v-4h6v4"/></svg></label>
+                <input type="radio" name="icon" id="i4" /><label for="i4"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="3" width="20" height="8" rx="2"/><rect x="2" y="13" width="20" height="8" rx="2"/><line x1="6" y1="7" x2="6.01" y2="7"/><line x1="6" y1="17" x2="6.01" y2="17"/></svg></label>
+                <input type="radio" name="icon" id="i5" /><label for="i5"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></label>
+                <input type="radio" name="icon" id="i6" /><label for="i6"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></label>
               </div>
             </div>
             <div class="toggle-row" style="border:0;padding:0;">
-              <div><b>Published</b><div class="muted" style="font-size:13px;">Off = saved as draft</div></div>
+              <div><b data-i18n="Published">Published</b><div class="muted" style="font-size:13px;">Off = saved as draft</div></div>
               <label class="toggle-switch"><input type="checkbox" id="cPublished" /><span class="track"></span></label>
             </div>
           </div>
@@ -55,35 +55,35 @@
 
         <!-- Modules -->
         <section class="card card-pad" style="margin-bottom:20px;">
-          <div class="between" style="margin-bottom:14px;"><h3 style="color:var(--core-navy);">Modules</h3>
-            <button class="btn btn-light btn-sm" id="addModule">+ Add Module</button></div>
+          <div class="between" style="margin-bottom:14px;"><h3 style="color:var(--core-navy);" data-i18n="Modules">Modules</h3>
+            <button class="btn btn-light btn-sm" id="addModule" data-i18n="+ Add Module">+ Add Module</button></div>
           <div id="modules"></div>
         </section>
 
         <!-- Course materials (edit mode only — needs a saved course to attach to) -->
         <section class="card card-pad" style="margin-bottom:20px;display:none;" id="materialsSection">
-          <div class="between" style="margin-bottom:6px;"><h3 style="color:var(--core-navy);">Course Materials</h3></div>
+          <div class="between" style="margin-bottom:6px;"><h3 style="color:var(--core-navy);" data-i18n="Course Materials">Course Materials</h3></div>
           <p class="muted" style="margin:0 0 14px;font-size:13px;">
             PDFs, slides, or video files. Only students enrolled in this course can open them, and downloading stays admin-only.
           </p>
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px;">
             <input class="input" type="file" id="matFile" style="flex:1;min-width:220px;" />
             <input class="input" id="matTitle" placeholder="Display name (optional)" style="flex:1;min-width:180px;" />
-            <button class="btn btn-primary btn-sm" id="matUpload">Upload</button>
+            <button class="btn btn-primary btn-sm" id="matUpload" data-i18n="Upload">Upload</button>
           </div>
           <div id="matList"></div>
         </section>
 
         <!-- Assignments -->
         <section class="card card-pad" style="margin-bottom:20px;">
-          <div class="between" style="margin-bottom:14px;"><h3 style="color:var(--core-navy);">Assignments</h3>
-            <button class="btn btn-light btn-sm" id="addAssignment">+ Add Assignment</button></div>
+          <div class="between" style="margin-bottom:14px;"><h3 style="color:var(--core-navy);" data-i18n="Assignments">Assignments</h3>
+            <button class="btn btn-light btn-sm" id="addAssignment" data-i18n="+ Add Assignment">+ Add Assignment</button></div>
           <div id="assignments"></div>
         </section>
 
         <div style="display:flex;gap:10px;">
-          <button class="btn btn-primary" id="saveCourse">Save Course</button>
-          <a class="btn btn-light" href="teacher-courses.html">Cancel</a>
+          <button class="btn btn-primary" id="saveCourse" data-i18n="Save Course">Save Course</button>
+          <a class="btn btn-light" href="teacher-courses.html" data-i18n="Cancel">Cancel</a>
         </div>
 
       </main>
@@ -93,6 +93,8 @@
   <script src="teacher-mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {
@@ -101,7 +103,7 @@
     var modules = document.getElementById("modules");
     var assignments = document.getElementById("assignments");
     var modCount = 0;
-    var iconOf = { i1: "🛡️", i2: "🔥", i3: "🏢", i4: "🖥️", i5: "🌐", i6: "🎚️" };
+    var iconOf = { i1: "" + ICON('shield') + "", i2: "" + ICON('fire') + "", i3: "" + ICON('building') + "", i4: "" + ICON('server') + "", i5: "" + ICON('globe') + "", i6: "" + ICON('sliders') + "" };
     /* what the course looked like when loaded — used to warn about deletions */
     var originalLessonIds = [], originalAssignmentIds = [];
 
@@ -184,7 +186,7 @@
       var iconRadio = document.querySelector('input[name="icon"]:checked');
       var course = {
         title: document.getElementById("cTitle").value.trim(),
-        icon: iconOf[iconRadio ? iconRadio.id : "i1"] || "📚",
+        icon: iconOf[iconRadio ? iconRadio.id : "i1"] || "" + ICON('book') + "",
         description: document.getElementById("cDesc").value.trim(),
         status: document.getElementById("cPublished").checked ? "published" : "draft",
       };
@@ -261,7 +263,7 @@
         if (!list.length) { box.innerHTML = '<p class="muted" style="margin:0;">No materials uploaded yet.</p>'; return; }
         box.innerHTML = list.map(function (m) {
           return '<div class="list-row" style="margin-bottom:8px;">' +
-            '<span class="course-icon" style="width:38px;height:38px;font-size:16px;margin:0;border-radius:10px;" aria-hidden="true">📄</span>' +
+            '<span class="course-icon" style="width:38px;height:38px;font-size:16px;margin:0;border-radius:10px;" aria-hidden="true">' + ICON("doc") + '</span>' +
             '<div class="grow"><b>' + esc(m.title) + "</b>" +
             '<div class="muted" style="font-size:12px;">' + esc(humanSize(m.size_bytes)) + " &middot; " + prettyDate(ymd(m.uploaded_at)) + "</div></div>" +
             '<button class="btn btn-light btn-sm" data-openmat="' + m.id + '">Open</button>' +

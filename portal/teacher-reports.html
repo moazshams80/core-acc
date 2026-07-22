@@ -48,11 +48,11 @@
 
         <div class="row-2" style="margin-bottom:22px;">
           <section class="card card-pad">
-            <h3 style="color:var(--core-navy);margin-bottom:14px;">🏆 Top Performers</h3>
+            <h3 style="color:var(--core-navy);margin-bottom:14px;"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg> Top Performers</h3>
             <div id="top"></div>
           </section>
           <section class="card card-pad">
-            <h3 style="color:var(--core-navy);margin-bottom:14px;">⚠️ At-Risk Students</h3>
+            <h3 style="color:var(--core-navy);margin-bottom:14px;"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> At-Risk Students</h3>
             <div id="risk"></div>
           </section>
         </div>
@@ -61,7 +61,7 @@
           <h3 style="color:var(--core-navy);margin-bottom:14px;">Per-Student Summary</h3>
           <div class="table-wrap">
             <table class="data">
-              <thead><tr><th>Student</th><th>Grade</th><th>Attendance</th><th>Completion</th></tr></thead>
+              <thead><tr><th data-i18n="Student">Student</th><th data-i18n="Grade">Grade</th><th data-i18n="Attendance">Attendance</th><th data-i18n="Completion">Completion</th></tr></thead>
               <tbody id="summary"></tbody>
             </table>
           </div>
@@ -74,6 +74,8 @@
   <script src="teacher-mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {
@@ -90,10 +92,10 @@
     // metric cards
     var m = reportMetrics;
     var cards = [
-      { ico: "📊", num: m.avgGrade, label: "Avg Class Grade" },
-      { ico: "✅", num: m.completionRate + "%", label: "Completion Rate" },
-      { ico: "📅", num: m.avgAttendance + "%", label: "Avg Attendance" },
-      { ico: "📝", num: m.submissionRate + "%", label: "Submission Rate" },
+      { ico: "" + ICON('chart') + "", num: m.avgGrade, label: "Avg Class Grade" },
+      { ico: "" + ICON('check') + "", num: m.completionRate + "%", label: "Completion Rate" },
+      { ico: "" + ICON('calendar') + "", num: m.avgAttendance + "%", label: "Avg Attendance" },
+      { ico: "" + ICON('assignment') + "", num: m.submissionRate + "%", label: "Submission Rate" },
     ];
     document.getElementById("metrics").innerHTML = cards.map(function (c) {
       return '<div class="portal-stat-card"><span class="ico" aria-hidden="true">' + c.ico + "</span><div><strong>" + c.num + "</strong><span>" + c.label + "</span></div></div>";

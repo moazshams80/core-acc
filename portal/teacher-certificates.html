@@ -25,10 +25,10 @@
         <section class="card card-pad" style="margin-bottom:22px;">
           <h3 style="color:var(--core-navy);margin-bottom:14px;">Issue a certificate</h3>
           <div class="stack" style="max-width:620px;">
-            <div><label class="field-label">Course</label><select class="select" id="cCourse"></select></div>
-            <div><label class="field-label">Student</label><select class="select" id="cStudent"></select></div>
+            <div><label class="field-label" data-i18n="Course">Course</label><select class="select" id="cCourse"></select></div>
+            <div><label class="field-label" data-i18n="Student">Student</label><select class="select" id="cStudent"></select></div>
             <div><label class="field-label">Certificate file (PDF or image)</label><input class="input" type="file" id="cFile" accept=".pdf,image/*" /></div>
-            <button class="btn btn-primary" style="justify-self:start;" id="cIssue">Issue Certificate</button>
+            <button class="btn btn-primary" style="justify-self:start;" id="cIssue" data-i18n="Issue Certificate">Issue Certificate</button>
           </div>
         </section>
 
@@ -36,7 +36,7 @@
           <h3 style="color:var(--core-navy);margin-bottom:14px;">Issued for this course</h3>
           <div class="table-wrap">
             <table class="data">
-              <thead><tr><th>Student</th><th>Verification code</th><th>Issued</th><th></th></tr></thead>
+              <thead><tr><th data-i18n="Student">Student</th><th data-i18n="Verification code">Verification code</th><th data-i18n="Issued">Issued</th><th></th></tr></thead>
               <tbody id="rows"></tbody>
             </table>
           </div>
@@ -50,17 +50,19 @@
   <script src="teacher-mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {
       var main = document.querySelector(".portal-main");
       if (!dbReady()) {
-        main.innerHTML = '<div class="empty-state"><div class="es-ico">🔌</div><h3>Database not connected</h3><p>Certificates need the live database.</p></div>';
+        main.innerHTML = '<div class="empty-state"><div class="es-ico">' + ICON("plug") + '</div><h3>Database not connected</h3><p>Certificates need the live database.</p></div>';
         return;
       }
       var published = teacherCourses;
       if (!published.length) {
-        main.innerHTML = '<div class="empty-state"><div class="es-ico">📚</div><h3>No courses yet</h3><p>Create a course before issuing certificates.</p>' +
+        main.innerHTML = '<div class="empty-state"><div class="es-ico">' + ICON("book") + '</div><h3>No courses yet</h3><p>Create a course before issuing certificates.</p>' +
           '<a class="btn btn-primary btn-sm" href="teacher-courses.html">My Courses</a></div>';
         return;
       }
@@ -91,7 +93,7 @@
           if (err) { tbody.innerHTML = ""; empty.innerHTML = '<p class="muted">' + esc(err) + "</p>"; return; }
           if (!list.length) {
             tbody.innerHTML = "";
-            empty.innerHTML = '<div class="empty-state"><div class="es-ico">🎓</div><h3>None issued yet</h3><p>Certificates you issue for this course appear here.</p></div>';
+            empty.innerHTML = '<div class="empty-state"><div class="es-ico">' + ICON("award") + '</div><h3>None issued yet</h3><p>Certificates you issue for this course appear here.</p></div>';
             return;
           }
           empty.innerHTML = "";

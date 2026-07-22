@@ -19,15 +19,15 @@
 
         <div class="filter-tabs" id="filters">
           <button class="active" data-filter="all">All</button>
-          <button data-filter="pending">Pending</button>
-          <button data-filter="submitted">Submitted</button>
-          <button data-filter="graded">Graded</button>
+          <button data-filter="pending" data-i18n="Pending">Pending</button>
+          <button data-filter="submitted" data-i18n="Submitted">Submitted</button>
+          <button data-filter="graded" data-i18n="Graded">Graded</button>
         </div>
 
         <section class="card card-pad">
           <div class="table-wrap">
             <table class="data">
-              <thead><tr><th>Assignment</th><th>Course</th><th>Due</th><th>Status</th><th>Grade / Action</th></tr></thead>
+              <thead><tr><th data-i18n="Assignment">Assignment</th><th data-i18n="Course">Course</th><th data-i18n="Due">Due</th><th data-i18n="Status">Status</th><th data-i18n="Grade / Action">Grade / Action</th></tr></thead>
               <tbody id="rows"></tbody>
             </table>
           </div>
@@ -42,13 +42,13 @@
   <div class="portal-modal" id="submitModal">
     <div class="backdrop" data-modal-close></div>
     <div class="modal-card">
-      <div class="modal-head"><h3>Submit Assignment</h3><button class="modal-close" data-modal-close aria-label="Close">×</button></div>
+      <div class="modal-head"><h3 data-i18n="Submit Assignment">Submit Assignment</h3><button class="modal-close" data-modal-close aria-label="Close">×</button></div>
       <p class="muted" id="submitFor" style="margin-top:0;"></p>
       <form class="stack" id="submitForm">
         <div><label class="field-label">Notes for your instructor</label><textarea class="textarea" id="submitNotes" placeholder="Add any notes about your submission…"></textarea></div>
         <div><label class="field-label">Attach your work</label><input class="input" type="file" id="submitFile" />
           <p class="muted" style="margin:6px 0 0;font-size:12px;">PDF, images, documents or archives — up to 50 MB. Only you and your instructor can open it.</p></div>
-        <button type="submit" class="btn btn-primary btn-block">Submit Assignment</button>
+        <button type="submit" class="btn btn-primary btn-block" data-i18n="Submit Assignment">Submit Assignment</button>
       </form>
     </div>
   </div>
@@ -65,6 +65,8 @@
   <script src="mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {
@@ -74,14 +76,14 @@
       var empty = document.getElementById("empty");
       if (!list.length) {
         tbody.innerHTML = "";
-        empty.innerHTML = '<div class="empty-state"><div class="es-ico">✅</div><h3>Nothing here</h3><p>No assignments match this filter.</p></div>';
+        empty.innerHTML = '<div class="empty-state"><div class="es-ico">' + ICON("check") + '</div><h3>Nothing here</h3><p>No assignments match this filter.</p></div>';
         return;
       }
       empty.innerHTML = "";
       tbody.innerHTML = list.map(function (a) {
         var course = courseById(a.courseId);
         var soon = a.status === "pending" && daysUntil(a.dueDate) <= 2 && daysUntil(a.dueDate) >= 0;
-        var due = '<span class="' + (soon ? "due-soon" : "") + '">' + prettyDate(a.dueDate) + (soon ? " ⚠" : "") + "</span>";
+        var due = '<span class="' + (soon ? "due-soon" : "") + '">' + prettyDate(a.dueDate) + (soon ? " " + ICON("alert", 12) : "") + "</span>";
         var action;
         if (a.status === "graded") action = '<span class="badge badge-success">' + esc(a.grade) + "</span>";
         else if (a.status === "submitted") action = '<span class="muted">Awaiting grade</span>';

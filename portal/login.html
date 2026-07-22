@@ -30,28 +30,30 @@
 
     <main class="login-form-panel">
       <div class="login-form-card">
-        <p class="kicker">Sign in</p>
-        <h2 class="section-title" style="margin-bottom:6px;">How would you like to sign in?</h2>
-        <p class="muted" style="margin:0 0 22px;font-size:14px;">Choose your account type to continue.</p>
+        <p class="kicker" data-i18n="Sign in">Sign in</p>
+        <h2 class="section-title" style="margin-bottom:6px;" data-i18n="How would you like to sign in?">How would you like to sign in?</h2>
+        <p class="muted" style="margin:0 0 22px;font-size:14px;" data-i18n="Choose your account type to continue.">Choose your account type to continue.</p>
 
         <div class="chooser-grid">
           <a class="chooser-card" href="student-login.html">
-            <span class="ci" aria-hidden="true">🎓</span>
-            <h3>I'm a Student</h3>
+            <span class="ci" aria-hidden="true"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="6"/><polyline points="8.21 13.89 7 22 12 19 17 22 15.79 13.88"/></svg></span>
+            <h3 data-i18n="I'm a Student">I'm a Student</h3>
             <p>Access your courses, assignments &amp; certificates.</p>
           </a>
           <a class="chooser-card" href="teacher-login.html">
-            <span class="ci" aria-hidden="true">👨‍🏫</span>
-            <h3>I'm a Teacher</h3>
+            <span class="ci" aria-hidden="true"><svg class="icon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+            <h3 data-i18n="I'm a Teacher">I'm a Teacher</h3>
             <p>Manage courses, grading, sessions &amp; reports.</p>
           </a>
         </div>
 
         <p style="text-align:center;margin:22px 0 0;font-size:14px;" class="muted">
-          New here? <a href="register.html?role=student" style="color:var(--core-blue);font-weight:700;">Create an account</a>
+          New here? <a href="register.html?role=student" style="color:var(--core-blue);font-weight:700;" data-i18n="Create an account">Create an account</a>
         </p>
       </div>
     </main>
   </div>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
 </body>
 </html>

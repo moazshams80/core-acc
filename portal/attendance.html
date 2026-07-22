@@ -42,10 +42,10 @@
         </div>
 
         <section class="card card-pad">
-          <h2 class="section-title" style="font-size:20px;margin-bottom:16px;">Session Log</h2>
+          <h2 class="section-title" style="font-size:20px;margin-bottom:16px;" data-i18n="Session Log">Session Log</h2>
           <div class="table-wrap">
             <table class="data">
-              <thead><tr><th>Date</th><th>Course</th><th>Session</th><th>Status</th></tr></thead>
+              <thead><tr><th data-i18n="Date">Date</th><th data-i18n="Course">Course</th><th data-i18n="Session">Session</th><th data-i18n="Status">Status</th></tr></thead>
               <tbody id="log"></tbody>
             </table>
           </div>
@@ -58,6 +58,8 @@
   <script src="mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {

@@ -18,7 +18,7 @@
       <main class="portal-main">
 
         <div class="page-head">
-          <h2 class="section-title" style="font-size:22px;">Your Certificates</h2>
+          <h2 class="section-title" style="font-size:22px;" data-i18n="Your Certificates">Your Certificates</h2>
           <p>Earn a verified certificate for every course you complete. Each one carries a unique code and QR authentication.</p>
         </div>
 
@@ -36,7 +36,7 @@
       <div class="qr qr-lg" style="margin:8px auto 16px;" aria-hidden="true"></div>
       <p style="margin:0 0 4px;font-weight:800;color:var(--core-navy);" id="vCode"></p>
       <p class="muted" id="vCourse" style="margin:0 0 14px;"></p>
-      <p style="display:inline-flex;align-items:center;gap:8px;background:#e4f6ec;color:#1b8a4b;font-weight:800;padding:10px 16px;border-radius:999px;margin:0 0 14px;">✅ This certificate is authentic</p>
+      <p style="display:inline-flex;align-items:center;gap:8px;background:#e4f6ec;color:#1b8a4b;font-weight:800;padding:10px 16px;border-radius:999px;margin:0 0 14px;"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> This certificate is authentic</p>
       <p style="margin:0;font-size:14px;"><a id="vLink" href="#" target="_blank" rel="noopener" style="color:var(--core-blue);font-weight:700;"></a></p>
       <p class="muted" style="margin:8px 0 0;font-size:12px;">Share this link (or the QR code) with an employer — it works without logging in.</p>
     </div>
@@ -45,12 +45,14 @@
   <script src="mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {
     if (!certificates.length) {
       document.getElementById("certGrid").innerHTML =
-        '<div class="empty-state" style="grid-column:1/-1;"><div class="es-ico">🎓</div><h3>No certificates yet</h3><p>Complete a course to earn your first verified certificate.</p></div>';
+        '<div class="empty-state" style="grid-column:1/-1;"><div class="es-ico">' + ICON("award") + '</div><h3>No certificates yet</h3><p>Complete a course to earn your first verified certificate.</p></div>';
     }
     document.getElementById("certGrid").innerHTML += certificates.map(function (cert) {
       var course = courseById(cert.courseId);
@@ -75,7 +77,7 @@
         '<div class="cert-name">' + esc(currentStudent.name) + "</div>" +
         '<div class="cert-foot"><span class="qr" style="filter:grayscale(1);opacity:.5;" aria-hidden="true"></span>' +
           '<span class="cert-meta"><strong>Verification:</strong> —<br>Locked</span></div>' +
-        '<div class="cert-lock"><span class="lk" aria-hidden="true">🔒</span><span>Complete course to unlock</span></div>' +
+        '<div class="cert-lock"><span class="lk" aria-hidden="true">' + ICON("lock") + '</span><span>Complete course to unlock</span></div>' +
         "</article>";
     }).join("");
 

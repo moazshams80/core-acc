@@ -24,20 +24,20 @@
         <div class="row-2">
           <section class="card card-pad">
             <div class="between" style="margin-bottom:16px;">
-              <h2 class="section-title" style="font-size:20px;">Continue Learning</h2>
+              <h2 class="section-title" style="font-size:20px;" data-i18n="Continue Learning">Continue Learning</h2>
               <a href="courses.html" class="muted" style="font-weight:700;font-size:14px;">View all →</a>
             </div>
             <div class="stack" id="continue"></div>
           </section>
 
           <section class="card card-pad">
-            <h2 class="section-title" style="font-size:20px;margin-bottom:8px;">Upcoming</h2>
+            <h2 class="section-title" style="font-size:20px;margin-bottom:8px;" data-i18n="Upcoming">Upcoming</h2>
             <div id="upcoming"></div>
           </section>
         </div>
 
         <section class="card card-pad" style="margin-top:22px;">
-          <h2 class="section-title" style="font-size:20px;margin-bottom:18px;">Recent Activity</h2>
+          <h2 class="section-title" style="font-size:20px;margin-bottom:18px;" data-i18n="Recent Activity">Recent Activity</h2>
           <ul class="timeline" id="activity"></ul>
         </section>
 
@@ -48,22 +48,24 @@
   <script src="mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {
     // Welcome banner
     document.getElementById("banner").innerHTML =
-      '<div class="portal-banner"><h2>Welcome back, ' + esc(currentStudent.name) + ' 👋</h2>' +
+      '<div class="portal-banner"><h2>Welcome back, ' + esc(currentStudent.name) + ' ' + ICON("wave") + '</h2>' +
       '<p>' + esc(currentStudent.program) + ' &middot; Day ' + currentStudent.dayOfJourney + ' of your journey</p></div>';
 
     // Stat cards
     var inProgress = courses.filter(function (c) { return c.status === "in-progress"; }).length;
     var dueSoon = assignments.filter(function (a) { return a.status === "pending" && daysUntil(a.dueDate) <= 2 && daysUntil(a.dueDate) >= 0; }).length;
     var statData = [
-      { ico: "📚", num: inProgress, label: "Courses in Progress", href: "courses.html?filter=in-progress" },
-      { ico: "📝", num: dueSoon, label: "Assignments Due", href: "assignments.html?filter=pending" },
-      { ico: "📅", num: overallAttendance + "%", label: "Attendance Rate", href: "attendance.html" },
-      { ico: "📊", num: overallGrade, label: "Overall Grade", href: "grades.html" },
+      { ico: "" + ICON('book') + "", num: inProgress, label: "Courses in Progress", href: "courses.html?filter=in-progress" },
+      { ico: "" + ICON('assignment') + "", num: dueSoon, label: "Assignments Due", href: "assignments.html?filter=pending" },
+      { ico: "" + ICON('calendar') + "", num: overallAttendance + "%", label: "Attendance Rate", href: "attendance.html" },
+      { ico: "" + ICON('chart') + "", num: overallGrade, label: "Overall Grade", href: "grades.html" },
     ];
     document.getElementById("stats").innerHTML = statData.map(function (s) {
       return '<a class="portal-stat-card" href="' + s.href + '"><span class="ico" aria-hidden="true">' + s.ico + '</span>' +

@@ -178,7 +178,7 @@ function dbLoadStudentData(done) {
         var doneAsgs = subs.filter(function (s) { return courseAsgIds.indexOf(s.assignment_id) !== -1; }).length;
         var progress = courseAsgIds.length ? Math.round((doneAsgs / courseAsgIds.length) * 100) : 0;
         return {
-          id: c.id, title: c.title, icon: c.icon || "📚",
+          id: c.id, title: c.title, icon: ICON_COURSE(c.icon),
           instructor: c.instructor ? "Eng. " + c.instructor.first_name : "CORE Egypt",
           progress: enr ? progress : 0,
           status: !enr ? "not-started" : (progress >= 100 ? "completed" : "in-progress"),
@@ -244,13 +244,13 @@ function dbLoadStudentData(done) {
       recentActivity = [];
       certs.slice(0, 2).forEach(function (c) {
         var course = courses.find(function (x) { return x.id === c.course_id; });
-        recentActivity.push({ icon: "🎓", text: "Earned the <strong>" + esc(course ? course.title : "course") + "</strong> certificate", time: monthYear(c.issued_at), cert: true, link: "certificates.html" });
+        recentActivity.push({ icon: "" + ICON('award') + "", text: "Earned the <strong>" + esc(course ? course.title : "course") + "</strong> certificate", time: monthYear(c.issued_at), cert: true, link: "certificates.html" });
       });
       subs.slice(0, 3).forEach(function (s) {
         var a = asgs.find(function (x) { return x.id === s.assignment_id; });
-        recentActivity.push({ icon: "📝", text: "Submitted <strong>" + esc(a ? a.title : "assignment") + "</strong>", time: monthYear(s.submitted_at), link: "assignments.html" });
+        recentActivity.push({ icon: "" + ICON('assignment') + "", text: "Submitted <strong>" + esc(a ? a.title : "assignment") + "</strong>", time: monthYear(s.submitted_at), link: "assignments.html" });
       });
-      if (!recentActivity.length) recentActivity.push({ icon: "👋", text: "Welcome to CORE Egypt — your activity will appear here", time: "now", link: "courses.html" });
+      if (!recentActivity.length) recentActivity.push({ icon: "" + ICON('wave') + "", text: "Welcome to CORE Egypt — your activity will appear here", time: "now", link: "courses.html" });
 
       var firstEnrolled = courses.find(function (c) { return c.enrolled; });
       currentStudent = {
@@ -303,7 +303,7 @@ function dbLoadTeacherData(done) {
         var courseSessIds = sess.filter(function (s) { return s.course_id === c.id; }).map(function (s) { return s.id; });
         var courseAtt = att.filter(function (a) { return courseSessIds.indexOf(a.session_id) !== -1; });
         var attPct = courseAtt.length ? Math.round((courseAtt.filter(function (a) { return a.status !== "absent"; }).length / courseAtt.length) * 100) : 100;
-        return { id: c.id, title: c.title, icon: c.icon || "📚", programType: "", status: c.status,
+        return { id: c.id, title: c.title, icon: ICON_COURSE(c.icon), programType: "", status: c.status,
           enrolledCount: enrolledCount, avgProgress: avgProgress,
           avgGrade: avgPct == null ? "—" : gradeLetter(avgPct), avgGradePct: avgPct == null ? 0 : Math.round(avgPct),
           avgAttendance: attPct };

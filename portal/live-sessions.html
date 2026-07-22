@@ -17,14 +17,14 @@
       <header class="portal-header" id="portalHeader"></header>
       <main class="portal-main">
 
-        <h2 class="section-title" style="font-size:20px;margin-bottom:16px;">Upcoming Sessions</h2>
+        <h2 class="section-title" style="font-size:20px;margin-bottom:16px;" data-i18n="Upcoming Sessions">Upcoming Sessions</h2>
         <div class="grid grid-3" id="upcoming" style="margin-bottom:32px;"></div>
 
-        <h2 class="section-title" style="font-size:20px;margin-bottom:16px;">Past Sessions</h2>
+        <h2 class="section-title" style="font-size:20px;margin-bottom:16px;" data-i18n="Past Sessions">Past Sessions</h2>
         <section class="card card-pad">
           <div class="table-wrap">
             <table class="data">
-              <thead><tr><th>Session</th><th>Course</th><th>Date</th><th>Duration</th><th></th></tr></thead>
+              <thead><tr><th data-i18n="Session">Session</th><th data-i18n="Course">Course</th><th data-i18n="Date">Date</th><th>Duration</th><th></th></tr></thead>
               <tbody id="past"></tbody>
             </table>
           </div>
@@ -38,6 +38,8 @@
   <script src="integrations.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {

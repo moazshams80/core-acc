@@ -18,14 +18,14 @@
       <main class="portal-main">
 
         <div class="toolbar">
-          <input class="input grow" id="search" type="search" placeholder="🔍 Search students by name…" />
+          <input class="input grow" id="search" type="search" placeholder="<svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Search students by name…" />
           <select class="select" id="courseFilter"></select>
         </div>
 
         <section class="card card-pad">
           <div class="table-wrap">
             <table class="data">
-              <thead><tr><th>Student</th><th>ID</th><th>Courses</th><th>Progress</th><th>Grade</th><th>Attendance</th><th></th></tr></thead>
+              <thead><tr><th data-i18n="Student">Student</th><th>ID</th><th data-i18n="Courses">Courses</th><th data-i18n="Progress">Progress</th><th data-i18n="Grade">Grade</th><th data-i18n="Attendance">Attendance</th><th></th></tr></thead>
               <tbody id="rows"></tbody>
             </table>
           </div>
@@ -40,7 +40,7 @@
   <div class="portal-modal" id="studentModal">
     <div class="backdrop" data-modal-close></div>
     <div class="modal-card" style="width:min(560px,100%);">
-      <div class="modal-head"><h3 id="smName">Student</h3><button class="modal-close" data-modal-close aria-label="Close">×</button></div>
+      <div class="modal-head"><h3 id="smName" data-i18n="Student">Student</h3><button class="modal-close" data-modal-close aria-label="Close">×</button></div>
       <div id="smBody"></div>
     </div>
   </div>
@@ -48,6 +48,8 @@
   <script src="teacher-mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {
@@ -78,7 +80,7 @@
         return okName && okCourse;
       });
       var tbody = document.getElementById("rows"), empty = document.getElementById("empty");
-      if (!list.length) { tbody.innerHTML = ""; empty.innerHTML = '<div class="empty-state"><div class="es-ico">🔍</div><h3>No students found</h3><p>Try a different search or filter.</p></div>'; return; }
+      if (!list.length) { tbody.innerHTML = ""; empty.innerHTML = '<div class="empty-state"><div class="es-ico">' + ICON("search") + '</div><h3>No students found</h3><p>Try a different search or filter.</p></div>'; return; }
       empty.innerHTML = "";
       tbody.innerHTML = list.map(function (s) {
         return "<tr><td><div style='display:flex;align-items:center;gap:10px;'>" + avatarHTML(s.avatarInitials, "avatar-sm") + "<b>" + esc(s.name) + "</b></div></td>" +

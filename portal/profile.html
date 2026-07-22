@@ -24,9 +24,9 @@
           <!-- Right: tabbed sections -->
           <section class="card card-pad">
             <div class="tabs">
-              <button class="active" data-tab="pi" data-tab-group="pf">Personal Info</button>
-              <button data-tab="sec" data-tab-group="pf">Security</button>
-              <button data-tab="notif" data-tab-group="pf">Notifications</button>
+              <button class="active" data-tab="pi" data-tab-group="pf" data-i18n="Personal Info">Personal Info</button>
+              <button data-tab="sec" data-tab-group="pf" data-i18n="Security">Security</button>
+              <button data-tab="notif" data-tab-group="pf" data-i18n="Notifications">Notifications</button>
             </div>
 
             <div id="pi" class="tab-panel active" data-tab-panel-group="pf">
@@ -36,17 +36,17 @@
                 <div><label class="field-label">Phone</label><input class="input" id="f-phone" /></div>
                 <div><label class="field-label">Date of Birth</label><input class="input" id="f-dob" type="date" /></div>
                 <div><label class="field-label">Address</label><textarea class="textarea" id="f-addr"></textarea></div>
-                <button class="btn btn-primary" style="justify-self:start;">Save Changes</button>
+                <button class="btn btn-primary" style="justify-self:start;" data-i18n="Save Changes">Save Changes</button>
               </form>
             </div>
 
             <div id="sec" class="tab-panel" data-tab-panel-group="pf">
               <form id="pwdForm" class="stack" style="max-width:460px;">
-                <div><label class="field-label">Current Password</label><input class="input" type="password" placeholder="••••••••" required /></div>
-                <div><label class="field-label">New Password</label><input class="input" id="newPwd" type="password" placeholder="At least 8 characters" minlength="8" required /></div>
-                <div><label class="field-label">Confirm New Password</label><input class="input" id="confPwd" type="password" placeholder="Re-enter new password" required />
+                <div><label class="field-label" data-i18n="Current Password">Current Password</label><input class="input" type="password" placeholder="••••••••" required /></div>
+                <div><label class="field-label" data-i18n="New Password">New Password</label><input class="input" id="newPwd" type="password" placeholder="At least 8 characters" data-i18n-ph="At least 8 characters" minlength="8" required /></div>
+                <div><label class="field-label" data-i18n="Confirm New Password">Confirm New Password</label><input class="input" id="confPwd" type="password" placeholder="Re-enter new password" data-i18n-ph="Re-enter new password" required />
                   <p id="pwdError" class="muted" style="display:none;margin:6px 0 0;color:#c0392b;font-size:13px;font-weight:700;"></p></div>
-                <button class="btn btn-primary" style="justify-self:start;">Update Password</button>
+                <button class="btn btn-primary" style="justify-self:start;" data-i18n="Update Password">Update Password</button>
               </form>
             </div>
 
@@ -70,6 +70,8 @@
   <script src="mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {

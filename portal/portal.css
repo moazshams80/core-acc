@@ -433,6 +433,26 @@ table.data tbody tr:hover { background: var(--core-sky); }
 .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--core-border); }
 
 /* =========================================================
+   ICONS + LANGUAGE TOGGLE
+   ========================================================= */
+.icon { display: block; flex: none; }
+.portal-nav a .ico { display: inline-flex; align-items: center; justify-content: center; width: 24px; }
+.portal-nav a .ico .icon { width: 20px; height: 20px; }
+.portal-stat-card .ico .icon { width: 26px; height: 26px; }
+.course-icon .icon { width: 55%; height: 55%; }
+.es-ico .icon { width: 40px; height: 40px; margin: 0 auto; }
+.timeline .dot .icon, .mini-item .dot .icon { width: 14px; height: 14px; }
+.download-lock .icon { width: 15px; height: 15px; }
+.cert-lock .lk .icon, .cert-lock .icon { width: 30px; height: 30px; }
+.list-row > .grow ~ * .icon, .attention .icon { width: 18px; height: 18px; }
+.lang-toggle { width: auto; gap: 7px; padding: 0 12px; }
+.lang-toggle .lang-label { font-weight: 700; font-size: 14px; }
+@media (max-width: 780px) { .lang-toggle .lang-label { display: none; } .lang-toggle { padding: 0; width: 42px; } }
+.lang-toggle-floating { position: fixed; top: 16px; inset-inline-end: 16px; z-index: 70; }
+.lang-toggle-floating .lang-toggle { background: #fff; box-shadow: var(--core-shadow); }
+.chooser-card .ci .icon { width: 30px; height: 30px; }
+
+/* =========================================================
    SEGMENTED CONTROL (login role toggle, etc.)
    ========================================================= */
 .segmented { display: flex; gap: 4px; padding: 4px; margin-bottom: 20px; background: var(--core-bg); border: 1px solid var(--core-border); border-radius: 999px; }

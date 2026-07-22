@@ -20,22 +20,22 @@
         <div class="toolbar">
           <select class="select" id="courseSel"></select>
           <select class="select" id="sessionSel"></select>
-          <button class="btn btn-light btn-sm" id="allPresent">Mark All Present</button>
+          <button class="btn btn-light btn-sm" id="allPresent" data-i18n="Mark All Present">Mark All Present</button>
         </div>
 
         <section class="card card-pad" style="margin-bottom:22px;">
           <div class="between" style="margin-bottom:16px;flex-wrap:wrap;gap:10px;">
             <div id="counter" style="font-weight:800;color:var(--core-navy);"></div>
-            <button class="btn btn-primary btn-sm" id="saveAtt">Save Attendance</button>
+            <button class="btn btn-primary btn-sm" id="saveAtt" data-i18n="Save Attendance">Save Attendance</button>
           </div>
           <div id="roster"></div>
         </section>
 
         <section class="card card-pad">
-          <h3 style="color:var(--core-navy);margin-bottom:14px;">Recent Sessions</h3>
+          <h3 style="color:var(--core-navy);margin-bottom:14px;" data-i18n="Recent Sessions">Recent Sessions</h3>
           <div class="table-wrap">
             <table class="data">
-              <thead><tr><th>Session</th><th>Course</th><th>Date</th><th>Summary</th></tr></thead>
+              <thead><tr><th data-i18n="Session">Session</th><th data-i18n="Course">Course</th><th data-i18n="Date">Date</th><th data-i18n="Summary">Summary</th></tr></thead>
               <tbody id="history"></tbody>
             </table>
           </div>
@@ -48,6 +48,8 @@
   <script src="teacher-mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {
@@ -84,7 +86,7 @@
 
     function renderRoster() {
       var list = roster();
-      if (!list.length) { document.getElementById("roster").innerHTML = '<div class="empty-state"><div class="es-ico">👥</div><h3>No students enrolled</h3></div>'; updateCounter(); return; }
+      if (!list.length) { document.getElementById("roster").innerHTML = '<div class="empty-state"><div class="es-ico">' + ICON("users") + '</div><h3>No students enrolled</h3></div>'; updateCounter(); return; }
       document.getElementById("roster").innerHTML = list.map(function (s) {
         var v = state[s.id];
         function btn(val, label) { return '<button type="button" class="' + (v === val ? "on " + val : "") + '" data-set="' + s.id + ":" + val + '">' + label + "</button>"; }

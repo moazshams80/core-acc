@@ -6,21 +6,21 @@
 
 /* ---- Navigation definition (single source) ---- */
 var PORTAL_NAV = [
-  { key: "dashboard",     label: "Dashboard",     icon: "🏠", href: "dashboard.html" },
-  { key: "courses",       label: "Courses",       icon: "📚", href: "courses.html" },
-  { key: "assignments",   label: "Assignments",   icon: "📝", href: "assignments.html" },
-  { key: "live-sessions", label: "Live Sessions", icon: "🎥", href: "live-sessions.html" },
-  { key: "attendance",    label: "Attendance",    icon: "📅", href: "attendance.html" },
-  { key: "grades",        label: "Grades",        icon: "📊", href: "grades.html" },
-  { key: "certificates",  label: "Certificates",  icon: "🎓", href: "certificates.html" },
-  { key: "profile",       label: "Profile",       icon: "👤", href: "profile.html" },
+  { key: "dashboard",     label: "Dashboard",     icon: "home",       href: "dashboard.html" },
+  { key: "courses",       label: "Courses",       icon: "book",       href: "courses.html" },
+  { key: "assignments",   label: "Assignments",   icon: "assignment", href: "assignments.html" },
+  { key: "live-sessions", label: "Live Sessions", icon: "video",      href: "live-sessions.html" },
+  { key: "attendance",    label: "Attendance",    icon: "calendar",   href: "attendance.html" },
+  { key: "grades",        label: "Grades",        icon: "chart",      href: "grades.html" },
+  { key: "certificates",  label: "Certificates",  icon: "award",      href: "certificates.html" },
+  { key: "profile",       label: "Profile",       icon: "user",       href: "profile.html" },
 ];
 
 /* ---- Notifications shown in the header bell dropdown ---- */
 var PORTAL_NOTIFS = [
-  { icon: "📝", text: "<strong>CCTV Coverage Plan</strong> is due tomorrow", href: "assignments.html?filter=pending" },
-  { icon: "🎥", text: "<strong>Live Q&amp;A: NFPA Standards</strong> starts in 15 min", href: "live-sessions.html" },
-  { icon: "🎓", text: "Your <strong>Data Center</strong> certificate is ready", href: "certificates.html" },
+  { icon: "assignment", text: "<strong>CCTV Coverage Plan</strong> is due tomorrow", href: "assignments.html?filter=pending" },
+  { icon: "video", text: "<strong>Live Q&amp;A: NFPA Standards</strong> starts in 15 min", href: "live-sessions.html" },
+  { icon: "award", text: "Your <strong>Data Center</strong> certificate is ready", href: "certificates.html" },
 ];
 
 var PAGE_TITLES = {
@@ -37,24 +37,24 @@ var PAGE_TITLES = {
 
 /* ---- Teacher (instructor) portal navigation ---- */
 var TEACHER_NAV = [
-  { key: "teacher-dashboard",  label: "Dashboard",     icon: "🏠", href: "teacher-dashboard.html" },
-  { key: "teacher-courses",    label: "My Courses",    icon: "📚", href: "teacher-courses.html" },
-  { key: "teacher-students",   label: "Students",      icon: "👥", href: "teacher-students.html" },
-  { key: "teacher-grading",    label: "Grading",       icon: "✍️", href: "teacher-grading.html" },
-  { key: "teacher-sessions",   label: "Live Sessions", icon: "🎥", href: "teacher-sessions.html" },
-  { key: "teacher-attendance", label: "Attendance",    icon: "📅", href: "teacher-attendance.html" },
-  { key: "teacher-certificates", label: "Certificates", icon: "🎓", href: "teacher-certificates.html" },
-  { key: "teacher-reports",    label: "Reports",       icon: "📊", href: "teacher-reports.html" },
-  { key: "teacher-profile",    label: "Profile",       icon: "👤", href: "teacher-profile.html" },
+  { key: "teacher-dashboard",  label: "Dashboard",     icon: "home",     href: "teacher-dashboard.html" },
+  { key: "teacher-courses",    label: "My Courses",    icon: "book",     href: "teacher-courses.html" },
+  { key: "teacher-students",   label: "Students",      icon: "users",    href: "teacher-students.html" },
+  { key: "teacher-grading",    label: "Grading",       icon: "edit",     href: "teacher-grading.html" },
+  { key: "teacher-sessions",   label: "Live Sessions", icon: "video",    href: "teacher-sessions.html" },
+  { key: "teacher-attendance", label: "Attendance",    icon: "calendar", href: "teacher-attendance.html" },
+  { key: "teacher-certificates", label: "Certificates", icon: "award",   href: "teacher-certificates.html" },
+  { key: "teacher-reports",    label: "Reports",       icon: "chart",    href: "teacher-reports.html" },
+  { key: "teacher-profile",    label: "Profile",       icon: "user",     href: "teacher-profile.html" },
 ];
 
 /* Admin-only nav entry, appended for admins in buildShell() */
-var TEACHER_ADMIN_NAV = { key: "teacher-approvals", label: "Approvals", icon: "🛡️", href: "teacher-approvals.html" };
+var TEACHER_ADMIN_NAV = { key: "teacher-approvals", label: "Approvals", icon: "shield", href: "teacher-approvals.html" };
 
 var TEACHER_NOTIFS = [
-  { icon: "✍️", text: "<strong>7 submissions</strong> awaiting your grading", href: "teacher-grading.html" },
-  { icon: "🎥", text: "<strong>CCTV Network Integration</strong> session starts soon", href: "teacher-sessions.html" },
-  { icon: "📊", text: "Low attendance flagged in <strong>Fire Alarm Systems</strong>", href: "teacher-reports.html" },
+  { icon: "edit", text: "<strong>7 submissions</strong> awaiting your grading", href: "teacher-grading.html" },
+  { icon: "video", text: "<strong>CCTV Network Integration</strong> session starts soon", href: "teacher-sessions.html" },
+  { icon: "chart", text: "Low attendance flagged in <strong>Fire Alarm Systems</strong>", href: "teacher-reports.html" },
 ];
 
 var TEACHER_PAGE_TITLES = {
@@ -112,7 +112,7 @@ function avatarHTML(initials, cls) {
 
 function progressHTML(pct, showLabel) {
   var p = Math.max(0, Math.min(100, pct || 0));
-  var meta = showLabel ? '<div class="progress-meta"><span>Progress</span><span>' + p + '%</span></div>' : "";
+  var meta = showLabel ? '<div class="progress-meta"><span>' + t("Progress") + '</span><span>' + p + '%</span></div>' : "";
   return meta + '<div class="progress-bar"><div class="fill" style="width:' + p + '%"></div></div>';
 }
 
@@ -128,7 +128,7 @@ var STATUS_BADGES = {
 };
 function badgeHTML(status) {
   var b = STATUS_BADGES[status] || { cls: "badge-neutral", label: status };
-  return '<span class="badge ' + b.cls + '">' + esc(b.label) + "</span>";
+  return '<span class="badge ' + b.cls + '">' + esc(t(b.label)) + "</span>";
 }
 
 /* days from TODAY (defined in mock-data.js) to a yyyy-mm-dd date */
@@ -179,34 +179,35 @@ function buildShell() {
   if (sidebar) {
     var navHTML = nav.map(function (n) {
       return '<li><a href="' + n.href + '" class="' + (n.key === activeKey ? "active" : "") + '">' +
-             '<span class="ico" aria-hidden="true">' + n.icon + "</span>" + esc(n.label) + "</a></li>";
+             '<span class="ico" aria-hidden="true">' + ICON(n.icon) + "</span>" + esc(t(n.label)) + "</a></li>";
     }).join("");
-    var pill = isTeacher ? ' <span class="teacher-pill">Instructor</span>' : "";
+    var pill = isTeacher ? ' <span class="teacher-pill">' + t("Instructor") + "</span>" : "";
     sidebar.innerHTML =
       '<div class="portal-brand"><span class="brand-mark">C</span><span>CORE Egypt</span>' + pill + "</div>" +
       '<ul class="portal-nav">' + navHTML + "</ul>" +
       '<div class="portal-userbox">' + avatarHTML(person.avatarInitials, "avatar-sm") +
         '<div class="meta"><b>' + esc(person.name) + "</b>" +
-        '<a href="#" data-logout>Log Out</a></div></div>';
+        '<a href="#" data-logout>' + t("Log Out") + "</a></div></div>";
   }
 
   /* Header */
   var header = document.getElementById("portalHeader");
   if (header) {
-    var title = document.body.getAttribute("data-title") || titles[page] || "Portal";
+    var title = t(document.body.getAttribute("data-title") || titles[page] || "Portal");
     var notifItems = notifs.map(function (n) {
-      return '<a href="' + n.href + '"><span class="ico" aria-hidden="true" style="margin-right:8px;">' + n.icon + "</span>" + n.text + "</a>";
+      return '<a href="' + n.href + '"><span class="ico" aria-hidden="true" style="display:inline-flex;vertical-align:middle;margin-inline-end:8px;">' + ICON(n.icon, 16) + "</span>" + n.text + "</a>";
     }).join("");
     header.innerHTML =
       '<div class="ph-left">' +
-        '<button class="portal-hamburger" data-toggle-sidebar aria-label="Toggle navigation">☰</button>' +
+        '<button class="portal-hamburger" data-toggle-sidebar aria-label="' + t("Menu") + '">' + ICON("menu", 18) + "</button>" +
         "<h1>" + esc(title) + "</h1>" +
       "</div>" +
       '<div class="ph-right">' +
+        langToggleHTML() +
         '<div class="portal-notif" style="position:relative;">' +
-          '<button class="icon-btn" data-dropdown-toggle="notifMenu" aria-label="Notifications" title="Notifications">🔔<span class="dot"></span></button>' +
+          '<button class="icon-btn" data-dropdown-toggle="notifMenu" aria-label="' + t("Notifications") + '" title="' + t("Notifications") + '">' + ICON("bell", 18) + '<span class="dot"></span></button>' +
           '<div class="dropdown" id="notifMenu" style="min-width:300px;">' +
-            '<div style="padding:8px 12px;font-weight:800;color:var(--core-navy);">Notifications</div>' +
+            '<div style="padding:8px 12px;font-weight:800;color:var(--core-navy);">' + t("Notifications") + "</div>" +
             notifItems +
           "</div>" +
         "</div>" +
@@ -215,9 +216,9 @@ function buildShell() {
             avatarHTML(person.avatarInitials, "avatar-sm") + "<b>" + esc(person.name) + '</b><span class="caret">▾</span>' +
           "</button>" +
           '<div class="dropdown" id="userMenu">' +
-            '<a href="' + profileHref + '">Profile</a>' +
-            '<a href="' + profileHref + '#security">Settings</a>' +
-            '<a href="#" data-logout>Log Out</a>' +
+            '<a href="' + profileHref + '">' + t("Profile") + "</a>" +
+            '<a href="' + profileHref + '#security">' + t("Settings") + "</a>" +
+            '<a href="#" data-logout>' + t("Log Out") + "</a>" +
           "</div>" +
         "</div>" +
       "</div>";
@@ -254,7 +255,7 @@ function canDownload() {
 }
 function downloadLockHTML() {
   var rtl = document.documentElement.getAttribute("dir") === "rtl";
-  return '<span class="download-lock">🔒 ' + (rtl ? "التنزيل يتطلب صلاحية المشرف" : "Downloads require admin access") + "</span>";
+  return '<span class="download-lock">' + ICON("lock", 15) + ' ' + (rtl ? "التنزيل يتطلب صلاحية المشرف" : "Downloads require admin access") + "</span>";
 }
 
 /* Wrap protected material: watermark + anti-copy + print/screenshot deterrents.

@@ -18,8 +18,8 @@
       <main class="portal-main">
 
         <div class="between" style="margin-bottom:22px;">
-          <div><h2 class="section-title" style="font-size:22px;">My Courses</h2><p class="muted" style="margin:4px 0 0;">Courses you create and manage.</p></div>
-          <a class="btn btn-primary" href="teacher-course-builder.html">+ Create New Course</a>
+          <div><h2 class="section-title" style="font-size:22px;" data-i18n="My Courses">My Courses</h2><p class="muted" style="margin:4px 0 0;">Courses you create and manage.</p></div>
+          <a class="btn btn-primary" href="teacher-course-builder.html" data-i18n="+ Create New Course">+ Create New Course</a>
         </div>
 
         <div class="grid grid-3" id="grid"></div>
@@ -31,6 +31,8 @@
   <script src="teacher-mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {
@@ -42,7 +44,7 @@
       return '<article class="course-card"><span class="corner">' + badge + "</span>" +
         '<span class="course-icon" aria-hidden="true">' + c.icon + "</span>" +
         "<h3>" + esc(c.title) + "</h3>" +
-        '<p class="muted" style="font-size:13px;margin:0 0 4px;">👥 ' + c.enrolledCount + " students enrolled</p>" +
+        '<p class="muted" style="font-size:13px;margin:0 0 4px;">' + ICON("users") + ' ' + c.enrolledCount + " students enrolled</p>" +
         progress +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
           '<a class="btn btn-primary btn-sm" href="teacher-course-builder.html?id=' + c.id + '">Manage</a>' +

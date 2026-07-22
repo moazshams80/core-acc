@@ -20,7 +20,7 @@
         <div class="toolbar">
           <div class="filter-tabs" id="filters" style="margin:0;">
             <button class="active" data-filter="ungraded">To Grade</button>
-            <button data-filter="graded">Graded</button>
+            <button data-filter="graded" data-i18n="Graded">Graded</button>
             <button data-filter="all">All</button>
           </div>
           <select class="select" id="courseFilter" style="margin-left:auto;"></select>
@@ -29,7 +29,7 @@
         <section class="card card-pad">
           <div class="table-wrap">
             <table class="data">
-              <thead><tr><th>Student</th><th>Assignment</th><th>Submitted</th><th>Status</th><th></th></tr></thead>
+              <thead><tr><th data-i18n="Student">Student</th><th data-i18n="Assignment">Assignment</th><th data-i18n="Submitted">Submitted</th><th data-i18n="Status">Status</th><th></th></tr></thead>
               <tbody id="rows"></tbody>
             </table>
           </div>
@@ -50,14 +50,14 @@
           <p class="muted" style="margin-top:0;font-size:13px;" id="gmMeta"></p>
           <div class="card card-pad protected-content" style="background:var(--core-bg);box-shadow:none;">
             <p style="margin:0 0 12px;" id="gmNotes">Submission notes from the student would appear here.</p>
-            <button type="button" id="gmFile" class="card-link" style="color:var(--core-blue);font-weight:800;background:none;border:0;padding:0;cursor:pointer;font:inherit;">📎 Open attached file</button>
+            <button type="button" id="gmFile" class="card-link" style="color:var(--core-blue);font-weight:800;background:none;border:0;padding:0;cursor:pointer;font:inherit;"><svg class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg> Open attached file</button>
           </div>
         </div>
         <div class="stack">
           <div><label class="field-label">Score (<span id="gmMax"></span> max)</label><input class="input" id="gmScore" type="number" min="0" placeholder="0" /></div>
           <div><label class="field-label">Letter grade (auto)</label><input class="input" id="gmLetter" readonly placeholder="—" /></div>
           <div><label class="field-label">Feedback</label><textarea class="textarea" id="gmFeedback" placeholder="Comments for the student…"></textarea></div>
-          <button class="btn btn-primary btn-block" id="gmSave">Save Grade</button>
+          <button class="btn btn-primary btn-block" id="gmSave" data-i18n="Save Grade">Save Grade</button>
         </div>
       </div>
     </div>
@@ -66,6 +66,8 @@
   <script src="teacher-mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {
@@ -92,7 +94,7 @@
         return okStatus && okCourse;
       });
       var tbody = document.getElementById("rows"), empty = document.getElementById("empty");
-      if (!list.length) { tbody.innerHTML = ""; empty.innerHTML = '<div class="empty-state"><div class="es-ico">✅</div><h3>All caught up</h3><p>No submissions match this view.</p></div>'; return; }
+      if (!list.length) { tbody.innerHTML = ""; empty.innerHTML = '<div class="empty-state"><div class="es-ico">' + ICON("check") + '</div><h3>All caught up</h3><p>No submissions match this view.</p></div>'; return; }
       empty.innerHTML = "";
       tbody.innerHTML = list.map(function (s) {
         var stu = teacherStudentById(s.studentId), c = teacherCourseById(s.courseId);

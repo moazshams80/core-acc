@@ -18,14 +18,14 @@
       <main class="portal-main">
 
         <div class="page-head">
-          <h2 class="section-title" style="font-size:22px;">Instructor Approvals</h2>
+          <h2 class="section-title" style="font-size:22px;" data-i18n="Instructor Approvals">Instructor Approvals</h2>
           <p>People who signed up as instructors. They cannot create courses, grade, or see student data until you approve them.</p>
         </div>
 
         <section class="card card-pad">
           <div class="table-wrap">
             <table class="data">
-              <thead><tr><th>Name</th><th>Instructor ID</th><th>Requested</th><th>Decision</th></tr></thead>
+              <thead><tr><th data-i18n="Name">Name</th><th data-i18n="Instructor ID">Instructor ID</th><th data-i18n="Requested">Requested</th><th data-i18n="Decision">Decision</th></tr></thead>
               <tbody id="rows"></tbody>
             </table>
           </div>
@@ -39,6 +39,8 @@
   <script src="teacher-mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {
@@ -46,14 +48,14 @@
 
       // Admin-only screen. Non-admins never see the nav link; this blocks direct URLs.
       if (!currentInstructor.isAdmin) {
-        main.innerHTML = '<div class="empty-state"><div class="es-ico">🛡️</div><h3>Admins only</h3>' +
+        main.innerHTML = '<div class="empty-state"><div class="es-ico">' + ICON("shield") + '</div><h3>Admins only</h3>' +
           '<p>Only administrators can review instructor requests.</p>' +
           '<a class="btn btn-primary btn-sm" href="teacher-dashboard.html">Back to dashboard</a></div>';
         return;
       }
 
       if (!dbReady()) {
-        main.innerHTML = '<div class="empty-state"><div class="es-ico">🔌</div><h3>Database not connected</h3>' +
+        main.innerHTML = '<div class="empty-state"><div class="es-ico">' + ICON("plug") + '</div><h3>Database not connected</h3>' +
           '<p>Instructor approvals need the live database.</p></div>';
         return;
       }
@@ -61,10 +63,10 @@
       function render() {
         dbPendingTeachers(function (err, list) {
           var tbody = document.getElementById("rows"), empty = document.getElementById("empty");
-          if (err) { tbody.innerHTML = ""; empty.innerHTML = '<div class="empty-state"><div class="es-ico">⚠️</div><h3>Could not load requests</h3><p>' + esc(err) + "</p></div>"; return; }
+          if (err) { tbody.innerHTML = ""; empty.innerHTML = '<div class="empty-state"><div class="es-ico">' + ICON("alert") + '</div><h3>Could not load requests</h3><p>' + esc(err) + "</p></div>"; return; }
           if (!list.length) {
             tbody.innerHTML = "";
-            empty.innerHTML = '<div class="empty-state"><div class="es-ico">✅</div><h3>Nothing to review</h3><p>No instructor requests are waiting.</p></div>';
+            empty.innerHTML = '<div class="empty-state"><div class="es-ico">' + ICON("check") + '</div><h3>Nothing to review</h3><p>No instructor requests are waiting.</p></div>';
             return;
           }
           empty.innerHTML = "";

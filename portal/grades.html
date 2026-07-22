@@ -19,7 +19,7 @@
 
         <div class="row-2" style="margin-bottom:22px;">
           <section class="card card-pad" style="text-align:center;display:flex;flex-direction:column;justify-content:center;align-items:center;">
-            <p class="kicker">Overall Grade</p>
+            <p class="kicker" data-i18n="Overall Grade">Overall Grade</p>
             <div class="grade-big" id="gpa"></div>
             <p class="muted" style="margin-top:8px;">Across all active courses</p>
           </section>
@@ -35,7 +35,7 @@
           <p class="muted" style="margin:-8px 0 16px;font-size:13px;">Click a course to see individual assignment grades.</p>
           <div class="table-wrap">
             <table class="data">
-              <thead><tr><th>Course</th><th>Assignments</th><th>Labs</th><th>Final</th><th>Overall</th></tr></thead>
+              <thead><tr><th data-i18n="Course">Course</th><th data-i18n="Assignments">Assignments</th><th>Labs</th><th>Final</th><th data-i18n="Overall">Overall</th></tr></thead>
               <tbody id="rows"></tbody>
             </table>
           </div>
@@ -48,6 +48,8 @@
   <script src="mock-data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="db.js"></script>
+  <script src="icons.js"></script>
+  <script src="i18n.js"></script>
   <script src="portal.js"></script>
   <script>
     portalBoot(function () {
