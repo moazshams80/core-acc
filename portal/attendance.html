@@ -81,7 +81,7 @@
     document.getElementById("calTitle").textContent = TODAY.toLocaleDateString("en-US", { month: "long", year: "numeric" });
     var attended = attendanceRecords.filter(function (r) { return r.status === "present"; }).length;
     document.getElementById("attSummary").textContent = attendanceRecords.length
-      ? "You've attended " + attended + " of " + attendanceRecords.length + " scheduled sessions."
+      ? t("You’ve attended") + " " + attended + " " + t("of") + " " + attendanceRecords.length + " " + t("scheduled sessions")
       : "No attendance has been recorded yet.";
     if (!attendanceRecords.length) document.getElementById("attHeadline").textContent = "Nothing recorded yet";
     var firstDow = new Date(year, month, 1).getDay();

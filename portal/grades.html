@@ -67,7 +67,7 @@
       var course = courseById(g.courseId);
       var h = (gradeVal[g.overallGrade] || 70);
       return '<div class="bar"><div class="col" style="height:' + h + '%"></div>' +
-        '<div class="lbl">' + esc(course.icon) + "<br>" + esc(g.overallGrade) + "</div></div>";
+        '<div class="lbl">' + course.icon + "<br>" + esc(g.overallGrade) + "</div></div>";
     }).join("");
 
     // Breakdown table with expandable rows

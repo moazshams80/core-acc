@@ -93,7 +93,7 @@
       }).join("");
       return '<div class="accordion-item' + (i === 0 ? " open" : "") + '">' +
         '<button class="accordion-head"><span>' + esc(m.title) + '</span>' +
-        '<span class="muted" style="font-weight:700;font-size:13px;">' + m.lessons.length + " lesson" + (m.lessons.length === 1 ? "" : "s") + ' &nbsp;<span class="chev">▾</span></span></button>' +
+        '<span class="muted" style="font-weight:700;font-size:13px;">' + m.lessons.length + " " + t("lessons") + ' &nbsp;<span class="chev">▾</span></span></button>' +
         '<div class="accordion-body">' + lessons + "</div></div>";
     }).join("");
 

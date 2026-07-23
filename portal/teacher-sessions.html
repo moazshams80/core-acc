@@ -88,7 +88,7 @@
           '<span class="tag">' + esc(c.title) + "</span>" +
           '<h3 style="margin-top:12px;">' + esc(s.title) + "</h3>" +
           '<p style="font-size:17px;font-weight:800;color:var(--core-blue);margin:4px 0;">' + esc(s.when) + "</p>" +
-          '<p class="muted" style="font-size:13px;margin:0 0 16px;">' + ICON("users") + ' ' + s.enrolledCount + " enrolled</p>" +
+          '<p class="muted" style="font-size:13px;margin:0 0 16px;">' + ICON("users") + ' ' + s.enrolledCount + ' ' + t("enrolled") + "</p>" +
           '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
             '<button class="btn btn-primary btn-sm" data-start="' + s.id + '">Start Session</button>' +
             '<button class="btn btn-light btn-sm" data-edit="' + s.id + '">Edit</button>' +
@@ -101,7 +101,7 @@
         return "<tr><td><b>" + esc(s.title) + "</b></td>" +
           '<td><span class="tag">' + esc(c.title) + "</span></td>" +
           "<td>" + esc(s.when) + "</td>" +
-          "<td>" + s.attendedCount + "/" + s.enrolledCount + " attended</td>" +
+          "<td>" + s.attendedCount + "/" + s.enrolledCount + " " + t("attended") + "</td>" +
           '<td><a class="card-link" style="color:var(--core-blue);font-weight:800;" href="#">⬆ Upload Recording</a></td></tr>';
       }).join("");
     }

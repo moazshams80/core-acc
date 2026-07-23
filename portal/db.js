@@ -131,11 +131,11 @@ function ymd(d) { d = new Date(d); return d.getFullYear() + "-" + String(d.getMo
 function monthYear(ts) { return new Date(ts).toLocaleDateString("en-US", { month: "short", year: "numeric" }); }
 function countdownText(ts) {
   var mins = Math.round((new Date(ts) - new Date()) / 60000);
-  if (mins <= 0) return "In progress";
-  if (mins < 60) return "Starts in " + mins + " min";
-  if (mins < 1440) return "Starts in " + Math.round(mins / 60) + " h";
+  if (mins <= 0) return t("In progress");
+  if (mins < 60) return t("Starts in") + " " + mins + " " + t("min");
+  if (mins < 1440) return t("Starts in") + " " + Math.round(mins / 60) + " " + t("h");
   var days = Math.round(mins / 1440);
-  return "Starts in " + days + " day" + (days > 1 ? "s" : "");
+  return t("Starts in") + " " + days + " " + t(days > 1 ? "days" : "day");
 }
 
 /* ---------- STUDENT LOADER ---------- */
@@ -208,7 +208,7 @@ function dbLoadStudentData(done) {
           instructor: course ? course.instructor : "", when: fmtWhen(s.starts_at),
           joinable: joinable, countdown: countdownText(s.starts_at), past: past,
           platform: s.platform, meetingUrl: s.meeting_url,
-          duration: (s.duration_min || 60) + " min" };
+          duration: (s.duration_min || 60) + " " + t("min") };
       });
 
       attendanceRecords = att.filter(function (a) { return a.session; }).map(function (a) {

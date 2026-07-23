@@ -44,7 +44,7 @@
       return '<article class="course-card"><span class="corner">' + badge + "</span>" +
         '<span class="course-icon" aria-hidden="true">' + c.icon + "</span>" +
         "<h3>" + esc(c.title) + "</h3>" +
-        '<p class="muted" style="font-size:13px;margin:0 0 4px;">' + ICON("users") + ' ' + c.enrolledCount + " students enrolled</p>" +
+        '<p class="muted" style="font-size:13px;margin:0 0 4px;">' + ICON("users") + ' ' + c.enrolledCount + ' ' + t("students enrolled") + "</p>" +
         progress +
         '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
           '<a class="btn btn-primary btn-sm" href="teacher-course-builder.html?id=' + c.id + '">Manage</a>' +

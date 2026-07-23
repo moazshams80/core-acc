@@ -72,13 +72,13 @@
     var items = [];
     published.forEach(function (c) {
       var n = submissions.filter(function (s) { return s.status === "ungraded" && s.courseId === c.id; }).length;
-      if (n) items.push({ icon: "" + ICON('edit') + "", text: "<strong>" + n + " submissions</strong> to grade in " + esc(c.title), btn: "Grade now", href: "teacher-grading.html?course=" + c.id });
+      if (n) items.push({ icon: "" + ICON('edit') + "", text: "<strong>" + n + " " + t("submissions") + "</strong> " + t("to grade in") + " " + esc(c.title), btn: "Grade now", href: "teacher-grading.html?course=" + c.id });
     });
     teacherSessions.filter(function (s) { return s.today; }).forEach(function (s) {
-      items.push({ icon: "" + ICON('video') + "", text: "Host <strong>" + esc(s.title) + "</strong> at " + esc(s.time), btn: "Start session", href: "teacher-sessions.html" });
+      items.push({ icon: "" + ICON('video') + "", text: t("Host") + " <strong>" + esc(s.title) + "</strong> " + t("at") + " " + esc(s.time), btn: "Start session", href: "teacher-sessions.html" });
     });
     published.filter(function (c) { return c.avgAttendance < 80; }).forEach(function (c) {
-      items.push({ icon: "" + ICON('calendar') + "", text: "Low attendance in <strong>" + esc(c.title) + "</strong> (" + c.avgAttendance + "%)", btn: "View", href: "teacher-reports.html" });
+      items.push({ icon: "" + ICON('calendar') + "", text: t("Low attendance in") + " <strong>" + esc(c.title) + "</strong> (" + c.avgAttendance + "%)", btn: "View", href: "teacher-reports.html" });
     });
     document.getElementById("attention").innerHTML = items.map(function (i) {
       return '<div class="list-row"><span class="course-icon" style="width:42px;height:42px;font-size:18px;margin:0;border-radius:12px;" aria-hidden="true">' + i.icon + "</span>" +
@@ -91,7 +91,7 @@
     document.getElementById("schedule").innerHTML = today.length ? today.map(function (s) {
       var c = teacherCourseById(s.courseId);
       return '<div class="mini-item"><div class="grow"><div style="font-weight:700;">' + esc(s.title) + "</div>" +
-        '<div class="when">' + esc(c.title) + " &middot; " + s.enrolledCount + ' enrolled</div></div>' +
+        '<div class="when">' + esc(c.title) + " &middot; " + s.enrolledCount + ' ' + t("enrolled") + '</div></div>' +
         '<span class="badge badge-cyan">' + esc(s.time) + "</span></div>";
     }).join("") : '<div class="empty-state"><div class="es-ico">' + ICON("coffee") + '</div><h3>No sessions today</h3><p>Enjoy the breather.</p></div>';
 

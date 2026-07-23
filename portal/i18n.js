@@ -385,6 +385,144 @@ var AR = {
   "Welcome to CORE Egypt — your activity will appear here": "مرحبًا بك في CORE Egypt — سيظهر نشاطك هنا",
   "View all →": "عرض الكل",
 
+  /* ---- units / counts (wrapped in code) ---- */
+  "students enrolled": "طالب مسجّل",
+  "enrolled": "مسجّل",
+  "attended": "حضروا",
+  "lessons": "دروس",
+  "submissions": "تسليمات",
+  "to grade in": "للتصحيح في",
+  "Host": "استضافة",
+  "at": "في",
+  "Low attendance in": "انخفاض الحضور في",
+  "Starts in": "يبدأ خلال",
+  "In progress": "جارٍ الآن",
+  "min": "دقيقة",
+  "h": "ساعة",
+  "day": "يوم",
+  "days": "أيام",
+  "of": "من",
+  "You’ve attended": "لقد حضرت",
+  "scheduled sessions": "جلسة مجدولة",
+  "Start session": "بدء الجلسة",
+  "Grade now": "صحّح الآن",
+
+  /* ---- countdown (mock values) ---- */
+  "Starts in 15 min": "يبدأ خلال 15 دقيقة",
+  "Starts in 2 days": "يبدأ خلال يومين",
+  "Starts in 4 days": "يبدأ خلال 4 أيام",
+  "Starts in 1 week": "يبدأ خلال أسبوع",
+
+  /* ---- weekday abbreviations (attendance calendar) ---- */
+  "Sun": "أحد", "Mon": "إثن", "Tue": "ثلا", "Wed": "أرب", "Thu": "خمس", "Fri": "جمع", "Sat": "سبت",
+
+  /* ---- lesson types (builder select) ---- */
+  "Video": "فيديو", "Reading": "قراءة", "Lab": "معمل", "Quiz": "اختبار",
+
+  /* ---- report range (select) ---- */
+  "Last 7 weeks": "آخر 7 أسابيع", "This term": "هذا الفصل", "All time": "كل الأوقات",
+  "Weekly attendance trend": "اتجاه الحضور الأسبوعي",
+
+  /* ---- attendance ---- */
+  "Great consistency!": "التزام رائع!",
+
+  /* ---- placeholders ---- */
+  "Add any notes about your submission…": "أضف أي ملاحظات حول تسليمك…",
+  "Comments for the student…": "ملاحظات للطالب…",
+  "Display name (optional)": "الاسم المعروض (اختياري)",
+  "Assignment title": "عنوان الواجب",
+  "Max pts": "الدرجة القصوى",
+  "Paste the meeting link…": "الصق رابط الاجتماع…",
+  "Search students by name…": "ابحث عن الطلاب بالاسم…",
+  "Type a skill and press Enter…": "اكتب مهارة واضغط Enter…",
+  "What will students learn in this course?": "ماذا سيتعلّم الطلاب في هذه الدورة؟",
+  "e.g. Security Systems Engineering": "مثال: هندسة الأنظمة الأمنية",
+  "e.g. Youssef": "مثال: يوسف",
+  "e.g. CCTV Network Integration": "مثال: دمج شبكات الكاميرات",
+  "Enter a code, e.g. CORE-2026-A1B2C3": "أدخل رمزًا، مثال: CORE-2026-A1B2C3",
+  "you@example.com": "you@example.com",
+  "At least 6 characters": "6 أحرف على الأقل",
+
+  /* ---- titles / aria-labels ---- */
+  "Attach the assignment PDF": "أرفق ملف الواجب PDF",
+  "Create a meeting on the selected platform, then paste its link here": "أنشئ اجتماعًا على المنصة المختارة، ثم الصق رابطه هنا",
+  "Show password": "إظهار كلمة المرور",
+  "Hide password": "إخفاء كلمة المرور",
+  "Close": "إغلاق",
+  "Remove assignment": "إزالة الواجب",
+  "Remove lesson": "إزالة الدرس",
+  "Toggle navigation": "تبديل التنقّل",
+  "Notifications": "الإشعارات",
+  "Choose account type": "اختر نوع الحساب",
+
+  /* ---- forms / labels / notes ---- */
+  "\"Get link\" opens the platform to create the meeting with your account — then paste the link here.":
+    "«احصل على الرابط» يفتح المنصة لإنشاء الاجتماع بحسابك — ثم الصق الرابط هنا.",
+  "Courses you create and manage.": "الدورات التي تنشئها وتديرها.",
+  "Certificates need the live database.": "تحتاج الشهادات إلى قاعدة البيانات المباشرة.",
+  "Instructor approvals need the live database.": "تحتاج موافقات المدرّبين إلى قاعدة البيانات المباشرة.",
+  "Password reset needs the live database.": "تحتاج إعادة تعيين كلمة المرور إلى قاعدة البيانات المباشرة.",
+  "Materials appear here once the database is connected.": "تظهر المواد هنا بمجرد اتصال قاعدة البيانات.",
+  "Already have an account?": "لديك حساب بالفعل؟",
+  "Areas of expertise": "مجالات الخبرة",
+  "Create Student Account": "إنشاء حساب طالب",
+  "Create Instructor Account": "إنشاء حساب مدرّب",
+  "Create your account to access courses, live sessions, assignments, and verified certificates — all in one portal.":
+    "أنشئ حسابك للوصول إلى الدورات والجلسات المباشرة والواجبات والشهادات الموثّقة — كل ذلك في بوابة واحدة.",
+  "Discussion is quiet": "النقاش هادئ",
+  "Start a thread with your instructor and classmates.": "ابدأ نقاشًا مع مدرّبك وزملائك.",
+  "Download PDF": "تنزيل PDF",
+  "Open public verification page": "فتح صفحة التحقق العامة",
+  "Enter a verification code to check a certificate.": "أدخل رمز تحقق للتحقق من شهادة.",
+  "Enter the email you signed up with and we'll send you a link to choose a new password.":
+    "أدخل البريد الإلكتروني الذي سجّلت به وسنرسل لك رابطًا لاختيار كلمة مرور جديدة.",
+  "Instructor accounts are reviewed by an administrator before they can be used.":
+    "تتم مراجعة حسابات المدرّبين من قِبل المشرف قبل استخدامها.",
+  "Licensed to you only — each file is watermarked with your name and ID. Copying, printing and screenshots are disabled.":
+    "مرخّصة لك وحدك — كل ملف يحمل علامة مائية باسمك ورقمك. النسخ والطباعة ولقطات الشاشة معطّلة.",
+  "Manage your courses, grade submissions, host live sessions, mark attendance, and review reports — all in one place.":
+    "أدر دوراتك، وصحّح التسليمات، واستضف الجلسات المباشرة، وسجّل الحضور، وراجع التقارير — كل ذلك في مكان واحد.",
+  "No notes were added with this submission.": "لم تُضف أي ملاحظات مع هذا التسليم.",
+  "Off = saved as draft": "إيقاف = يُحفظ كمسودة",
+  "One portal for students and instructors — courses, live sessions, grading, attendance, and verified certificates, all in one place.":
+    "بوابة واحدة للطلاب والمدرّبين — الدورات والجلسات المباشرة والتصحيح والحضور والشهادات الموثّقة، كلها في مكان واحد.",
+  "Password Reset": "إعادة تعيين كلمة المرور",
+  "Pick something at least 8 characters long that you don't use anywhere else.":
+    "اختر كلمة مرور لا تقل عن 8 أحرف ولا تستخدمها في مكان آخر.",
+  "Pick up your training where you left off — courses, live sessions, assignments, and your verified certificates, all in one place.":
+    "تابع تدريبك من حيث توقّفت — الدورات والجلسات المباشرة والواجبات وشهاداتك الموثّقة، كلها في مكان واحد.",
+  "PDFs, slides, or video files. Only students enrolled in this course can open them, and downloading stays admin-only.":
+    "ملفات PDF أو شرائح أو فيديو. يمكن فقط للطلاب المسجّلين في هذه الدورة فتحها، ويبقى التنزيل للمشرفين فقط.",
+  "Remembered it?": "تذكّرتها؟",
+  "Score (": "الدرجة (",
+  "max)": "كحد أقصى)",
+  "Share this link (or the QR code) with an employer — it works without logging in.":
+    "شارك هذا الرابط (أو رمز QR) مع صاحب العمل — يعمل دون تسجيل الدخول.",
+  "Start your": "ابدأ",
+  "journey with CORE.": "رحلتك مع CORE.",
+  "Submission notes from the student would appear here.": "تظهر ملاحظات الطالب هنا.",
+  "This reset link is invalid or has expired. Reset links can only be used once.":
+    "رابط إعادة التعيين غير صالح أو انتهت صلاحيته. يمكن استخدام روابط إعادة التعيين مرة واحدة فقط.",
+  "We'll email you a secure link to set a new one.": "سنرسل إليك رابطًا آمنًا لتعيين كلمة مرور جديدة.",
+  "Welcome to": "مرحبًا بك في",
+  "Locked out?": "لا يمكنك الدخول؟",
+  "Let's fix that.": "لنُصلح ذلك.",
+  "Choose a new": "اختر كلمة مرور",
+  "password.": "جديدة.",
+  "future engineer.": "أيها المهندس المستقبلي.",
+  "instructor.": "أيها المدرّب.",
+  "Welcome back,": "مرحبًا بعودتك،",
+  "Teacher": "مدرّب",
+  "Student": "طالب",
+  "ID": "المعرّف",
+
+  /* ---- symbol-prefixed ---- */
+  "← Back to courses": "→ العودة إلى الدورات",
+  "▶ Watch Recording": "▶ مشاهدة التسجيل",
+  "⬆ Upload Recording": "⬆ رفع التسجيل",
+
+  "View all →": "عرض الكل",
+
   /* ---- misc ---- */
   "Database not connected": "قاعدة البيانات غير متصلة",
   "Day": "اليوم",
@@ -412,6 +550,14 @@ function translateNode(node) {
   var key = raw.trim();
   if (key && AR[key]) node.nodeValue = raw.replace(key, AR[key]);
 }
+var I18N_ATTRS = ["placeholder", "title", "aria-label"];
+function translateAttrs(el) {
+  if (!el || el.nodeType !== 1 || !el.getAttribute) return;
+  I18N_ATTRS.forEach(function (a) {
+    var v = el.getAttribute(a);
+    if (v && AR[v.trim()]) el.setAttribute(a, AR[v.trim()]);
+  });
+}
 function translateTree(root) {
   if (LANG !== "ar" || !root) return;
   if (root.nodeType === 3) { translateNode(root); return; }
@@ -426,6 +572,10 @@ function translateTree(root) {
   var nodes = [], n;
   while ((n = walker.nextNode())) nodes.push(n);
   nodes.forEach(translateNode);
+  // attributes on the root and every descendant element
+  translateAttrs(root);
+  var els = root.querySelectorAll("*");
+  for (var i = 0; i < els.length; i++) translateAttrs(els[i]);
 }
 
 /* Translate static markup: data-i18n (text) and data-i18n-ph (placeholder) */
