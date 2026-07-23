@@ -195,7 +195,8 @@ function dbLoadStudentData(done) {
         var s = subByAsg[a.id];
         return { id: a.id, title: a.title, courseId: a.course_id, dueDate: a.due_date || ymd(new Date()),
           status: !s ? "pending" : (s.status === "graded" ? "graded" : "submitted"),
-          grade: s && s.status === "graded" ? gradeLetter((s.score / a.max_points) * 100) : null };
+          grade: s && s.status === "graded" ? gradeLetter((s.score / a.max_points) * 100) : null,
+          filePath: a.file_path || null };
       });
 
       liveSessions = sess.filter(function (s) { return enrolledCourseIds.indexOf(s.course_id) !== -1; }).map(function (s) {
@@ -431,9 +432,17 @@ function dbCreateCourse(course, modulesArr, assignmentsArr, done) {
             }));
           }));
       });
-      if (assignmentsArr.length) work.push(sb.from("assignments").insert(assignmentsArr.map(function (a) {
-        return { course_id: courseId, title: a.title, due_date: a.due_date || null, max_points: a.max_points || 100 };
-      })));
+      if (assignmentsArr.length) work.push(Promise.all(assignmentsArr.map(function (a) {
+        var row = { course_id: courseId, title: a.title, due_date: a.due_date || null, max_points: a.max_points || 100 };
+        if (a.file) {
+          var path = courseId + "/assignment-" + Date.now() + "-" + safeFileName(a.file.name);
+          return sb.storage.from("course-materials").upload(path, a.file).then(function (up) {
+            if (!up.error) row.file_path = path;
+            return row;
+          });
+        }
+        return Promise.resolve(row);
+      })).then(function (rows) { return sb.from("assignments").insert(rows); }));
       Promise.all(work).then(function () { done(null, courseId); }).catch(function (e) { done(String(e)); });
     });
   });
@@ -523,11 +532,19 @@ function dbUpdateCourse(courseId, course, modulesArr, assignmentsArr, done) {
       }
     });
 
-    /* assignments: update kept, insert new */
+    /* assignments: update kept, insert new, uploading any attached file first */
     assignmentsArr.forEach(function (a) {
       var row = { title: a.title, due_date: a.due_date || null, max_points: a.max_points || 100 };
-      if (a.id) work.push(sb.from("assignments").update(row).eq("id", a.id));
-      else { row.course_id = courseId; work.push(sb.from("assignments").insert(row)); }
+      work.push(Promise.resolve().then(function () {
+        if (a.file) {
+          var path = courseId + "/assignment-" + Date.now() + "-" + safeFileName(a.file.name);
+          return sb.storage.from("course-materials").upload(path, a.file).then(function (up) { if (!up.error) row.file_path = path; });
+        }
+      }).then(function () {
+        if (a.id) return sb.from("assignments").update(row).eq("id", a.id);
+        row.course_id = courseId;
+        return sb.from("assignments").insert(row);
+      }));
     });
 
     return Promise.all(work);

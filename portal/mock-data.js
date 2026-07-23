@@ -272,7 +272,7 @@ var assignments = [
 var liveSessions = [
   { id: "s1", title: "Live Q&A: NFPA Standards", courseId: "c2", instructor: "Eng. Mona", when: "Today, 6:00 PM", joinable: true, countdown: "Starts in 15 min", past: false, platform: "zoom", meetingUrl: "https://zoom.us/j/94628731045" },
   { id: "s2", title: "CCTV Network Integration", courseId: "c1", instructor: "Eng. Karim", when: "Thu, Jun 18 — 5:00 PM", joinable: false, countdown: "Starts in 2 days", past: false, platform: "meet", meetingUrl: "https://meet.google.com/kbd-ozxq-fce" },
-  { id: "s3", title: "BMS Controllers Workshop", courseId: "c5", instructor: "Eng. Omar", when: "Sat, Jun 20 — 4:00 PM", joinable: false, countdown: "Starts in 4 days", past: false, platform: "teams", meetingUrl: "https://teams.live.com/meet/9482031846127" },
+  { id: "s3", title: "BMS Controllers Workshop", courseId: "c5", instructor: "Eng. Omar", when: "Sat, Jun 20 — 4:00 PM", joinable: false, countdown: "Starts in 4 days", past: false, platform: "teams", meetingUrl: "https://teams.live.com/9482031846127" },
   { id: "s4", title: "Access Control Deep Dive", courseId: "c1", instructor: "Eng. Karim", when: "Tue, Jun 23 — 6:00 PM", joinable: false, countdown: "Starts in 1 week", past: false, platform: "zoom", meetingUrl: "https://zoom.us/j/91537248064" },
   { id: "s5", title: "Subnetting Masterclass", courseId: "c3", instructor: "Eng. Tarek", when: "Jun 9 — 5:00 PM", duration: "58 min", past: true },
   { id: "s6", title: "VLANs in Practice", courseId: "c3", instructor: "Eng. Tarek", when: "Jun 4 — 5:00 PM", duration: "1h 04m", past: true },

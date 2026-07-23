@@ -150,6 +150,8 @@
     document.addEventListener("click", function (e) {
       var b = e.target.closest("[data-brief]"); if (!b) return;
       var a = assignments.find(function (x) { return x.id === b.getAttribute("data-brief"); });
+      // if the instructor attached a PDF, open it (private bucket, signed link)
+      if (a.filePath && typeof dbOpenFile === "function") { dbOpenFile("course-materials", a.filePath); return; }
       var course = courseById(a.courseId);
       document.getElementById("briefTitle").textContent = a.title;
       document.getElementById("briefBody").innerHTML =

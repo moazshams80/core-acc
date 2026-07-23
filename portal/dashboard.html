@@ -55,8 +55,8 @@
     portalBoot(function () {
     // Welcome banner
     document.getElementById("banner").innerHTML =
-      '<div class="portal-banner"><h2>Welcome back, ' + esc(currentStudent.name) + ' ' + ICON("wave") + '</h2>' +
-      '<p>' + esc(currentStudent.program) + ' &middot; Day ' + currentStudent.dayOfJourney + ' of your journey</p></div>';
+      '<div class="portal-banner"><h2>' + t("Welcome back") + ', ' + esc(currentStudent.name) + ' ' + ICON("wave") + '</h2>' +
+      '<p>' + esc(currentStudent.program) + ' &middot; ' + t("Day") + ' ' + currentStudent.dayOfJourney + ' ' + t("of your journey") + '</p></div>';
 
     // Stat cards
     var inProgress = courses.filter(function (c) { return c.status === "in-progress"; }).length;

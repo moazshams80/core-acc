@@ -195,7 +195,7 @@ function buildShell() {
   if (header) {
     var title = t(document.body.getAttribute("data-title") || titles[page] || "Portal");
     var notifItems = notifs.map(function (n) {
-      return '<a href="' + n.href + '"><span class="ico" aria-hidden="true" style="display:inline-flex;vertical-align:middle;margin-inline-end:8px;">' + ICON(n.icon, 16) + "</span>" + n.text + "</a>";
+      return '<a href="' + n.href + '"><span class="ico" aria-hidden="true" style="display:inline-flex;vertical-align:middle;margin-inline-end:8px;">' + ICON(n.icon, 16) + "</span>" + t(n.text) + "</a>";
     }).join("");
     header.innerHTML =
       '<div class="ph-left">' +

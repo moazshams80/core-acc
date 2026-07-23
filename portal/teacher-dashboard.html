@@ -54,8 +54,8 @@
     var upcoming = teacherSessions.filter(function (s) { return s.status === "upcoming"; });
 
     document.getElementById("banner").innerHTML =
-      '<div class="portal-banner"><h2>Welcome back, ' + esc(currentInstructor.name) + ' ' + ICON("wave") + '</h2>' +
-      '<p>' + published.length + ' active courses &middot; ' + totalStudents + ' students taught</p></div>';
+      '<div class="portal-banner"><h2>' + t("Welcome back") + ', ' + esc(currentInstructor.name) + ' ' + ICON("wave") + '</h2>' +
+      '<p>' + published.length + ' ' + t("active courses") + ' &middot; ' + totalStudents + ' ' + t("students taught") + '</p></div>';
 
     var statData = [
       { ico: "" + ICON('book') + "", num: published.length, label: "Active Courses", href: "teacher-courses.html" },

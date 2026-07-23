@@ -161,18 +161,21 @@
     function addAssignment(a) {
       var row = document.createElement("div");
       row.className = "lesson-row";
-      row.style.gridTemplateColumns = "1fr 160px 110px auto";
+      row.style.gridTemplateColumns = "1fr 140px 90px 170px auto";
       if (a && a.id) row.setAttribute("data-id", a.id);
+      if (a && a.file_path) row.setAttribute("data-file-path", a.file_path);
       row.innerHTML =
         '<input class="input" placeholder="Assignment title" />' +
         '<input class="input" type="date" />' +
         '<input class="input" type="number" placeholder="Max pts" />' +
+        '<input class="input asg-file" type="file" accept=".pdf,image/*" title="Attach the assignment PDF" />' +
         '<button type="button" class="row-remove" aria-label="Remove assignment">✕</button>';
       if (a) {
-        var ins = row.querySelectorAll("input");
+        var ins = row.querySelectorAll('input:not([type=file])');
         ins[0].value = a.title || "";
         ins[1].value = a.due_date || "";
         ins[2].value = a.max_points || 100;
+        if (a.file_path) row.querySelector(".asg-file").title = "A PDF is already attached — choose a new file to replace it.";
       }
       row.querySelector(".row-remove").addEventListener("click", function () { row.remove(); });
       assignments.appendChild(row);
@@ -206,11 +209,14 @@
       });
       var assignmentsArr = [];
       document.querySelectorAll("#assignments .lesson-row").forEach(function (row) {
-        var ins = row.querySelectorAll("input");
+        var ins = row.querySelectorAll('input:not([type=file])');
         var t = ins[0].value.trim();
         if (!t) return;
+        var fileInput = row.querySelector(".asg-file");
         assignmentsArr.push({ id: row.getAttribute("data-id") || null, title: t,
-          due_date: ins[1].value || null, max_points: parseInt(ins[2].value, 10) || 100 });
+          due_date: ins[1].value || null, max_points: parseInt(ins[2].value, 10) || 100,
+          file: fileInput && fileInput.files[0] ? fileInput.files[0] : null,
+          file_path: row.getAttribute("data-file-path") || null });
       });
       return { course: course, modulesArr: modulesArr, assignmentsArr: assignmentsArr };
     }

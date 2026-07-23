@@ -33,9 +33,9 @@ var MEETING_PLATFORMS = {
     name: "Microsoft Teams",
     color: "#6264A7",
     // Teams "Meet now" flow for the signed-in Microsoft account
-    newMeetingUrl: "https://teams.live.com/meet",
+    newMeetingUrl: "https://teams.live.com",
     // Real backend swap: Microsoft Graph POST /me/onlineMeetings
-    joinHint: "teams.live.com/meet/…",
+    joinHint: "teams.live.com/…",
   },
 };
 
