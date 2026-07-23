@@ -141,7 +141,7 @@
         document.getElementById("scheduleModal").classList.remove("open");
         document.getElementById("sTitle").value = "";
         document.getElementById("sLink").value = "";
-        showToast(link ? "Session scheduled on " + platformOf(platform).name : "Session scheduled — add the meeting link before it starts");
+        showToast(link ? t("Session scheduled on") + " " + platformOf(platform).name : t("Session scheduled — add the meeting link before it starts"));
       }
       if (dbReady()) {
         dbCreateSession({

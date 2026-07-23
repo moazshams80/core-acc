@@ -124,7 +124,7 @@
           btn.disabled = false; btn.textContent = "Issue Certificate";
           if (err) { showToast(err); return; }
           document.getElementById("cFile").value = "";
-          showToast("Certificate issued — code " + code);
+          showToast(t("Certificate issued — code") + " " + code);
           loadIssued();
         });
       });
@@ -142,7 +142,7 @@
           var c2 = items.find(function (x) { return x.id === r.getAttribute("data-revoke"); });
           if (!c2) return;
           var who = c2.student ? c2.student.first_name : "this student";
-          if (!confirm("Revoke " + who + "'s certificate?\n\nThe file is deleted and code " + c2.verification_code + " will no longer verify.")) return;
+          if (!confirm(t("Revoke the certificate for") + " " + who + "?\n\n" + t("The file is deleted and this code will no longer verify."))) return;
           r.disabled = true;
           dbRevokeCertificate(c2, function (err) {
             if (err) { r.disabled = false; showToast("Could not revoke: " + err); return; }

@@ -91,7 +91,7 @@
         if (!btn) return;
         var approve = !!ap;
         var name = btn.getAttribute("data-name");
-        if (!approve && !confirm("Reject " + name + "'s instructor request?\n\nThey will keep a student account.")) return;
+        if (!approve && !confirm(t("Reject the instructor request from") + " " + name + "?\n\n" + t("They will keep a student account."))) return;
         btn.disabled = true;
         dbReviewTeacher(btn.getAttribute(approve ? "data-approve" : "data-reject"), approve, function (err) {
           if (err) { btn.disabled = false; showToast("Could not save: " + err); return; }

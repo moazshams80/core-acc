@@ -246,10 +246,10 @@
       var lostLessons = originalLessonIds.filter(function (x) { return keptLessons.indexOf(x) === -1; }).length;
       var lostAsgs = originalAssignmentIds.filter(function (x) { return keptAsgs.indexOf(x) === -1; }).length;
       if (lostLessons || lostAsgs) {
-        var warn = "You are about to permanently delete:\n";
-        if (lostAsgs) warn += "\n• " + lostAsgs + " assignment(s) — along with every student submission and grade for them";
-        if (lostLessons) warn += "\n• " + lostLessons + " lesson(s) — along with students' completion progress";
-        warn += "\n\nThis cannot be undone. Continue?";
+        var warn = t("You are about to permanently delete:") + "\n";
+        if (lostAsgs) warn += "\n• " + lostAsgs + " " + t("assignment(s) — along with every student submission and grade for them");
+        if (lostLessons) warn += "\n• " + lostLessons + " " + t("lesson(s) — along with students' completion progress");
+        warn += "\n\n" + t("This cannot be undone. Continue?");
         if (!confirm(warn)) return;
       }
 
@@ -305,7 +305,7 @@
       var del = e.target.closest("[data-delmat]");
       if (del) {
         var mm = items.find(function (x) { return x.id === del.getAttribute("data-delmat"); });
-        if (!mm || !confirm('Remove "' + mm.title + '"? Students will lose access to it.')) return;
+        if (!mm || !confirm(mm.title + " — " + t("Remove this material? Students will lose access to it."))) return;
         del.disabled = true;
         dbDeleteMaterial(mm, function (err) {
           if (err) { del.disabled = false; showToast("Could not remove: " + err); return; }

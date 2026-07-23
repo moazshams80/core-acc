@@ -160,7 +160,7 @@
         currentSub.status = "graded";
         currentSub.score = v;
         document.getElementById("gradeModal").classList.remove("open");
-        showToast("Grade saved for " + teacherStudentById(currentSub.studentId).name);
+        showToast(t("Grade saved for") + " " + teacherStudentById(currentSub.studentId).name);
         render();
       }
       if (dbReady()) {
